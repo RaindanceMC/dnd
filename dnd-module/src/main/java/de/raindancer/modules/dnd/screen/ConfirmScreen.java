@@ -1,5 +1,7 @@
 package de.raindancer.modules.dnd.screen;
 
+import de.raindancer.core.ui.menu.Backdrop;
+import de.raindancer.modules.dnd.store.DndPack;
 import de.raindancer.core.ui.chat.Brand;
 import de.raindancer.core.ui.menu.ConfirmMenu;
 import de.raindancer.core.ui.menu.Menu;
@@ -18,5 +20,10 @@ public final class ConfirmScreen extends ConfirmMenu implements IDndScreen {
     @Override
     public String describe() {
         return "a yes or no before something that cannot be taken back";
+    }
+
+    @Override
+    protected Backdrop backdrop() {
+        return DndPack.parchment(layout().rows());
     }
 }

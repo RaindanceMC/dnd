@@ -1,5 +1,6 @@
 package de.raindancer.modules.dnd.screen;
 
+import de.raindancer.core.ui.menu.Backdrop;
 import de.raindancer.core.ui.effect.Cues;
 import de.raindancer.core.ui.menu.Icons;
 import de.raindancer.core.ui.menu.Menu;
@@ -46,70 +47,25 @@ public final class SheetMenu extends Menu implements IDndScreen {
     static final int REST = 41;
     static final int ORIGIN = 43;
 
-    /** The background glyph and the spaces around it, in the pack's "sheet" font. */
-    private static final String BACKGROUND = "\uF808\uE000\uF8A9";
-    private static final net.kyori.adventure.key.Key FONT = net.kyori.adventure.key.Key.key(DndPack.NAMESPACE, "sheet");
-    private static final net.kyori.adventure.text.format.TextColor INK =
-            net.kyori.adventure.text.format.TextColor.color(0x4A3220);
-
     @Override
     protected Component title() {
         return MINI.deserialize("<dark_gray>Character sheet");
     }
 
-    /** Whether this viewer sees the painted sheet: only with the pack on, or the title would show its glyphs. */
-    private boolean designed() {
-        return services.core().resourcePacks().isWearing(viewer.getUniqueId());
+    @Override
+    protected Backdrop backdrop() {
+        return DndPack.SHEET_BACKDROP;
     }
 
+    /** On the painted sheet the title is the hero's class and level, written on the page. */
     @Override
     public Component windowTitle() {
         if (!designed()) {
             return super.windowTitle();
         }
-        String heading = services.heroes().of(viewer.getUniqueId())
+        return Component.text(services.heroes().of(viewer.getUniqueId())
                 .map(hero -> hero.heroClass().title() + ", level " + hero.level())
-                .orElse("Character sheet");
-        return Component.text(BACKGROUND).font(FONT).color(net.kyori.adventure.text.format.NamedTextColor.WHITE)
-                .append(Component.text(heading).font(net.kyori.adventure.key.Key.key("minecraft", "default"))
-                        .color(INK));
-    }
-
-    /** On the painted sheet the page itself is the background: no filler panes over it. */
-    @Override
-    protected void decorate() {
-        if (!designed()) {
-            super.decorate();
-        }
-    }
-
-    @Override
-    public void open() {
-        super.open();
-        veil();
-    }
-
-    @Override
-    public void refresh() {
-        super.refresh();
-        veil();
-    }
-
-    /** The chrome row's filler panes become invisible, so the painted leather strip shows instead. */
-    private void veil() {
-        if (!designed()) {
-            return;
-        }
-        for (int slot = 0; slot < getInventory().getSize(); slot++) {
-            ItemStack item = getInventory().getItem(slot);
-            if (item != null && (item.getType() == Material.GRAY_STAINED_GLASS_PANE
-                    || item.getType() == Material.BLACK_STAINED_GLASS_PANE)) {
-                ItemStack blank = DndPack.dress(new ItemStack(Material.PAPER), "ui/blank");
-                blank.setData(io.papermc.paper.datacomponent.DataComponentTypes.TOOLTIP_DISPLAY,
-                        io.papermc.paper.datacomponent.item.TooltipDisplay.tooltipDisplay().hideTooltip(true).build());
-                getInventory().setItem(slot, blank);
-            }
-        }
+                .orElse("Character sheet"));
     }
 
     @Override

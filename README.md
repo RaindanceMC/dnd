@@ -23,6 +23,7 @@ designed character sheet:
 | ![Magic items, in Blockbench](docs/screenshots/11-items-blockbench.png) | ![Every icon](docs/screenshots/12-icons.png) |
 | ![Potions on a wall](docs/screenshots/14-wall-close.png) | ![Gear on a wall](docs/screenshots/15-wall-gear.png) |
 | ![The character sheet](docs/screenshots/16-sheet.png) | ![Spell icons](docs/screenshots/17-spell-icons.png) |
+| ![Choosing a class, on parchment](docs/screenshots/19-parchment-classes.png) | ![The spellbook, on parchment](docs/screenshots/20-parchment-spellbook.png) |
 
 Taken with the real client by `AdventurersScreenshotsTest` and `AdventurersLooksScreenshotsTest` in
 [e2e](https://github.com/RaindanceMC/e2e). The art is made in `dnd-module/art/`: `items/` (Blockbench models, built

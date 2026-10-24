@@ -16,7 +16,7 @@ OUT = os.path.join(HERE, "..", "..", "src", "main", "resources", "de", "raindanc
 W, H = 176, 222
 SLOT = 18
 TOP = (7, 17)          # the first chest slot's outer corner
-INVENTORY_TOP = 139    # the player's inventory, three rows, then the hotbar at 197
+INVENTORY_TOP = 138    # the player's inventory, three rows, then the hotbar at 196 (measured from generic_54)
 
 rng = random.Random(5)
 img = Image.new("RGBA", (W, H), (0, 0, 0, 0))

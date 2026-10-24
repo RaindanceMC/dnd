@@ -1,5 +1,7 @@
 package de.raindancer.modules.dnd.screen;
 
+import de.raindancer.core.ui.menu.Backdrop;
+import de.raindancer.modules.dnd.store.DndPack;
 import de.raindancer.core.ui.effect.Cues;
 import de.raindancer.core.ui.menu.Icons;
 import de.raindancer.core.ui.menu.Menu;
@@ -114,5 +116,10 @@ public final class ClassMenu extends Menu implements IDndScreen {
     @Override
     public String describe() {
         return "the six classes, side by side, to choose from";
+    }
+
+    @Override
+    protected Backdrop backdrop() {
+        return DndPack.parchment(layout().rows());
     }
 }

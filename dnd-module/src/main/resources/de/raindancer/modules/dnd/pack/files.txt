@@ -1,3 +1,4 @@
+assets/rainsadventurers/font/parchment.json
 assets/rainsadventurers/font/sheet.json
 assets/rainsadventurers/items/class/barbarian.json
 assets/rainsadventurers/items/class/cleric.json
@@ -318,6 +319,12 @@ assets/rainsadventurers/models/item/subclass/wild_magic.json
 assets/rainsadventurers/models/item/ui/blank.json
 assets/rainsadventurers/models/item/ui/empty.json
 assets/rainsadventurers/models/item/ui/sheet.json
+assets/rainsadventurers/textures/font/parchment/parchment_1.png
+assets/rainsadventurers/textures/font/parchment/parchment_2.png
+assets/rainsadventurers/textures/font/parchment/parchment_3.png
+assets/rainsadventurers/textures/font/parchment/parchment_4.png
+assets/rainsadventurers/textures/font/parchment/parchment_5.png
+assets/rainsadventurers/textures/font/parchment/parchment_6.png
 assets/rainsadventurers/textures/font/sheet.png
 assets/rainsadventurers/textures/item/class/barbarian.png
 assets/rainsadventurers/textures/item/class/cleric.png

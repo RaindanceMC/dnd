@@ -1,5 +1,7 @@
 package de.raindancer.modules.dnd.screen;
 
+import de.raindancer.core.ui.menu.Backdrop;
+import de.raindancer.modules.dnd.store.DndPack;
 import de.raindancer.core.ui.effect.Cues;
 import de.raindancer.core.ui.menu.Menu;
 import de.raindancer.core.ui.menu.PaginatedMenu;
@@ -79,5 +81,10 @@ public final class SpellPickerMenu extends PaginatedMenu<Castable> implements ID
     @Override
     public String describe() {
         return "everything the hero knows, to choose one stance slot's content from";
+    }
+
+    @Override
+    protected Backdrop backdrop() {
+        return DndPack.parchment(layout().rows());
     }
 }

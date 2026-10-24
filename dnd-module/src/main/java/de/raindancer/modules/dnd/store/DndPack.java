@@ -2,6 +2,7 @@ package de.raindancer.modules.dnd.store;
 
 import de.raindancer.core.RainsCore;
 import de.raindancer.core.content.pack.JarPack;
+import de.raindancer.core.ui.menu.Backdrop;
 import de.raindancer.core.platform.log.Log;
 import de.raindancer.modules.dnd.model.Feature;
 import de.raindancer.modules.dnd.model.HeroClass;
@@ -38,6 +39,14 @@ public final class DndPack {
     private static final String OWNER = "Adventurers";
     private static final String NAME = "looks";
     private static volatile List<String> files;
+    private static final net.kyori.adventure.text.format.TextColor INK =
+            net.kyori.adventure.text.format.TextColor.color(0x4A3220);
+    private static final net.kyori.adventure.key.Key PARCHMENT_FONT =
+            net.kyori.adventure.key.Key.key(NAMESPACE, "parchment");
+    /** The character sheet's own page; its slots are where {@code art/gui/sheet.py} painted them. */
+    public static final Backdrop SHEET_BACKDROP =
+            new Backdrop(net.kyori.adventure.key.Key.key(NAMESPACE, "sheet"), "\uF808\uE000\uF8A9", INK,
+                    Backdrop.TITLE_FONT);
 
     private DndPack() {
     }
@@ -58,6 +67,12 @@ public final class DndPack {
         }
         files = known;
         return known;
+    }
+
+    /** Every other adventurers' menu: a parchment page, in the sheet's hand. */
+    public static Backdrop parchment(int rows) {
+        return new Backdrop(PARCHMENT_FONT, "\uF808" + (char) (0xE000 + Math.max(1, Math.min(6, rows))) + "\uF8A9",
+                INK, Backdrop.TITLE_FONT);
     }
 
     public static String iconOf(Spell spell) {
