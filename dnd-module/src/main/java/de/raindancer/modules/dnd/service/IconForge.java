@@ -30,6 +30,7 @@ public final class IconForge implements IDndService {
     private final SpellSlotRule slots;
     private final FeatureRule features;
     private final DamageRule damage;
+    private volatile DndSettings settings = DndSettings.DEFAULTS;
 
     public IconForge(SpellSlotRule slots, FeatureRule features, DamageRule damage) {
         this.slots = slots;
@@ -39,7 +40,7 @@ public final class IconForge implements IDndService {
 
     @Override
     public void settings(DndSettings settings) {
-        // Drawing reads nothing configurable.
+        this.settings = settings == null ? DndSettings.DEFAULTS : settings;
     }
 
     public static String ordinal(int level) {
@@ -75,7 +76,8 @@ public final class IconForge implements IDndService {
                 dice.forEach(one -> parts.add(one.toString()));
                 String kind = spell.kind().name().toLowerCase(Locale.ROOT);
                 lore.add("<dark_gray>" + String.join(" + ", parts) + " " + kind
-                        + spell.save().map(ability -> ", " + ability.title() + " save").orElse(""));
+                        + spell.save().filter(ability -> settings.abilityScores())
+                        .map(ability -> ", " + ability.title() + " save").orElse(""));
             }
             if (spell.concentration()) {
                 lore.add("<dark_gray>Concentration");

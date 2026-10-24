@@ -68,4 +68,25 @@ class ParchmentTest {
         assertThat(DndPack.parchment(3).titleFont()).as("the storybook capitals are the adventurers' own")
                 .isEqualTo(Backdrop.TITLE_FONT);
     }
+
+    @Test
+    @DisplayName("Without ability scores the sheet is painted without their row, in the same font")
+    void simpleSheet() throws Exception {
+        assertThat(DndPack.SHEET_SIMPLE_BACKDROP.font()).isEqualTo(DndPack.SHEET_BACKDROP.font());
+        assertThat(DndPack.SHEET_SIMPLE_BACKDROP.glyphs()).isNotEqualTo(DndPack.SHEET_BACKDROP.glyphs());
+        String glyph = String.valueOf(DndPack.SHEET_SIMPLE_BACKDROP.glyphs().charAt(1));
+        try (InputStream in = DndPack.class.getResourceAsStream(DndPack.ROOT + "assets/rainsadventurers/font/sheet.json")) {
+            JsonObject font = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
+            boolean found = false;
+            for (JsonElement p : font.getAsJsonArray("providers")) {
+                JsonObject provider = p.getAsJsonObject();
+                if (provider.has("chars") && provider.getAsJsonArray("chars").get(0).getAsString().equals(glyph)) {
+                    String file = provider.get("file").getAsString().replace("rainsadventurers:", "assets/rainsadventurers/textures/");
+                    assertThat(DndPack.files()).contains(file);
+                    found = true;
+                }
+            }
+            assertThat(found).isTrue();
+        }
+    }
 }

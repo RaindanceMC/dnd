@@ -41,6 +41,7 @@ public final class SheetMenu extends Menu implements IDndScreen {
     static final int PORTRAIT = 4;
     static final int HIT_DICE = 6;
     static final int[] ABILITIES = {10, 11, 12, 14, 15, 16};
+    static final int D20 = 13;
     static final int[] LEDGER = {19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34};
     static final int SPELLBOOK = 37;
     static final int STANCE = 39;
@@ -54,7 +55,7 @@ public final class SheetMenu extends Menu implements IDndScreen {
 
     @Override
     protected Backdrop backdrop() {
-        return DndPack.SHEET_BACKDROP;
+        return services.config().abilityScores() ? DndPack.SHEET_BACKDROP : DndPack.SHEET_SIMPLE_BACKDROP;
     }
 
     /** On the painted sheet the title is the hero's class and level, written on the page. */
@@ -83,7 +84,9 @@ public final class SheetMenu extends Menu implements IDndScreen {
         }
         Hero hero = found.get();
         header(hero);
-        abilities(hero);
+        if (services.config().abilityScores()) {
+            abilities(hero);
+        }
         resources(hero);
         doors(hero);
         danger(Icons.of(Material.BARRIER, "<red>Change class",
@@ -110,14 +113,18 @@ public final class SheetMenu extends Menu implements IDndScreen {
                 "<green>Level " + hero.level() + " " + hero.heroClass().title(), progress));
 
         List<String> lore = new ArrayList<>();
-        lore.add("<gray>Proficiency bonus: <white>+" + progression.proficiency(hero.level()));
-        if (hero.heroClass().castsSpells()) {
-            lore.add("<gray>Spell save DC: <white>" + services.checks().spellDc(hero));
-            lore.add("<gray>Spell attack: <white>+" + services.checks().spellAttackBonus(hero));
+        if (services.config().abilityScores()) {
+            lore.add("<gray>Proficiency bonus: <white>+" + progression.proficiency(hero.level()));
+            if (hero.heroClass().castsSpells()) {
+                lore.add("<gray>Spell save DC: <white>" + services.checks().spellDc(hero));
+                lore.add("<gray>Spell attack: <white>+" + services.checks().spellAttackBonus(hero));
+            }
+            var armour = viewer.getAttribute(org.bukkit.attribute.Attribute.ARMOR);
+            lore.add("<gray>Armour class: <white>" + services.checks().playerArmourClass(
+                    armour == null ? 0 : (int) Math.round(armour.getValue()), hero.modifier(Ability.DEXTERITY)));
+        } else {
+            lore.add("<gray>Level " + hero.level() + " " + hero.heroClass().title());
         }
-        var armour = viewer.getAttribute(org.bukkit.attribute.Attribute.ARMOR);
-        lore.add("<gray>Armour class: <white>" + services.checks().playerArmourClass(
-                armour == null ? 0 : (int) Math.round(armour.getValue()), hero.modifier(Ability.DEXTERITY)));
         set(PORTRAIT, Icons.head(viewer, "<white>" + viewer.getName(), lore));
 
         int left = hero.level() - hero.hitDiceSpent();
@@ -154,6 +161,11 @@ public final class SheetMenu extends Menu implements IDndScreen {
             set(ABILITIES[index++], Icons.of(icon, "<white>" + ability.title() + " " + score, lore),
                     click -> raise(ability));
         }
+        set(D20, DndPack.dress(Icons.of(Material.FIRE_CHARGE, "<gold>The d20",
+                "<gray>Every check, attack and save is a d20",
+                "<gray>plus an ability's modifier,",
+                "<gray>plus <white>+" + services.progression().proficiency(hero.level())
+                        + "</white> where you are proficient."), DndPack.D20));
     }
 
     private void raise(Ability ability) {

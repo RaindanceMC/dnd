@@ -32,7 +32,7 @@
         <!-- 0.2.1: /adventurer stance and /adventurer rest close an open menu first. -->
         <!-- 0.3.0: its own looks — a 32px icon for every spell, feature, class, subclass and metamagic; 3D models
              for every magic item, made in Blockbench; rune overlays for +1 to +3 swords and axes. -->
-        <plugin.version>0.4.0</plugin.version>
+        <plugin.version>0.5.0</plugin.version>
     </properties>
 
     <dependencies>

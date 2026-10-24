@@ -249,7 +249,7 @@ public final class SpellService implements IDndService {
         int armourClass = armourClassOf(target);
         int die = cast.extras().advantage() ? checks.d20WithAdvantage(random) : checks.d20(random, false);
         Roll roll = checks.attack(die, bonus, armourClass);
-        if (tell && settings.showRolls()) {
+        if (tell && settings.tellsRolls()) {
             String key = roll.critical() ? "dnd.roll.attack-critical" : roll.fumble() ? "dnd.roll.attack-fumble"
                     : roll.succeeded() ? "dnd.roll.attack-hit" : "dnd.roll.attack-miss";
             messages.send(cast.caster(), key, "die", String.valueOf(roll.die()), "bonus", signed(roll.bonus()),
@@ -793,7 +793,7 @@ public final class SpellService implements IDndService {
             onTarget(player, () -> heroes.change(player, hero -> features.spend(hero, Feature.INDOMITABLE)));
             messages.send(player, "dnd.indomitable");
         }
-        if (tell && settings.showRolls()) {
+        if (tell && settings.tellsRolls()) {
             messages.send(cast.caster(), roll.succeeded() ? "dnd.roll.save-made" : "dnd.roll.save-failed",
                     "name", nameOf(target), "ability", ability.shortName(), "die", String.valueOf(roll.die()),
                     "bonus", signed(roll.bonus()), "total", String.valueOf(roll.total()), "dc", String.valueOf(dc));

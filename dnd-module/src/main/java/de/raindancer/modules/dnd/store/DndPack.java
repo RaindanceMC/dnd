@@ -36,6 +36,7 @@ public final class DndPack {
     static final String ROOT = "/de/raindancer/modules/dnd/pack/";
     public static final String EMPTY = "ui/empty";
     public static final String SHEET = "ui/sheet";
+    public static final String D20 = "ui/d20";
     private static final String OWNER = "Adventurers";
     private static final String NAME = "looks";
     private static volatile List<String> files;
@@ -68,6 +69,11 @@ public final class DndPack {
         files = known;
         return known;
     }
+
+    /** The sheet without the ability scores' row, for a server that switched them off. */
+    public static final Backdrop SHEET_SIMPLE_BACKDROP =
+            new Backdrop(net.kyori.adventure.key.Key.key(NAMESPACE, "sheet"), "\uF808\uE001\uF8A9", INK,
+                    Backdrop.TITLE_FONT);
 
     /** Every other adventurers' menu: a parchment page, in the sheet's hand. */
     public static Backdrop parchment(int rows) {

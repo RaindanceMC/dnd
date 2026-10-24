@@ -146,6 +146,12 @@ def paint_face(pixels, x0, y0, face, rng, colours=None, frame=0):
                     t -= 1.3
                 if kind == "page" and 2 <= x < w - 2 and y % 3 == 1 and y > 1 and y < h - 2 and rng.random() < 0.82:
                     t = 0.2
+            elif kind == "smooth":
+                # One surface cut into slices: no edge of its own, so the slices read as one curve; the shading
+                # comes from the colour each slice is given.
+                if face.side in ("up", "down"):
+                    t = 2.2 if face.side == "up" else 3.8  # pre-darkened: the renderer lights a ledge from above, and every slice would draw a line
+                t += noise * 0.15
             elif kind == "speckle":
                 t += noise * 1.3 + (-1.2 if rng.random() < 0.12 else 0)
             elif kind == "cloth":
@@ -174,7 +180,7 @@ def paint_face(pixels, x0, y0, face, rng, colours=None, frame=0):
                 else:
                     t = 0.6 + noise * 0.4
             # Bevel: the rim facing the light is brighter, the far rim darker.
-            if kind not in ("glass", "void", "rune"):
+            if kind not in ("glass", "void", "rune", "smooth"):
                 if x == 0 or y == 0:
                     t += 0.9
                 if x == w - 1 or y == h - 1:

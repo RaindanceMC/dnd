@@ -10,6 +10,15 @@
    ]
   },
   {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/sheet_simple.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue001"
+   ]
+  },
+  {
    "type": "space",
    "advances": {
     "\uf808": -8,

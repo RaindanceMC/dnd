@@ -59,16 +59,20 @@ public final class ClassMenu extends Menu implements IDndScreen {
         heroClass.pitch().forEach(line -> lore.add("<gray>" + line));
         lore.add("");
         lore.add("<dark_gray>Hit die: <white>d" + heroClass.hitDie());
-        lore.add("<dark_gray>Best at: <white>" + heroClass.primary().title());
-        List<String> saves = new ArrayList<>();
-        for (Ability ability : Ability.values()) {
-            if (heroClass.proficientIn(ability)) {
-                saves.add(ability.title());
+        if (services.config().abilityScores()) {
+            lore.add("<dark_gray>Best at: <white>" + heroClass.primary().title());
+            List<String> saves = new ArrayList<>();
+            for (Ability ability : Ability.values()) {
+                if (heroClass.proficientIn(ability)) {
+                    saves.add(ability.title());
+                }
             }
+            lore.add("<dark_gray>Saving throws: <white>" + String.join(", ", saves));
+            lore.add("<dark_gray>Spells: <white>" + heroClass.spellcasting().map(Ability::title)
+                    .map(name -> "yes, with " + name).orElse("none, class features instead"));
+        } else {
+            lore.add("<dark_gray>Spells: <white>" + (heroClass.castsSpells() ? "yes" : "none, class features instead"));
         }
-        lore.add("<dark_gray>Saving throws: <white>" + String.join(", ", saves));
-        lore.add("<dark_gray>Spells: <white>" + heroClass.spellcasting().map(Ability::title).map(name -> "yes, with " + name)
-                .orElse("none, class features instead"));
         lore.add("");
         lore.add("<yellow>Click<gray> to become one");
         return de.raindancer.modules.dnd.store.DndPack.dress(Icons.of(heroClass.icon(), "<gold>" + heroClass.title(),

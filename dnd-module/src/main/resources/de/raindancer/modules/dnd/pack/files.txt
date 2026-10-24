@@ -157,6 +157,7 @@ assets/rainsadventurers/items/subclass/life.json
 assets/rainsadventurers/items/subclass/thief.json
 assets/rainsadventurers/items/subclass/wild_magic.json
 assets/rainsadventurers/items/ui/blank.json
+assets/rainsadventurers/items/ui/d20.json
 assets/rainsadventurers/items/ui/empty.json
 assets/rainsadventurers/items/ui/sheet.json
 assets/rainsadventurers/models/item/class/barbarian.json
@@ -317,6 +318,7 @@ assets/rainsadventurers/models/item/subclass/life.json
 assets/rainsadventurers/models/item/subclass/thief.json
 assets/rainsadventurers/models/item/subclass/wild_magic.json
 assets/rainsadventurers/models/item/ui/blank.json
+assets/rainsadventurers/models/item/ui/d20.json
 assets/rainsadventurers/models/item/ui/empty.json
 assets/rainsadventurers/models/item/ui/sheet.json
 assets/rainsadventurers/textures/font/parchment/parchment_1.png
@@ -326,6 +328,7 @@ assets/rainsadventurers/textures/font/parchment/parchment_4.png
 assets/rainsadventurers/textures/font/parchment/parchment_5.png
 assets/rainsadventurers/textures/font/parchment/parchment_6.png
 assets/rainsadventurers/textures/font/sheet.png
+assets/rainsadventurers/textures/font/sheet_simple.png
 assets/rainsadventurers/textures/item/class/barbarian.png
 assets/rainsadventurers/textures/item/class/cleric.png
 assets/rainsadventurers/textures/item/class/fighter.png
@@ -512,6 +515,7 @@ assets/rainsadventurers/textures/item/subclass/life.png
 assets/rainsadventurers/textures/item/subclass/thief.png
 assets/rainsadventurers/textures/item/subclass/wild_magic.png
 assets/rainsadventurers/textures/item/ui/blank.png
+assets/rainsadventurers/textures/item/ui/d20.png
 assets/rainsadventurers/textures/item/ui/empty.png
 assets/rainsadventurers/textures/item/ui/sheet.png
 pack.mcmeta

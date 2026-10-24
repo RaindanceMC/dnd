@@ -76,7 +76,7 @@ import java.util.random.RandomGenerator;
  */
 public final class DndModule implements FlexModule {
 
-    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.4.0")
+    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.5.0")
             .describedAs("Classes, levels, spell slots, sorcery points and spells cast from a casting stance.")
             .by("Raindancer118");
 

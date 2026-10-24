@@ -27,6 +27,7 @@ class DndSettingsTest {
         assertThat(defaults.stanceNeedsSneak()).isFalse();
         assertThat(defaults.wildSurgePercent()).isEqualTo(5);
         assertThat(defaults.lootPercent()).isEqualTo(100);
+        assertThat(defaults.abilityScores()).isTrue();
     }
 
     @Test
@@ -45,9 +46,9 @@ class DndSettingsTest {
         DndSettings changed = defaults.withXpPercent(200).withHealthPercent(50)
                 .withSpellDamagePercent(80).withPlayerDamagePercent(10).withShowRolls(false).withActionMillis(1)
                 .withBonusActionMillis(2).withShortRestSeconds(3).withLongRestMinutes(4).withStanceNeedsSneak(true).withWildSurgePercent(50)
-                .withLootPercent(7);
+                .withLootPercent(7).withAbilityScores(false);
         assertThat(changed).isEqualTo(new DndSettings(List.of(), 200, 50, 80, 10, false, 1, 2, 3, 4, true, 50,
-                7));
+                7, false));
         assertThat(defaults.withXpPercent(5).healthPercent()).isEqualTo(defaults.healthPercent());
     }
 }

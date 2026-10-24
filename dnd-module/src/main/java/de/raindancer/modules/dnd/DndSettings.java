@@ -95,10 +95,18 @@ public record DndSettings(
         @Describe("Percent of the normal chance that a monster drops a magic item. 0 switches drops off; "
                 + "bosses always drop one unless this is 0.")
         @Key("loot-percent")
-        int lootPercent) {
+        int lootPercent,
+
+        @In("dnd") @Title("Ability scores")
+        @Describe("Off: nobody sees or spends Strength, Intelligence and the rest — a class is its level, its spells "
+                + "and its features. Each class keeps fixed scores underneath, its main one rising by itself at levels "
+                + "4, 8, 12, 16 and 19, and the dice are not shown. Points players already spent are kept for when "
+                + "this is switched back on.")
+        @Key("ability-scores")
+        boolean abilityScores) {
 
     public static final DndSettings DEFAULTS = new DndSettings(List.of(), 100, 25, 100, 50, true, 1200, 500,
-            30, 15, false, 5, 100);
+            30, 15, false, 5, 100, true);
 
     public boolean worksIn(String world) {
         if (worlds == null || worlds.isEmpty()) {
@@ -111,77 +119,88 @@ public record DndSettings(
     public DndSettings withWorlds(List<String> value) {
         return new DndSettings(value, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak, wildSurgePercent, lootPercent);
+                stanceNeedsSneak, wildSurgePercent, lootPercent, abilityScores);
     }
 
     public DndSettings withXpPercent(int value) {
         return new DndSettings(worlds, value, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak, wildSurgePercent, lootPercent);
+                stanceNeedsSneak, wildSurgePercent, lootPercent, abilityScores);
     }
 
     public DndSettings withHealthPercent(int value) {
         return new DndSettings(worlds, xpPercent, value, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak, wildSurgePercent, lootPercent);
+                stanceNeedsSneak, wildSurgePercent, lootPercent, abilityScores);
     }
 
 
     public DndSettings withSpellDamagePercent(int value) {
         return new DndSettings(worlds, xpPercent, healthPercent, value, playerDamagePercent,
-                showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes, stanceNeedsSneak, wildSurgePercent, lootPercent);
+                showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes, stanceNeedsSneak, wildSurgePercent, lootPercent, abilityScores);
     }
 
     public DndSettings withPlayerDamagePercent(int value) {
         return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent, value,
-                showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes, stanceNeedsSneak, wildSurgePercent, lootPercent);
+                showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes, stanceNeedsSneak, wildSurgePercent, lootPercent, abilityScores);
     }
 
     public DndSettings withShowRolls(boolean value) {
         return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, value, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak, wildSurgePercent, lootPercent);
+                stanceNeedsSneak, wildSurgePercent, lootPercent, abilityScores);
     }
 
     public DndSettings withActionMillis(int value) {
         return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, value, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak, wildSurgePercent, lootPercent);
+                stanceNeedsSneak, wildSurgePercent, lootPercent, abilityScores);
     }
 
     public DndSettings withBonusActionMillis(int value) {
         return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, value, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak, wildSurgePercent, lootPercent);
+                stanceNeedsSneak, wildSurgePercent, lootPercent, abilityScores);
     }
 
     public DndSettings withShortRestSeconds(int value) {
         return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, value, longRestMinutes,
-                stanceNeedsSneak, wildSurgePercent, lootPercent);
+                stanceNeedsSneak, wildSurgePercent, lootPercent, abilityScores);
     }
 
     public DndSettings withLongRestMinutes(int value) {
         return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, value,
-                stanceNeedsSneak, wildSurgePercent, lootPercent);
+                stanceNeedsSneak, wildSurgePercent, lootPercent, abilityScores);
     }
 
     public DndSettings withWildSurgePercent(int value) {
         return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak, value, lootPercent);
+                stanceNeedsSneak, value, lootPercent, abilityScores);
     }
 
     public DndSettings withLootPercent(int value) {
         return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak, wildSurgePercent, value);
+                stanceNeedsSneak, wildSurgePercent, value, abilityScores);
     }
 
     public DndSettings withStanceNeedsSneak(boolean value) {
         return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                value, wildSurgePercent, lootPercent);
+                value, wildSurgePercent, lootPercent, abilityScores);
+    }
+
+    public DndSettings withAbilityScores(boolean value) {
+        return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
+                playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
+                stanceNeedsSneak, wildSurgePercent, lootPercent, value);
+    }
+
+    /** Whether the dice are told: only with ability scores on, since every roll is a score at work. */
+    public boolean tellsRolls() {
+        return showRolls && abilityScores;
     }
 }

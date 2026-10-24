@@ -52,6 +52,7 @@ public final class HeroService implements IDndService {
     private final LoadoutRule loadouts;
     private final SorceryRule sorcery;
     private final de.raindancer.modules.dnd.rules.SubclassRule subclasses;
+    private final de.raindancer.modules.dnd.rules.AbilityRule abilities;
     private final Messages messages;
     private final Effects effects;
     private final ActionBars actionBars;
@@ -70,6 +71,7 @@ public final class HeroService implements IDndService {
                        LoadoutRule loadouts, SorceryRule sorcery, Messages messages, Effects effects,
                        ActionBars actionBars, de.raindancer.modules.dnd.rules.SubclassRule subclasses) {
         this.subclasses = subclasses;
+        this.abilities = new de.raindancer.modules.dnd.rules.AbilityRule(progression);
         this.plugin = plugin;
         this.server = server;
         this.log = log;
@@ -92,9 +94,14 @@ public final class HeroService implements IDndService {
         this.changed = listener == null ? player -> { } : listener;
     }
 
+    /** The hero as every rule sees it — with the derived scores while ability scores are switched off. */
     public Optional<Hero> of(UUID player) {
         Entry entry = heroes.get(player);
-        return entry == null ? Optional.empty() : Optional.of(entry.hero());
+        return entry == null ? Optional.empty() : Optional.of(shown(entry.hero()));
+    }
+
+    private Hero shown(Hero stored) {
+        return abilities.shown(stored, settings.abilityScores());
     }
 
     /** Read from the database, so a class may be chosen; false while loading or when it could not be read. */
@@ -165,7 +172,8 @@ public final class HeroService implements IDndService {
         UUID id = player.getUniqueId();
         Entry[] after = new Entry[1];
         heroes.computeIfPresent(id, (key, entry) -> {
-            Hero next = subclasses.settled(how.apply(entry.hero()));
+            Hero next = abilities.kept(entry.hero(), subclasses.settled(how.apply(shown(entry.hero()))),
+                    settings.abilityScores());
             after[0] = next.equals(entry.hero()) ? entry : new Entry(next, entry.rev(), true);
             return after[0];
         });
@@ -173,7 +181,7 @@ public final class HeroService implements IDndService {
             return Optional.empty();
         }
         changed.accept(player);
-        return Optional.of(after[0].hero());
+        return Optional.of(shown(after[0].hero()));
     }
 
     /** A new class, always from level 1: a level belongs to the class it was earned in. */
@@ -192,7 +200,7 @@ public final class HeroService implements IDndService {
         if (subclasses.choosing(fresh)) {
             messages.send(player, "dnd.subclass.waiting");
         }
-        return Optional.of(fresh);
+        return Optional.of(shown(fresh));
     }
 
     /** Experience from a kill or a staff member, scaled by the setting. */
@@ -261,7 +269,7 @@ public final class HeroService implements IDndService {
         if (subclasses.choosing(now) && !subclasses.choosing(before)) {
             messages.send(player, "dnd.subclass.waiting");
         }
-        if (now.improvements() > before.improvements()) {
+        if (settings.abilityScores() && now.improvements() > before.improvements()) {
             messages.send(player, "dnd.improvement-earned", "points", String.valueOf(now.improvements()));
         }
         List<String> fresh = now.loadout().stream().filter(id -> !id.isEmpty() && !before.loadout().contains(id))

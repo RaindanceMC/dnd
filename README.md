@@ -47,6 +47,8 @@ Staff (`rainsadventurers.admin`):
 
 Everything an owner can tune (worlds, experience, health per level, spell damage, damage against players, waits, rest lengths, wild surge chance, loot rate) is under `/settings` → Adventurers.
 
+**Lighter play:** `/settings set ability-scores false` takes Strength, Intelligence and the rest out of the game for players — a class is its level, its spells and its features. Each class keeps fixed scores underneath, its main one rising by itself at levels 4, 8, 12, 16 and 19; the sheet loses its ability row and the dice stay quiet. Points already spent are kept for when it is switched back on.
+
 ## Build
 
 ```

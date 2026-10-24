@@ -7,6 +7,7 @@ title through a font glyph. Every frame sits exactly under a slot SheetMenu puts
 import math
 import os
 import random
+import sys
 
 from PIL import Image
 
@@ -18,6 +19,7 @@ SLOT = 18
 TOP = (7, 17)          # the first chest slot's outer corner
 INVENTORY_TOP = 138    # the player's inventory, three rows, then the hotbar at 196 (measured from generic_54)
 
+SIMPLE = "--simple" in sys.argv
 rng = random.Random(5)
 img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
 px = img.load()
@@ -172,21 +174,28 @@ x0, y0 = slot_origin(4, 0)
 for i in range(7):
     put(x0 - 3 - i, y0 + 9 + i // 2, (70, 110, 50))
     put(x0 + SLOT + 2 + i, y0 + 9 + i // 2, (70, 110, 50))
-# Row 1: two triads of abilities, the d20 between them
-for column in (1, 2, 3, 5, 6, 7):
-    frame(column, 1, "ink")
-cx, cy = slot_origin(4, 1)
-cx, cy = cx + 9, cy + 9
-for y in range(-8, 9):
-    for x in range(-8, 9):
-        if abs(x) + abs(y) * 0.85 <= 8:
-            facet = (x + y) > 0
-            edge = abs(x) + abs(y) * 0.85 > 7
-            put(cx + x, cy + y, GOLD_DARK if edge else (GOLD if facet else GOLD_LIGHT))
-for x, y in ((0, -3), (-2, 2), (2, 2), (0, 0)):
-    put(cx + x, cy + y, INK)
-put(cx - 1, cy - 1, INK)
-put(cx + 1, cy - 1, INK)
+# Row 1: two triads of abilities, the d20 in a gilded frame between them — or, without ability scores, a flourish
+if not SIMPLE:
+    for column in (1, 2, 3, 5, 6, 7):
+        frame(column, 1, "ink")
+    frame(4, 1, "gold")  # the d20 sits here: an item drawn in art/d20, not painted on the page
+else:
+    fx0, fy = slot_origin(1, 1)[0], slot_origin(1, 1)[1] + 9
+    fx1 = slot_origin(8, 1)[0]
+    mid = (fx0 + fx1) // 2
+    for x in range(fx0, fx1):
+        d = abs(x - mid)
+        if d > 3:
+            put(x, fy, mix(PARCHMENT_DARK, INK, 0.55 if d < 40 else 0.35), 220)
+    for dy in range(-3, 4):
+        for dx in range(-3, 4):
+            if abs(dx) + abs(dy) <= 3:
+                put(mid + dx, fy + dy, GOLD_LIGHT if dx + dy < 0 else (GOLD if abs(dx) + abs(dy) < 3 else GOLD_DARK))
+    for side in (-1, 1):
+        for i in range(3):
+            put(mid + side * (8 + i * 6), fy - 1, GOLD_DARK)
+            put(mid + side * (8 + i * 6), fy + 1, GOLD_DARK)
+
 # Rows 2 and 3: the ledger of resources and features
 lx0, ly0 = slot_origin(1, 2)
 lx1, ly1 = slot_origin(8, 4)
@@ -240,6 +249,6 @@ for row in range(4):
                     put(x, y, mix(LEATHER, LEATHER_DARK, 0.45 + noise(x, y, 0.05)))
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
-img.save(OUT)
-img.resize((W * 3, H * 3), Image.NEAREST).save(os.path.join(HERE, "sheet-preview.png"))
+img.save(OUT.replace("sheet.png", "sheet_simple.png") if SIMPLE else OUT)
+img.resize((W * 3, H * 3), Image.NEAREST).save(os.path.join(HERE, "sheet-simple-preview.png" if SIMPLE else "sheet-preview.png"))
 print("sheet ->", OUT)
