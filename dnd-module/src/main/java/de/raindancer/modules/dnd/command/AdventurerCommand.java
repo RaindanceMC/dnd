@@ -52,8 +52,12 @@ public final class AdventurerCommand implements IDndCommand {
             case "" -> live.screens().sheet(player);
             case "class" -> live.screens().classes(player);
             case "spells" -> live.screens().spellbook(player);
-            case "rest" -> live.resting().startShort(player);
+            case "rest" -> {
+                player.closeInventory();
+                live.resting().startShort(player);
+            }
             case "stance" -> live.heroes().of(player.getUniqueId()).ifPresentOrElse(hero -> {
+                player.closeInventory();
                 if (live.stance().isIn(player.getUniqueId())) {
                     live.stance().leave(player, false);
                 } else {

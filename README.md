@@ -5,6 +5,18 @@
 
 Part of [RaindanceMC](https://github.com/RaindanceMC); built on [RainsCore](https://github.com/RaindanceMC/RainsCore) and the shared parent in [framework](https://github.com/RaindanceMC/framework).
 
+## How it looks
+
+| | |
+|---|---|
+| ![Choosing a class](docs/screenshots/1-classes.png) | ![The character sheet](docs/screenshots/2-sheet.png) |
+| ![The spellbook](docs/screenshots/3-spellbook.png) | ![Picking Fireball](docs/screenshots/4-spell-picker.png) |
+| ![The casting stance](docs/screenshots/5-stance.png) | ![A fireball](docs/screenshots/6-fireball.png) |
+| ![A sorcerer's origin](docs/screenshots/7-origins.png) | ![A wild surge](docs/screenshots/8-surge-poppies.png) |
+| ![After a few surges](docs/screenshots/9-surge-aftermath.png) | ![Magic items](docs/screenshots/10-items.png) |
+
+Taken with the real client by `AdventurersScreenshotsTest` in [e2e](https://github.com/RaindanceMC/e2e).
+
 ## Playing
 
 - `/adventurer` (`/dnd`) — choose a class, then the character sheet: abilities, slots, features, spellbook.
