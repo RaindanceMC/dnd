@@ -1,0 +1,54 @@
+id: adventurer
+title: Adventurers
+summary: Pick a class, level up by slaying monsters, and play a tabletop hero inside Minecraft.
+intro: |
+  Somebody on this server decided that survival needed hit dice. I approve. {run:/adventurer} opens your character sheet, and everything below hangs off that one book.
+icon: ENCHANTED_BOOK
+category: Progress & rewards
+order: 40
+module: dnd
+aliases: [adventurer, adventurers, dnd, character, sheet, class, classes, hero, rpg, levels, xp]
+keywords: [level, experience, d20, dice, saving, throw, armour, hit, points, proficiency, subclass, spellbook, tabletop]
+commands: [adventurer]
+related: [adventurer-classes, adventurer-spells, adventurer-rest, adventurer-items]
+sections:
+  - question: What is this?
+    title: The idea
+    text: |
+      A tabletop-style class system laid over normal Minecraft survival, after the open SRD 5.1 rules. You choose a <white>class</white> (fighter, barbarian, rogue, wizard, sorcerer or cleric) and grow from level 1 to 20 by defeating monsters. Classes change your health, armour and attacks; casters get spells; everybody gets features, rests and magic items.
+      {if:dnd:ability-scores}Rolls are a d20 plus ability modifiers, like at the table.{else}Ability scores are switched off here, so you never see or spend them and the dice stay hidden — a class is simply its level, spells and features.{/if}
+  - question: How do I start?
+    title: Choosing a class
+    text: |
+      Type {run:/adventurer} and click <white>Choose a class</white> (or {run:/adventurer class}). Pick one and you begin at level 1. Then press <white>F</white> to take up your casting stance. You can change class later, but you start again at <red>level 1</red> — it asks first, and the new class is a fresh start.
+      {if:dnd:worlds}Classes only work in these worlds: <white>{setting:dnd:worlds}</white>. Elsewhere you give no extra health, cannot cast and earn nothing — your hero is kept, not lost.{else}Classes work in every world.{/if}
+  - question: What is on the character sheet?
+    title: The sheet
+    text: |
+      {run:/adventurer} shows your level and progress, your hit dice, {if:dnd:ability-scores}your six abilities with their modifiers and saving throws (click one to spend an improvement point), {/if}your armour class, spell slots and sorcery points, class features and how many uses are left, the spellbook, the casting stance, and a button for a short rest. Change class is the red button.
+  - question: How do I gain levels?
+    title: Experience
+    text: |
+      By defeating monsters. A zombie or skeleton is worth 50 experience, a creeper or witch 100, a blaze or wither skeleton 200, a ravager or evoker 450, and bosses far more: elder guardian 1,800, warden 5,000, wither 10,000, ender dragon 20,000. {if:dnd:xp-percent != 100}This server awards <white>{setting:dnd:xp-percent|percent}</white> of those numbers.{else}This server uses the book's numbers exactly.{/if}{if:dnd:xp-percent == 0} Levelling from kills is switched off.{/if}
+      Level 2 needs 300, level 3 900, level 4 2,700, level 5 6,500 and level 20 355,000 experience.
+  - question: What do I get when I level up?
+    title: Level-ups
+    text: |
+      More health, more spell slots and spells for casters, new features, a bigger proficiency bonus (+2 to +6) and bigger cantrips at levels 5, 11 and 17. At levels 4, 8, 12, 16 and 19 you also earn two ability points{if:dnd:ability-scores}, spent on your sheet{else}. With ability scores off they are not spent by hand: your class's main score simply rises by itself at those levels{/if}. Fighters, barbarians and rogues earn a subclass at 3, wizards at 2; clerics and sorcerers have one from level 1.
+  - question: How much health do I have?
+    title: Health
+    text: |
+      Level 1 is Minecraft's normal twenty. Every level after adds the average of your class's hit die plus your Constitution modifier, scaled to <white>{setting:dnd:health-percent|percent}</white> of the table so a level 20 hero does not wear a wall of hearts. Fighters and barbarians have the biggest dice, wizards and sorcerers the smallest. Armour works like normal Minecraft, plus bonuses from your class.
+  - question: How do spells and fights get damage?
+    title: Damage balance
+    text: |
+      Spells do <white>{setting:dnd:combat.spell-damage-percent|percent}</white> of what the dice roll. Against other players they do only <white>{setting:dnd:combat.player-damage-percent|percent}</white> of that, since players have far fewer hit points than the book assumes — and whether players can hurt each other at all is the server's PvP rule, which spells obey like any other attack.
+  - question: Can I see the dice?
+    title: Dice
+    when: dnd:combat.show-rolls && dnd:ability-scores
+    text: |
+      Yes. Attacks and saving throws tell you the roll: the d20, the bonus, the total and what it had to beat, with natural 20s as critical hits (double damage) and natural 1s as misses.
+  - question: Where did my class go if I leave?
+    title: Keeping your hero
+    text: |
+      Your hero is saved on the server (and shared across the network). It is saved every few seconds and when you leave. If it cannot be read, nothing about it can change until staff fix that — it never overwrites newer progress with older.

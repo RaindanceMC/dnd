@@ -1,0 +1,59 @@
+id: adventurer-spells
+title: Casting Spells
+summary: The casting stance, spell slots, upcasting, concentration, sorcery points, metamagic and the spellbook.
+intro: |
+  Press F, wave your hands, and set something on fire — politely, and within your slots. This is how magic works here.
+icon: BLAZE_ROD
+category: Progress & rewards
+order: 42
+module: dnd
+aliases: [spells, spell, stance, casting, slots, spellbook, metamagic, sorcery, concentration, fireball]
+keywords: [cast, f, hotbar, slot, upcast, cantrip, save, dc, attack, wizard, sorcerer, cleric, scroll, point, font]
+related: [adventurer, adventurer-classes, adventurer-rest, adventurer-items]
+sections:
+  - question: How do I cast a spell?
+    title: The casting stance
+    text: |
+      {if:dnd:stance.sneak-to-enter}<white>Sneak and press F</white> to take up your casting stance; plain F still swaps hands.{else}Press <white>F</white> (swap hands) to take up the casting stance.{/if} Your hotbar becomes your spells and features: <white>click</white> an icon to cast it, left- or right-click, aiming at what you want. Press F again to leave — your real hotbar comes back exactly as it was, even after a crash or a death. {cmd:/adventurer stance} does the same.
+      Slots 1 to 8 hold your choices; slot 9 is your sheet (or a sorcerer's metamagic).
+  - question: How do I choose my spells?
+    title: The spellbook
+    text: |
+      {run:/adventurer spells} (or clicking an empty slot in the stance) opens the spellbook: click a stance slot, then pick from everything you can use at your level. Right-click a slot to empty it. When you level up, new things that fit into empty slots are added by themselves.
+  - question: What are spell slots?
+    title: Slots
+    text: |
+      Casting a spell of 1st level or higher spends a slot. Wizards, sorcerers and clerics are full casters: 2 first-level slots at level 1, rising to nine levels of slots by level 17. <white>Cantrips</white> (level 0) cost nothing, and grow stronger at levels 5, 11 and 17. A spell uses the lowest free slot that is high enough; <white>sneak while clicking</white> to <white>upcast</white> — use your highest slot for a stronger spell. Slots come back with a long rest.
+  - question: What are the waits?
+    title: Actions and bonus actions
+    text: |
+      After a spell or feature that takes an action you wait <white>{setting:dnd:combat.action-millis|number}</white> milliseconds before the next one; bonus-action spells (Healing Word, Misty Step, Shield, Quickened spells) wait <white>{setting:dnd:combat.bonus-action-millis|number}</white>. The wait shows on the action bar. A thief's features and Action Surge shorten or cancel it.
+  - question: What is concentration?
+    title: Concentration
+    text: |
+      Some spells need you to concentrate: only one at a time, and a new one ends the old one. Being hit forces a Constitution save (difficulty 10, or half the damage if higher) to keep it; a failed save or death ends it. You are told when it ends.
+  - question: How do spells hit things?
+    title: Attacks and saves
+    text: |
+      Bolts and rays need an attack roll against the target's armour class; area spells let creatures roll a saving throw against your spell save DC — half damage on a success, or none for some. {if:dnd:ability-scores}Your DC and attack bonus are on the sheet, from your spellcasting ability and proficiency.{/if} Spells obey protection plugins and the server's PvP rule like any other attack.
+  - question: What spells exist?
+    title: The spell list
+    text: |
+      Wizards and sorcerers share the arcane list, clerics have the divine one, a few are on both. Arcane: Fire Bolt, Ray of Frost, Magic Missile, Burning Hands, Shield, Misty Step, Fireball, Lightning Bolt, Haste, Cone of Cold, Chain Lightning, Disintegrate, Meteor Swarm, Power Word Kill and more. Divine: Sacred Flame, Cure Wounds, Healing Word, Bless, Spirit Guardians, Death Ward, Mass Cure Wounds, Heal, Mass Heal. 48 spells in all, from cantrips to 9th level.
+  - question: What is Font of Magic?
+    title: Sorcery points
+    text: |
+      A sorcerer from level 2 has sorcery points equal to their level. On the sheet, <white>Font of Magic</white> turns points into slots (a 1st-level slot costs 2, 2nd 3, 3rd 5, 4th 6, 5th 7) or a slot into points (as many as its level). Slots made this way vanish at your next long rest; points refill on a long rest.
+  - question: What is metamagic?
+    title: Metamagic
+    text: |
+      Sorcerers from level 3 bend spells with points: <white>Quickened</white> (2) makes it a bonus action; <white>Twinned</white> (the spell's level) hits a second target; <white>Empowered</white> (1) rerolls low damage dice; <white>Extended</white> (1) doubles what the spell leaves behind; <white>Heightened</white> (3) makes the first target save twice; <white>Careful</white> (1) spares friendly players. Click slot 9 in the stance to cycle which one is active, then cast.
+  - question: What is a wild magic surge?
+    title: Wild magic
+    when: dnd:combat.wild-surge-percent > 0
+    text: |
+      Wild Magic sorcerers have a <white>{setting:dnd:combat.wild-surge-percent|percent}</white> chance on every spell cast from a slot that magic goes strange: one of 100 effects, good, bad or merely silly. Summoned creatures disappear again shortly. Tides of Chaos gives advantage on a spell attack, after which your next spell is guaranteed to surge.
+  - question: Can I read spell scrolls?
+    title: Scrolls
+    text: |
+      Yes, if the spell is on your class's list (thieves can read any): hold it and right-click. It casts at the scroll's level without using a slot, then crumbles. See {topic:adventurer-items}.

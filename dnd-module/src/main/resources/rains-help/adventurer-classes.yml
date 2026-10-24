@@ -1,0 +1,55 @@
+id: adventurer-classes
+title: Classes and Features
+summary: Fighter, barbarian, rogue, wizard, sorcerer and cleric — what each does, level by level, and their subclasses.
+intro: |
+  Six ways to be useful and one way to die gloriously. Choose well; changing class means starting again at level 1.
+icon: IRON_SWORD
+category: Progress & rewards
+order: 41
+module: dnd
+aliases: [classes-dnd, fighter, barbarian, rogue, wizard, sorcerer, cleric, features, subclass, subclasses, rage]
+keywords: [champion, berserker, thief, evocation, wild, magic, draconic, life, domain, second, wind, action, surge, sneak, attack, turn, undead]
+related: [adventurer, adventurer-spells, adventurer-rest]
+sections:
+  - question: Which class should I pick?
+    title: Choosing
+    text: |
+      <white>Fighter:</white> sturdy and simple. <white>Barbarian:</white> rage and toughness. <white>Rogue:</white> sneaky and fast. <white>Wizard:</white> the widest spell list. <white>Sorcerer:</white> flexible magic and sorcery points. <white>Cleric:</white> the best healer, and an answer to undead.
+      Fighters, barbarians and rogues have no spells; their strength is in <white>features</white>: some always work, some you trigger from the casting stance like spells.
+  - question: What does the Fighter do?
+    title: Fighter
+    text: |
+      <white>Second Wind</white> (L1): heal 1d10 plus your level; back after a short rest. <white>Defense</white> (L1): two more armour in a chestplate. <white>Action Surge</white> (L2): every wait is over and for six seconds you are faster and hit harder. <white>Extra Attack</white> (L5): melee hits harder, more at 11 and 20. <white>Indomitable</white> (L9): reroll a failed saving throw once per long rest.
+      <white>Champion</white> (subclass at L3): critical hits (10%, 15% from L15), a little more speed and jump, +2 melee damage at L10, and below half health you regain health at L18.
+  - question: What does the Barbarian do?
+    title: Barbarian
+    text: |
+      <white>Rage</white> (L1, long rest): for a minute your melee hits harder and every blow against you does half. <white>Unarmored Defense</white> (L1): without a chestplate, your toughness is your armour. <white>Reckless Attack</white> (L2): eight seconds of much stronger blows while blows against you land harder. <white>Fast Movement</white> (L5): a tenth faster.
+      <white>Path of the Berserker</white> (L3): Frenzy (swing faster, then exhaustion), Mindless Rage (immune to blinding and confusion), Intimidating Presence (frighten what you glare at), Retaliation (hit back whoever hits you in melee).
+  - question: What does the Rogue do?
+    title: Rogue
+    text: |
+      <white>Sneak Attack</white> (L1): extra dice on a melee hit while sneaking, unseen, from behind or against a foe busy with someone else — at most once every second and a half. <white>Cunning Action</white> (L2): Dash, Hide and Disengage from the stance. <white>Uncanny Dodge</white> (L5): the first blow every six seconds does half. <white>Evasion</white> (L7): area damage does half, or nothing when you save.
+      <white>Thief</white> (L3): shorter waits, higher jumps, longer hiding, scrolls of any class and quicker actions at L17.
+  - question: What does the Wizard do?
+    title: Wizard
+    text: |
+      A full caster with the longest spell list, up to 9th-level magic at level 17. <white>Arcane Recovery:</white> once per long rest, win back spent spell slots worth half your level (nothing above 5th level) from the stance.
+      <white>School of Evocation</white> (L2): Sculpt Spells (your area spells spare other players), Potent Cantrip (a missed cantrip still does half), Empowered Evocation (add your Intelligence to damage, L10), Overchannel (your next 1st-5th-level spell does maximum damage, L14).
+  - question: What does the Sorcerer do?
+    title: Sorcerer
+    text: |
+      A full caster who runs on <white>sorcery points</white> (equal to their level from L2). <white>Font of Magic</white> turns points into spell slots and back on your sheet; <white>Metamagic</white> (L3) bends spells for points — see {topic:adventurer-spells}. You choose an origin at level 1:
+      <white>Wild Magic:</white> any spell from a slot may surge; Tides of Chaos, Bend Luck, Controlled Chaos, Spell Bombardment. <white>Draconic Bloodline:</white> more health and scale armour, fire spells add Charisma and fire hurts you half, <white>dragon wings</white> at L14, Draconic Presence at L18.
+  - question: What does the Cleric do?
+    title: Cleric
+    text: |
+      A full caster of healing and radiance. <white>Channel Divinity: Turn Undead</white> (L2): undead nearby must save or flee, weakened; from level 5 the weakest are destroyed. <white>Life Domain</white>: <white>Disciple of Life</white> (your healing heals more), <white>Preserve Life</white> (heal the players near you), <white>Blessed Healer</white> (healing others heals you), <white>Divine Strike</white> (radiant damage on melee hits) and <white>Supreme Healing</white> (L17: maximum healing dice).
+  - question: How do features and uses work?
+    title: Uses and recharging
+    text: |
+      Active features sit on the casting stance beside spells. Many have limited uses that come back after a <white>short rest</white> (Second Wind, Action Surge, Channel Divinity) or a <white>long rest</white> (Rage, Arcane Recovery, Indomitable, Tides of Chaos). The sheet shows uses left. "Bonus action" features have a short wait; others use the normal action wait.
+  - question: When do I choose a subclass?
+    title: Subclasses
+    text: |
+      Fighters, barbarians and rogues are given theirs automatically at level 3, wizards at level 2. Sorcerers choose at level 1 — your sheet shows <white>Choose your origin</white>. An origin is chosen once; changing class resets it.

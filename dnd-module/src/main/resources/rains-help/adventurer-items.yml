@@ -1,0 +1,46 @@
+id: adventurer-items
+title: Magic Items
+summary: Potions, scrolls, wands, rings, boots, bags and plus-weapons — what they do and how to find them.
+intro: |
+  Loot! The kind that glows and has a rarity. Monsters drop it, staff hand it out, and it all works the same for everybody.
+icon: POTION
+category: Items & enchantments
+order: 44
+module: dnd
+aliases: [magic-items, loot, potions, scrolls, wand, rings, adventurer-loot, bag-of-holding]
+keywords: [healing, heroism, speed, spell, scroll, wand, charges, ring, protection, amulet, health, boots, bag, holding, weapon, plus, rarity]
+related: [adventurer, adventurer-spells]
+sections:
+  - question: Where do magic items come from?
+    title: Loot
+    text: |
+      From monsters you defeat, now and then. {if:dnd:loot-percent > 0}Tougher monsters drop more often (a creeper about one in twenty-one with the book's rate, bosses always) and better things; the server's drop rate is <white>{setting:dnd:loot-percent|percent}</white> of normal.{else}Drops are switched off on this server; staff can still hand items out.{/if}
+      Rarity runs Common, Uncommon, Rare, Very rare, Legendary, shown in the name's colour.
+  - question: What do the potions do?
+    title: Potions
+    text: |
+      Drink them like any potion. <white>Healing</white> heals 2d4+2, <white>Greater</white> 4d4+4, <white>Superior</white> 8d4+8 and <white>Supreme</white> 10d4+20. <white>Heroism</white>: ten temporary hit points and a minute of blessed strength. <white>Speed</white>: a minute of haste, faster legs and hands, harder skin.
+  - question: How do spell scrolls work?
+    title: Scrolls
+    text: |
+      Hold one and right-click. If the spell is on your class's list (a Thief reads any), it is cast, and the scroll crumbles; if it went wrong, you keep it. A scroll's rarity is its spell's level: common up to 1st, legendary at 9th.
+  - question: What is the Wand of Magic Missiles?
+    title: Wand
+    text: |
+      Seven charges of Magic Missile. Right-click to spend one; sneak and right-click to spend three for a stronger volley. It regains one charge every three minutes. Anybody can use it, whatever their class.
+  - question: What do rings, amulets and boots do?
+    title: Worn items
+    text: |
+      <white>Ring of Protection</white>, held in your off hand: more armour and +1 on every saving throw. <white>Amulet of Health</white>, off hand: your Constitution counts as 19. <white>Boots of Striding and Springing</white>, worn: you walk faster and jump three times as high.
+  - question: What about the Bag of Holding?
+    title: Bag of Holding
+    text: |
+      Right-click it and your <white>ender chest</white> opens, wherever you are. It stores nothing of its own, so nothing can be lost or duplicated through the bag.
+  - question: What are plus weapons?
+    title: Plus weapons
+    text: |
+      A +1, +2 or +3 weapon adds that much damage to every blow, or every arrow if it is a bow. Swords and axes glow with pulsing runes for the rune pack.
+  - question: Can I trade or share these?
+    title: Trading
+    text: |
+      They are real items marked with their identity, so you can store, trade and sell them like any other. A scroll or potion is used up; the rest last until you lose them.

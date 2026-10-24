@@ -1,0 +1,31 @@
+id: adventurer-rest
+title: Resting
+summary: Short rests with hit dice, long rests by sleeping — what comes back, and when.
+intro: |
+  Even heroes need to sit down occasionally. Rests are how slots, hit points and uses come back.
+icon: RED_BED
+category: Progress & rewards
+order: 43
+module: dnd
+aliases: [rest, resting, sleep, longrest, shortrest, hitdice, hit-dice]
+keywords: [short, long, night, recover, heal, slots, uses, dice]
+related: [adventurer, adventurer-spells, adventurer-classes]
+sections:
+  - question: What is a short rest?
+    title: Short rest
+    text: |
+      Type {run:/adventurer rest} (or use the sheet's bed) and then stand still, unhurt, for <white>{setting:dnd:rest.short-seconds|seconds}</white>. When it ends you spend as many <white>hit dice</white> as you need to heal what is missing (each heals the class's average roll plus Constitution), and everything that recharges on a short rest comes back: Second Wind, Action Surge, Channel Divinity and so on.
+      Move or get hurt and the rest is over with nothing restored.
+  - question: What is a long rest?
+    title: Long rest
+    text: |
+      Sleep through the night. Everyone sleeping when the night is skipped gets a long rest: full health, <white>every spell slot</white>, every sorcery point and every feature use come back, and half your hit dice (at least one).
+      {if:dnd:rest.long-minutes > 0}You can only take a long rest once every <white>{setting:dnd:rest.long-minutes|minutes}</white>; sleeping sooner just refuses and tells you how long to wait.{else}There is no limit: every night you sleep through counts.{/if}
+  - question: What are hit dice?
+    title: Hit dice
+    text: |
+      You have as many as your level, of the size your class uses (d6 for wizards and sorcerers up to d12 for barbarians). Short rests spend only what you need. The sheet shows how many are left.
+  - question: What gets ended by a long rest?
+    title: Long-rest extras
+    text: |
+      Spells that last "until your next long rest" end there — Mage Armor, Aid and Death Ward — and so do borrowed bonuses. Slots made from sorcery points vanish.
