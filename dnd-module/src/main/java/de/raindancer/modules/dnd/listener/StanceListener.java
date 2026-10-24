@@ -219,6 +219,7 @@ public final class StanceListener implements IDndListener {
         Player player = event.getPlayer();
         event.getDrops().removeIf(IconTags::isIcon);
         services.concentration().end(player, null);
+        services.features().foldWings(player);
         if (!services.stance().isIn(player.getUniqueId())) {
             return;
         }

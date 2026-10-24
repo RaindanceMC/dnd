@@ -55,7 +55,7 @@ class ModelTest {
     @DisplayName("a hero keeps its lists the right length and its numbers in range")
     void heroIsTidy() {
         Hero hero = new Hero(UUID.randomUUID(), HeroClass.WIZARD, 99, -5, new AbilityScores(10, 10, 10, 10, 10, 10),
-                -1, List.of("a"), List.of(0, 5), -3, 50, null, 0);
+                -1, List.of("a"), List.of(0, 5), -3, 50, null, 0, null);
         assertThat(hero.level()).isEqualTo(20);
         assertThat(hero.xp()).isZero();
         assertThat(hero.loadout()).hasSize(Hero.LOADOUT_SIZE);

@@ -171,6 +171,10 @@ public final class IconForge implements IDndService {
         }
     }
 
+    public static List<String> wrapText(String text) {
+        return wrap(text);
+    }
+
     static List<String> wrap(String text) {
         List<String> lines = new ArrayList<>();
         StringBuilder line = new StringBuilder();

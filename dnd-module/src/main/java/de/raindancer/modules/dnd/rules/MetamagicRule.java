@@ -9,7 +9,7 @@ import de.raindancer.modules.dnd.model.Spell;
 public final class MetamagicRule implements IDndRule {
 
     public boolean knows(Hero hero) {
-        return Feature.METAMAGIC.has(hero.heroClass(), hero.level());
+        return Feature.METAMAGIC.has(hero);
     }
 
     public boolean fits(Metamagic metamagic, Spell spell) {

@@ -26,7 +26,10 @@
 
         <!-- 0.1.0: the first release — six classes (fighter, barbarian, rogue, wizard, sorcerer, cleric),
              levels 1 to 20, spell slots, sorcery points and metamagic, the casting stance, short and long rests. -->
-        <plugin.version>0.1.0</plugin.version>
+        <!-- 0.2.0: subclasses (Champion, Berserker, Thief, Evocation, Life, and the sorcerer's choice of Wild Magic
+             with its own d100 surge table or Draconic Bloodline); magic items — potions, spell scrolls, +1 to +3
+             weapons, a wand, ring, amulet, boots, a bag — dropped by monsters by rarity. -->
+        <plugin.version>0.2.0</plugin.version>
     </properties>
 
     <dependencies>

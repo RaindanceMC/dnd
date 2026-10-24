@@ -11,5 +11,15 @@ public enum Condition {
     /** Invisibility that attacking or casting ends. */
     HIDDEN,
     /** Paralysed by Hold Person. */
-    HELD
+    HELD,
+    /** Tides of Chaos: the next spell attack roll has advantage. */
+    TIDES,
+    /** Bend Luck: creatures saving against this caster subtract a d4. */
+    BENT_LUCK,
+    /** Overchannel: the next 1st- to 5th-level damage spell rolls its highest. */
+    OVERCHANNELLING,
+    /** A wild surge: spells cost no slot. */
+    FREE_CASTING,
+    /** Frightened by Intimidating or Draconic Presence. */
+    FRIGHTENED
 }

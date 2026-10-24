@@ -55,6 +55,7 @@ public final class CastingService implements IDndService {
     private final Map<Feature, Cooldowns<UUID>> featureWaits = new EnumMap<>(Feature.class);
 
     private volatile DndSettings settings = DndSettings.DEFAULTS;
+    private volatile SurgeService surges;
 
     public CastingService(Messages messages, Effects effects, ActionBars actionBars, HeroService heroes,
                           StanceService stance, SpellService spells, FeatureService featureService,
@@ -82,6 +83,11 @@ public final class CastingService implements IDndService {
             }
         }
         settings(DndSettings.DEFAULTS);
+    }
+
+    /** Wild magic, told after every spell from a slot. */
+    public void surgesWith(SurgeService surges) {
+        this.surges = surges;
     }
 
     @Override
@@ -131,6 +137,11 @@ public final class CastingService implements IDndService {
             refuse(player, "dnd.feature.none-left", "name", feature.title());
             return;
         }
+        int points = features.sorceryCost(feature);
+        if (hero.sorceryPoints() < points) {
+            refuse(player, "dnd.feature.too-few-points", "name", feature.title(), "cost", String.valueOf(points));
+            return;
+        }
         Cooldowns<UUID> wait = featureWaits.get(feature);
         if (wait != null && !wait.isReady(id)) {
             long seconds = Math.max(1, wait.remaining(id).orElse(Duration.ZERO).toSeconds());
@@ -142,17 +153,23 @@ public final class CastingService implements IDndService {
             effects.play(id, Cues.NO);
             return;
         }
-        heroes.change(player, now -> features.spend(feature == Feature.ARCANE_RECOVERY ? after : now, feature));
+        heroes.change(player, now -> features.spend(feature == Feature.ARCANE_RECOVERY ? after : now, feature)
+                .withSorceryPoints(Math.max(0, now.sorceryPoints() - points)));
         if (feature == Feature.ACTION_SURGE) {
-            actions.forget(id);
-            bonusActions.forget(id);
-            featureWaits.values().forEach(each -> each.forget(id));
+            endWaits(id);
         } else {
-            turn.start(id);
+            begin(turn, id, hero);
             showWait(player, feature.bonusAction());
         }
         if (wait != null) {
-            wait.start(id);
+            int full = features.cooldownSeconds(feature);
+            int mine = features.cooldownSeconds(feature, hero);
+            if (mine < full) {
+                wait.forget(id);
+                wait.restore(id, System.currentTimeMillis() - (full - mine) * 1000L);
+            } else {
+                wait.start(id);
+            }
         }
         effects.play(id, Cues.ABILITY);
         actionBars.show(id, "dnd-cast", messages.get("dnd.cast.used", "name", feature.title()),
@@ -181,26 +198,39 @@ public final class CastingService implements IDndService {
             return;
         }
         int slotLevel = 0;
+        boolean free = conditions.has(id, Condition.FREE_CASTING);
         if (!spell.isCantrip()) {
             Optional<Integer> slot = slots.pick(hero, spell.level(), upcast);
-            if (slot.isEmpty()) {
+            if (slot.isEmpty() && !free) {
                 refuse(player, "dnd.cast.no-slot", "spell", spell.title());
                 return;
             }
-            slotLevel = slot.get();
+            slotLevel = slot.orElse(spell.level());
         }
+        boolean attackRoll = spell.shape() == de.raindancer.modules.dnd.model.SpellShape.BOLT
+                || spell.shape() == de.raindancer.modules.dnd.model.SpellShape.TOUCH;
+        boolean advantage = attackRoll && conditions.has(id, Condition.TIDES);
+        boolean overchannel = spell.harmful() && spell.level() >= 1 && spell.level() <= 5
+                && conditions.has(id, Condition.OVERCHANNELLING);
         if (conditions.has(id, Condition.HIDDEN)) {
             concentration.on(id).filter(focus -> focus.spell() == Spell.INVISIBILITY)
                     .ifPresent(focus -> concentration.end(player, "dnd.cast.visible"));
             conditions.clear(id, Condition.HIDDEN);
         }
         Optional<SpellService.Outcome> outcome = spells.perform(new SpellService.Cast(player, hero, spell,
-                slotLevel, bending));
+                slotLevel, bending, new SpellService.Extras(null, null, advantage, overchannel)));
         if (outcome.isEmpty()) {
             effects.play(id, Cues.NO);
             return;
         }
-        int spent = slotLevel;
+        if (advantage) {
+            conditions.clear(id, Condition.TIDES);
+        }
+        if (overchannel) {
+            conditions.clear(id, Condition.OVERCHANNELLING);
+        }
+        int cast = slotLevel;
+        int spent = free ? 0 : slotLevel;
         Metamagic paid = bending;
         heroes.change(player, now -> {
             Hero after = spent > 0 ? slots.spend(now, spent) : now;
@@ -212,10 +242,63 @@ public final class CastingService implements IDndService {
         if (paid != null) {
             heroes.of(id).ifPresent(now -> stance.disarm(player, now));
         }
-        turn.start(id);
+        begin(turn, id, hero);
         showWait(player, bonus);
         effects.play(id, Cues.MAGIC);
-        tell(player, spell, spent, paid, outcome.get());
+        tell(player, spell, cast, paid, outcome.get());
+        SurgeService wild = surges;
+        if (wild != null && cast > 0) {
+            heroes.of(id).ifPresent(now -> wild.afterCast(player, now, cast));
+        }
+    }
+
+    /**
+     * A spell from a scroll or a wand: the item's numbers, no slot, no metamagic — but it still takes the turn.
+     *
+     * @return whether it went off, so the item knows to spend itself
+     */
+    public boolean castFromItem(Player player, Hero hero, Spell spell, int slotLevel, int dc, int attack) {
+        UUID id = player.getUniqueId();
+        if (!settings.worksIn(player.getWorld().getName())) {
+            refuse(player, "dnd.stance.not-here");
+            return false;
+        }
+        if (conditions.has(id, Condition.HELD)) {
+            refuse(player, "dnd.cast.held");
+            return false;
+        }
+        Cooldowns<UUID> turn = spell.bonusAction() ? bonusActions : actions;
+        if (!ready(player, turn)) {
+            return false;
+        }
+        Optional<SpellService.Outcome> outcome = spells.perform(new SpellService.Cast(player, hero, spell,
+                Math.max(spell.level(), slotLevel), null, SpellService.Extras.fromItem(dc, attack)));
+        if (outcome.isEmpty()) {
+            effects.play(id, Cues.NO);
+            return false;
+        }
+        begin(turn, id, hero);
+        effects.play(id, Cues.MAGIC);
+        tell(player, spell, Math.max(spell.level(), slotLevel), null, outcome.get());
+        return true;
+    }
+
+    /** Starts a wait; Thief's Reflexes takes a quarter off it. */
+    private void begin(Cooldowns<UUID> turn, UUID id, Hero hero) {
+        if (Feature.THIEFS_REFLEXES.has(hero)) {
+            long full = turn == bonusActions ? settings.bonusActionMillis() : settings.actionMillis();
+            turn.forget(id);
+            turn.restore(id, System.currentTimeMillis() - full / 4);
+        } else {
+            turn.start(id);
+        }
+    }
+
+    /** Every wait is over at once: Action Surge, and a wild surge. */
+    public void endWaits(UUID player) {
+        actions.forget(player);
+        bonusActions.forget(player);
+        featureWaits.values().forEach(each -> each.forget(player));
     }
 
     private boolean ready(Player player, Cooldowns<UUID> turn) {

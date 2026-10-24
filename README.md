@@ -10,9 +10,17 @@ Part of [RaindanceMC](https://github.com/RaindanceMC); built on [RainsCore](http
 - `/adventurer` (`/dnd`) — choose a class, then the character sheet: abilities, slots, features, spellbook.
 - **F** (swap hands) — the casting stance: hotbar slots 1–8 become your spells and features, slot 9 your sheet (a sorcerer's metamagic). Click to cast; sneak and click to cast from your highest slot. F again and your hotbar is back.
 - `/adventurer rest` — a short rest: stand still, unhurt, for 30 seconds. Sleeping through the night is a long rest.
-- `/adventurer admin level|xp|rest|reset <player> …` — staff (`rainsadventurers.admin`).
+- A new class always starts at level 1.
+- **Subclasses**: Champion (fighter), Berserker (barbarian), Thief (rogue), Evocation (wizard), Life (cleric) come by themselves; a sorcerer chooses **Wild Magic** (an original d100 surge table, Tides of Chaos, Bend Luck, Controlled Chaos, Spell Bombardment) or **Draconic Bloodline** (scales, fire, dragon wings).
+- **Magic items** drop from monsters by rarity: healing potions, Heroism, Speed, spell scrolls, +1/+2/+3 weapons and bows, a Wand of Magic Missiles, Ring of Protection, Amulet of Health, Boots of Striding and Springing, a Bag of Holding (your ender chest, anywhere).
 
-Everything an owner can tune (worlds, experience, health per level, spell damage, damage against players, waits, rest lengths) is under `/settings` → Adventurers.
+Staff (`rainsadventurers.admin`):
+
+- `/adventurer admin xp <player> <amount>` — adventure experience, levels follow
+- `/adventurer admin level <player> <level>` · `rest <player>` · `reset <player>`
+- `/adventurer admin give <player> <item> [spell]` · `surge <player> [1-100]`
+
+Everything an owner can tune (worlds, experience, health per level, spell damage, damage against players, waits, rest lengths, wild surge chance, loot rate) is under `/settings` → Adventurers.
 
 ## Build
 
@@ -20,7 +28,7 @@ Everything an owner can tune (worlds, experience, health per level, spell damage
 mvn install
 ```
 
-Needs Java 25 and read access to `packages.tstieh.de` (server ids `packages-releases` / `packages-snapshots` in `~/.m2/settings.xml`). The end-to-end scenario is `AdventurersScenarioTest` in [e2e](https://github.com/RaindanceMC/e2e).
+Needs Java 25 and read access to `packages.tstieh.de` (server ids `packages-releases` / `packages-snapshots` in `~/.m2/settings.xml`). The end-to-end scenarios are `AdventurersScenarioTest` in [e2e](https://github.com/RaindanceMC/e2e).
 
 ## Versions
 

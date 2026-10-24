@@ -18,10 +18,11 @@ import java.util.UUID;
  * @param loadout      what sits on hotbar slots 1 to 8 of the casting stance, by id; empty strings are empty slots
  * @param slotsSpent   by slot level, index 0 unused
  * @param longRestAt   epoch milliseconds of the last long rest, 0 for never
+ * @param subclass     the class's second path, or null before it is gained or chosen
  */
 public record Hero(UUID player, HeroClass heroClass, int level, long xp, AbilityScores scores, int improvements,
                    List<String> loadout, List<Integer> slotsSpent, int sorceryPoints, int hitDiceSpent,
-                   Map<Feature, Integer> used, long longRestAt) {
+                   Map<Feature, Integer> used, long longRestAt, Subclass subclass) {
 
     public static final int MOST_LEVEL = 20;
     public static final int LOADOUT_SIZE = 8;
@@ -44,6 +45,9 @@ public record Hero(UUID player, HeroClass heroClass, int level, long xp, Ability
             });
         }
         used = Collections.unmodifiableMap(copy);
+        if (subclass != null && subclass.heroClass() != heroClass) {
+            subclass = null;
+        }
     }
 
     private static List<String> sized(List<String> loadout) {
@@ -67,7 +71,7 @@ public record Hero(UUID player, HeroClass heroClass, int level, long xp, Ability
     /** A level 1 adventurer of that class, rested and with nothing spent. */
     public static Hero fresh(UUID player, HeroClass heroClass, List<String> loadout) {
         return new Hero(player, heroClass, 1, 0, heroClass.startingScores(), 0, loadout, List.of(), 0, 0, Map.of(),
-                0);
+                0, null);
     }
 
     public int modifier(Ability ability) {
@@ -84,22 +88,22 @@ public record Hero(UUID player, HeroClass heroClass, int level, long xp, Ability
 
     public Hero withLevel(int newLevel, long newXp, int newImprovements) {
         return new Hero(player, heroClass, newLevel, newXp, scores, newImprovements, loadout, slotsSpent,
-                sorceryPoints, hitDiceSpent, used, longRestAt);
+                sorceryPoints, hitDiceSpent, used, longRestAt, subclass);
     }
 
     public Hero withXp(long newXp) {
         return new Hero(player, heroClass, level, newXp, scores, improvements, loadout, slotsSpent, sorceryPoints,
-                hitDiceSpent, used, longRestAt);
+                hitDiceSpent, used, longRestAt, subclass);
     }
 
     public Hero withScores(AbilityScores newScores, int newImprovements) {
         return new Hero(player, heroClass, level, xp, newScores, newImprovements, loadout, slotsSpent, sorceryPoints,
-                hitDiceSpent, used, longRestAt);
+                hitDiceSpent, used, longRestAt, subclass);
     }
 
     public Hero withLoadout(List<String> newLoadout) {
         return new Hero(player, heroClass, level, xp, scores, improvements, newLoadout, slotsSpent, sorceryPoints,
-                hitDiceSpent, used, longRestAt);
+                hitDiceSpent, used, longRestAt, subclass);
     }
 
     public Hero withSlotSpent(int slotLevel, int spent) {
@@ -108,22 +112,22 @@ public record Hero(UUID player, HeroClass heroClass, int level, long xp, Ability
             next.set(slotLevel, spent);
         }
         return new Hero(player, heroClass, level, xp, scores, improvements, loadout, next, sorceryPoints,
-                hitDiceSpent, used, longRestAt);
+                hitDiceSpent, used, longRestAt, subclass);
     }
 
     public Hero withSlotsSpent(List<Integer> spent) {
         return new Hero(player, heroClass, level, xp, scores, improvements, loadout, spent, sorceryPoints,
-                hitDiceSpent, used, longRestAt);
+                hitDiceSpent, used, longRestAt, subclass);
     }
 
     public Hero withSorceryPoints(int points) {
         return new Hero(player, heroClass, level, xp, scores, improvements, loadout, slotsSpent, points,
-                hitDiceSpent, used, longRestAt);
+                hitDiceSpent, used, longRestAt, subclass);
     }
 
     public Hero withHitDiceSpent(int spent) {
         return new Hero(player, heroClass, level, xp, scores, improvements, loadout, slotsSpent, sorceryPoints,
-                spent, used, longRestAt);
+                spent, used, longRestAt, subclass);
     }
 
     public Hero withUsed(Feature feature, int count) {
@@ -131,16 +135,25 @@ public record Hero(UUID player, HeroClass heroClass, int level, long xp, Ability
         next.putAll(used);
         next.put(feature.pool(), count);
         return new Hero(player, heroClass, level, xp, scores, improvements, loadout, slotsSpent, sorceryPoints,
-                hitDiceSpent, next, longRestAt);
+                hitDiceSpent, next, longRestAt, subclass);
     }
 
     public Hero withUsed(Map<Feature, Integer> all) {
         return new Hero(player, heroClass, level, xp, scores, improvements, loadout, slotsSpent, sorceryPoints,
-                hitDiceSpent, all, longRestAt);
+                hitDiceSpent, all, longRestAt, subclass);
+    }
+
+    public Hero withSubclass(Subclass chosen) {
+        return new Hero(player, heroClass, level, xp, scores, improvements, loadout, slotsSpent, sorceryPoints,
+                hitDiceSpent, used, longRestAt, chosen);
+    }
+
+    public boolean is(Subclass wanted) {
+        return subclass == wanted;
     }
 
     public Hero withLongRestAt(long at) {
         return new Hero(player, heroClass, level, xp, scores, improvements, loadout, slotsSpent, sorceryPoints,
-                hitDiceSpent, used, at);
+                hitDiceSpent, used, at, subclass);
     }
 }

@@ -15,6 +15,7 @@ import de.raindancer.modules.dnd.rules.ProgressionRule;
 import de.raindancer.modules.dnd.rules.RestRule;
 import de.raindancer.modules.dnd.rules.SorceryRule;
 import de.raindancer.modules.dnd.rules.SpellSlotRule;
+import de.raindancer.modules.dnd.rules.SubclassRule;
 import de.raindancer.modules.dnd.service.BodyService;
 import de.raindancer.modules.dnd.service.CastingService;
 import de.raindancer.modules.dnd.service.CombatService;
@@ -22,7 +23,12 @@ import de.raindancer.modules.dnd.service.ConcentrationService;
 import de.raindancer.modules.dnd.service.ConditionService;
 import de.raindancer.modules.dnd.service.HeroService;
 import de.raindancer.modules.dnd.service.HudService;
+import de.raindancer.modules.dnd.service.FeatureService;
 import de.raindancer.modules.dnd.service.IconForge;
+import de.raindancer.modules.dnd.service.ItemForge;
+import de.raindancer.modules.dnd.service.ItemService;
+import de.raindancer.modules.dnd.service.LootService;
+import de.raindancer.modules.dnd.service.SurgeService;
 import de.raindancer.modules.dnd.service.RestService;
 import de.raindancer.modules.dnd.service.StanceService;
 import org.bukkit.Server;
@@ -45,7 +51,7 @@ public record DndServices(
         ProgressionRule progression,
         SpellSlotRule slots,
         SorceryRule sorcery,
-        FeatureRule features,
+        FeatureRule featureRule,
         HealthRule health,
         CheckRule checks,
         RestRule rests,
@@ -62,6 +68,12 @@ public record DndServices(
         RestService resting,
         HudService hud,
         IconForge icons,
+        FeatureService features,
+        SurgeService surges,
+        ItemService items,
+        LootService loot,
+        ItemForge itemForge,
+        SubclassRule subclasses,
         IDndScreensOpener screens) {
 
     public DndSettings config() {

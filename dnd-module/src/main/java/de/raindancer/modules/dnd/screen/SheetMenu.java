@@ -57,8 +57,7 @@ public final class SheetMenu extends Menu implements IDndScreen {
         resources(hero);
         doors(hero);
         danger(Icons.of(Material.BARRIER, "<red>Change class",
-                services.config().classChangeKeepsLevel() ? "<gray>You keep your level."
-                        : "<gray>You start again at level 1.",
+                "<gray>You start again at level 1.",
                 "<yellow>Click<gray> to see the classes"), click -> new ClassMenu(services, viewer, this).open());
     }
 
@@ -67,11 +66,18 @@ public final class SheetMenu extends Menu implements IDndScreen {
         long next = progression.xpFor(hero.level() + 1);
         int filled = (int) Math.round(progression.progress(hero.xp()) * BAR);
         String bar = "<green>" + "|".repeat(filled) + "<dark_gray>" + "|".repeat(BAR - filled);
+        List<String> progress = new ArrayList<>();
+        progress.add(hero.subclass() == null ? "<dark_gray>No subclass yet"
+                : "<gold>" + hero.subclass().title());
+        if (hero.level() >= 20) {
+            progress.add("<gray>The highest level there is.");
+        } else {
+            progress.add("<gray>Experience: <white>" + hero.xp() + "</white> of " + next);
+            progress.add(bar);
+            progress.add("<dark_gray>Defeat monsters to gain more.");
+        }
         set(MenuLayout.HEADER_LEFT, Icons.of(Material.EXPERIENCE_BOTTLE,
-                "<green>Level " + hero.level() + " " + hero.heroClass().title(),
-                hero.level() >= 20 ? List.of("<gray>The highest level there is.")
-                        : List.of("<gray>Experience: <white>" + hero.xp() + "</white> of " + next, bar,
-                        "<dark_gray>Defeat monsters to gain more.")));
+                "<green>Level " + hero.level() + " " + hero.heroClass().title(), progress));
 
         List<String> lore = new ArrayList<>();
         lore.add("<gray>Proficiency bonus: <white>+" + progression.proficiency(hero.level()));
@@ -150,8 +156,8 @@ public final class SheetMenu extends Menu implements IDndScreen {
                     "<dark_gray>Spent on metamagic and on making slots.",
                     "<dark_gray>A long rest refills them."));
         }
-        FeatureRule features = services.features();
-        for (Feature feature : Feature.of(hero.heroClass(), hero.level())) {
+        FeatureRule features = services.featureRule();
+        for (Feature feature : Feature.of(hero)) {
             List<String> lore = new ArrayList<>();
             if (features.isCounted(feature) && features.uses(feature, hero.level()) > 0 && feature.pool() == feature) {
                 lore.add(features.isUnlimited(feature, hero.level()) ? "<gray>Uses: <white>unlimited"
@@ -185,7 +191,12 @@ public final class SheetMenu extends Menu implements IDndScreen {
                     viewer.closeInventory();
                     services.resting().startShort(viewer);
                 });
-        boolean sorcerer = Feature.FONT_OF_MAGIC.has(hero.heroClass(), hero.level());
+        if (services.subclasses().choosing(hero)) {
+            band(MenuLayout.LAND, 5, Icons.of(Material.CHORUS_FLOWER, "<light_purple>Choose your origin",
+                    "<gray>Wild Magic or the Draconic Bloodline.", "<yellow>Click<gray> to choose"),
+                    click -> new SubclassMenu(services, viewer, this).open());
+        }
+        boolean sorcerer = Feature.FONT_OF_MAGIC.has(hero);
         band(MenuLayout.LAND, 4, sorcerer, Icons.of(Material.AMETHYST_CLUSTER, "<aqua>Font of Magic",
                         "<gray>Turn sorcery points into spell slots and back.", "<yellow>Click<gray> to open"),
                 "Sorcerers from level 2", click -> new FontOfMagicMenu(services, viewer, this).open());

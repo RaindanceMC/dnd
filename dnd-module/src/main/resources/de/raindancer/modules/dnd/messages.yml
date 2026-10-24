@@ -22,6 +22,24 @@ dnd:
   sneak-attack: "<red>Sneak Attack</red> <gray>+<white><damage></white>"
   uncanny-dodge: "<yellow>Uncanny Dodge</yellow> <gray>— you take half."
   death-ward: "<gold>Death Ward holds.</gold> <gray>One hit point, and still standing."
+  critical: "<gold>Critical hit!"
+  surge: "<light_purple>Wild Magic Surge!</light_purple> <dark_gray>(<number>)</dark_gray> <gray><text>"
+  surge-tides: "<light_purple>The tides of chaos come due."
+  surge-spell: "<gray>The surge casts <white><spell></white> through you."
+  loot: "<gold>Loot!</gold> <gray>A <rarity> <white><item></white> falls from your foe."
+
+  subclass:
+    waiting: "<light_purple>Your power has an origin to choose.</light_purple> <gray>Open <white>/adventurer</white>."
+    gained: "<gold>You walk the path of the <white><subclass></white> now."
+    chosen: "<light_purple>Your origin: <white><subclass></white>."
+
+  item:
+    healed: "<green>The potion mends you:</green> <gray>+<white><health></white> health."
+    heroism: "<gold>You feel heroic.</gold> <gray>Ten extra hit points and a minute of strength."
+    speed: "<aqua>The world slows around you.</aqua> <gray>A minute of haste."
+    cannot-read: "<red>The words of <spell> swim on the page. It is not a spell your class can read."
+    scroll-read: "<gray>The scroll of <white><spell></white> crumbles to dust."
+    wand-empty: "<red>The wand fizzles: only <charges> charge(s) left. It recovers one every few minutes."
 
   stance:
     entered: "<light_purple>Casting stance.</light_purple> <gray>Click a slot to cast; sneak and click to use your highest slot. <white>F</white> to leave."
@@ -76,6 +94,16 @@ dnd:
     turned: "<gold>Channel Divinity:</gold> <gray><turned> of <count> undead flee, <destroyed> destroyed."
     nobody-low: "<gray>Nobody near you is below half their health."
     preserve-life: "<gold>Preserve Life:</gold> <gray><white><health></white> health for <count> player(s)."
+    too-few-points: "<red><name> costs <cost> sorcery point(s), and you have fewer."
+    tides: "<light_purple>Tides of Chaos:</light_purple> <gray>your next spell attack has advantage, and your next spell will surge."
+    bend-luck: "<light_purple>Bend Luck:</light_purple> <gray>for six seconds, saves against you go worse."
+    overchannel: "<light_purple>Overchannel:</light_purple> <gray>your next 1st- to 5th-level damage spell hits as hard as it can."
+    nobody-to-glare-at: "<gray>Look at whoever you want to frighten."
+    presence: "<gold>Draconic Presence:</gold> <gray><count> of <of> creatures flee in terror."
+    wings-spread: "<gold>You spread your dragon wings.</gold> <gray>Use it again to fold them."
+    wings-folded: "<gray>You fold your wings."
+    already-flying: "<gray>You can already fly."
+    exhausted: "<gray>The frenzy fades, and exhaustion sets in."
 
   rest:
     already: "<gray>You are already resting."
@@ -98,7 +126,7 @@ dnd:
 
   admin:
     not-allowed: "<red>Only staff can do that."
-    usage: "<gray>/adventurer admin level|xp <player> <number>  ·  /adventurer admin rest|reset <player>"
+    usage: "<gray>/adventurer admin level|xp <player> <number>  ·  rest|reset <player>  ·  give <player> <item> [spell]  ·  surge <player> [number]"
     not-online: "<red><player> is not online here."
     one-at-a-time: "<red>One player at a time, please."
     not-a-number: "<red><value> is not a number."
@@ -108,3 +136,7 @@ dnd:
     rested: "<green><player> had a long rest."
     reset: "<green><player>'s adventurer is gone; they can choose a class again."
     you-were-reset: "<yellow>Your adventurer was reset by staff. Type <white>/adventurer</white> to begin again."
+    unknown-item: "<red>No magic item is called <value>."
+    unknown-spell: "<red>A spell scroll needs a spell; <value> is not one."
+    given: "<green><player> got a <item>."
+    surged: "<green><player> surged: entry <number>."

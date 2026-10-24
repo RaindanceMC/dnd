@@ -44,7 +44,8 @@ class HeroBookTest {
                 .withSlotSpent(1, 2).withSlotSpent(3, -1)
                 .withSorceryPoints(4).withHitDiceSpent(3)
                 .withUsed(Feature.INDOMITABLE, 1)
-                .withLongRestAt(123_456_789_000L);
+                .withLongRestAt(123_456_789_000L)
+                .withSubclass(de.raindancer.modules.dnd.model.Subclass.WILD_MAGIC);
     }
 
     @Test

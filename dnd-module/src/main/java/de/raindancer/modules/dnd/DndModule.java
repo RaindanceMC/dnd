@@ -9,6 +9,7 @@ import de.raindancer.modules.api.ModuleCommand;
 import de.raindancer.modules.api.ModuleContext;
 import de.raindancer.modules.api.ModuleInfo;
 import de.raindancer.modules.dnd.listener.CombatListener;
+import de.raindancer.modules.dnd.listener.ItemListener;
 import de.raindancer.modules.dnd.listener.PresenceListener;
 import de.raindancer.modules.dnd.listener.RestListener;
 import de.raindancer.modules.dnd.listener.StanceListener;
@@ -17,6 +18,10 @@ import de.raindancer.modules.dnd.rules.ConcentrationRule;
 import de.raindancer.modules.dnd.rules.DamageRule;
 import de.raindancer.modules.dnd.rules.FeatureRule;
 import de.raindancer.modules.dnd.rules.HealthRule;
+import de.raindancer.modules.dnd.rules.ItemRule;
+import de.raindancer.modules.dnd.rules.LootRule;
+import de.raindancer.modules.dnd.rules.SubclassRule;
+import de.raindancer.modules.dnd.rules.SurgeRule;
 import de.raindancer.modules.dnd.rules.LoadoutRule;
 import de.raindancer.modules.dnd.rules.MartialRule;
 import de.raindancer.modules.dnd.rules.MetamagicRule;
@@ -38,6 +43,10 @@ import de.raindancer.modules.dnd.service.HeroService;
 import de.raindancer.modules.dnd.service.HudService;
 import de.raindancer.modules.dnd.service.IDndService;
 import de.raindancer.modules.dnd.service.IconForge;
+import de.raindancer.modules.dnd.service.ItemForge;
+import de.raindancer.modules.dnd.service.ItemService;
+import de.raindancer.modules.dnd.service.LootService;
+import de.raindancer.modules.dnd.service.SurgeService;
 import de.raindancer.modules.dnd.service.RestService;
 import de.raindancer.modules.dnd.service.SpellCues;
 import de.raindancer.modules.dnd.service.SpellService;
@@ -66,7 +75,7 @@ import java.util.random.RandomGenerator;
  */
 public final class DndModule implements FlexModule {
 
-    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.1.0")
+    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.2.0")
             .describedAs("Classes, levels, spell slots, sorcery points and spells cast from a casting stance.")
             .by("Raindancer118");
 
@@ -122,9 +131,13 @@ public final class DndModule implements FlexModule {
         MartialRule martial = new MartialRule(features);
         MobRule mobs = new MobRule();
         ConcentrationRule concentrationRule = new ConcentrationRule();
+        SubclassRule subclasses = new SubclassRule();
+        SurgeRule surgeRule = new SurgeRule();
+        LootRule lootRule = new LootRule();
+        ItemRule itemRule = new ItemRule();
 
         HeroService heroes = new HeroService(context.plugin(), server, log, book, progression, loadouts, sorcery,
-                messages, effects, actionBars);
+                messages, effects, actionBars, subclasses);
         BodyService body = new BodyService(health, martial);
         ConditionService conditions = new ConditionService(System::currentTimeMillis);
         IconForge icons = new IconForge(slots, features, damage);
@@ -138,23 +151,35 @@ public final class DndModule implements FlexModule {
                 features, heroes, conditions, body, concentration, random);
         FeatureService featureService = new FeatureService(context.plugin(), messages, effects, targets, cues,
                 conditions, features, slots, checks, mobs, random);
+        SurgeService surges = new SurgeService(context.plugin(), messages, effects, heroes, spells, body, conditions,
+                targets, cues, sorcery, surgeRule, random);
+        featureService.onTides(surges::owe);
         CastingService casting = new CastingService(messages, effects, actionBars, heroes, stance, spells,
                 featureService, concentration, conditions, slots, features, metamagic, loadouts);
+        casting.surgesWith(surges);
+        surges.onResetWaits(player -> casting.endWaits(player.getUniqueId()));
+        ItemForge itemForge = new ItemForge(System::currentTimeMillis);
+        ItemService items = new ItemService(messages, effects, heroes, itemForge, itemRule, cues, random,
+                System::currentTimeMillis);
+        items.castWith(casting::castFromItem);
+        spells.saveBonusFromItems(items::saveBonus);
+        LootService loot = new LootService(messages, effects, itemForge, lootRule, mobs, random);
         CombatService combat = new CombatService(messages, actionBars, heroes, conditions, concentration, martial,
                 features, checks, mobs, random);
+        combat.weaponBonus(items::weaponBonus);
         RestService resting = new RestService(messages, effects, actionBars, heroes, body, conditions, rests, health,
                 System::currentTimeMillis);
         HudService hud = new HudService(messages, actionBars, stance, slots, sorcery);
 
         List<IDndService> all = List.of(heroes, body, conditions, icons, stance, targets, cues, concentration, spells,
-                featureService, casting, combat, resting, hud);
+                featureService, casting, combat, resting, hud, surges, itemForge, items, loot);
         all.forEach(service -> service.settings(settings.current()));
         all.forEach(service -> settings.onChange(service::settings));
 
         services = new DndServices(context.plugin(), server, log, messages, context.chat().brand(), context.core(),
                 settings::current, settings, progression, slots, sorcery, features, health, checks, rests, loadouts,
                 metamagic, heroes, body, stance, casting, combat, concentration, conditions, resting, hud, icons,
-                new LiveScreens());
+                featureService, surges, items, loot, itemForge, subclasses, new LiveScreens());
 
         heroes.onChange(player -> {
             Optional<de.raindancer.modules.dnd.model.Hero> hero = heroes.of(player.getUniqueId());
@@ -170,6 +195,7 @@ public final class DndModule implements FlexModule {
         context.listener(new StanceListener(services));
         context.listener(new CombatListener(services));
         context.listener(new RestListener(services));
+        context.listener(new ItemListener(services));
 
         DndCommands.ready(services);
 
@@ -184,8 +210,11 @@ public final class DndModule implements FlexModule {
         var secondTimer = Scheduling.globalTimer(context.plugin(), SECOND_TICKS, SECOND_TICKS, task -> {
             for (Player player : server.getOnlinePlayers()) {
                 Scheduling.entity(context.plugin(), player, () -> {
+                    Optional<de.raindancer.modules.dnd.model.Hero> hero = heroes.of(player.getUniqueId());
                     concentration.tick(player);
                     resting.tick(player);
+                    featureService.tick(player, hero);
+                    body.refresh(player, hero);
                 });
             }
         });
@@ -241,8 +270,10 @@ public final class DndModule implements FlexModule {
             for (Player player : server.getOnlinePlayers()) {
                 services.stance().leave(player, true);
                 services.concentration().forget(player);
+                services.features().foldWings(player);
                 services.body().strip(player);
             }
+            services.surges().cleanUp();
             services.heroes().flush();
         }
         DndCommands.stopped();

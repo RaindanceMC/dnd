@@ -29,7 +29,9 @@ public final class DndCommands {
                         .taking("admin level <player> <level>")
                         .taking("admin xp <player> <amount>")
                         .taking("admin rest <player>")
-                        .taking("admin reset <player>"));
+                        .taking("admin reset <player>")
+                        .taking("admin give <player> <item> [spell]")
+                        .taking("admin surge <player> [number]"));
     }
 
     static void ready(DndServices live) {

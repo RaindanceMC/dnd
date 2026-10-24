@@ -20,7 +20,7 @@
 
     <!-- This repository's own versions: bump them here. CI publishes a new version on the next push to master. -->
     <properties>
-        <dnd-module.version>0.1.0</dnd-module.version>
+        <dnd-module.version>0.2.0</dnd-module.version>
     </properties>
 
     <modules>

@@ -51,6 +51,7 @@ public final class HeroService implements IDndService {
     private final ProgressionRule progression;
     private final LoadoutRule loadouts;
     private final SorceryRule sorcery;
+    private final de.raindancer.modules.dnd.rules.SubclassRule subclasses;
     private final Messages messages;
     private final Effects effects;
     private final ActionBars actionBars;
@@ -67,7 +68,8 @@ public final class HeroService implements IDndService {
 
     public HeroService(Plugin plugin, Server server, LogChannel log, HeroBook book, ProgressionRule progression,
                        LoadoutRule loadouts, SorceryRule sorcery, Messages messages, Effects effects,
-                       ActionBars actionBars) {
+                       ActionBars actionBars, de.raindancer.modules.dnd.rules.SubclassRule subclasses) {
+        this.subclasses = subclasses;
         this.plugin = plugin;
         this.server = server;
         this.log = log;
@@ -117,7 +119,8 @@ public final class HeroService implements IDndService {
             HeroBook.Loaded loaded = book.load(id);
             switch (loaded.status()) {
                 case FOUND -> {
-                    heroes.putIfAbsent(id, new Entry(loaded.hero(), loaded.rev(), false));
+                    Hero settled = subclasses.settled(loaded.hero());
+                    heroes.putIfAbsent(id, new Entry(settled, loaded.rev(), !settled.equals(loaded.hero())));
                     unreadable.remove(id);
                 }
                 case NONE -> {
@@ -135,6 +138,7 @@ public final class HeroService implements IDndService {
                 if (loaded.status() == HeroBook.Loaded.Status.NONE && player.isOnline()) {
                     messages.send(player, "dnd.welcome");
                 }
+                of(id).filter(subclasses::choosing).ifPresent(hero -> messages.send(player, "dnd.subclass.waiting"));
             });
         });
     }
@@ -161,7 +165,7 @@ public final class HeroService implements IDndService {
         UUID id = player.getUniqueId();
         Entry[] after = new Entry[1];
         heroes.computeIfPresent(id, (key, entry) -> {
-            Hero next = how.apply(entry.hero());
+            Hero next = subclasses.settled(how.apply(entry.hero()));
             after[0] = next.equals(entry.hero()) ? entry : new Entry(next, entry.rev(), true);
             return after[0];
         });
@@ -172,7 +176,7 @@ public final class HeroService implements IDndService {
         return Optional.of(after[0].hero());
     }
 
-    /** A new class: level 1, or the old level if the server keeps it. */
+    /** A new class, always from level 1: a level belongs to the class it was earned in. */
     public Optional<Hero> choose(Player player, HeroClass heroClass) {
         UUID id = player.getUniqueId();
         if (unreadable.contains(id) || !known(id)) {
@@ -180,15 +184,14 @@ public final class HeroService implements IDndService {
         }
         Entry old = heroes.get(id);
         Hero fresh = Hero.fresh(id, heroClass, loadouts.starting(heroClass));
-        if (old != null && settings.classChangeKeepsLevel()) {
-            fresh = loadouts.toppedUp(progression.atLevel(fresh, old.hero().level()).withXp(old.hero().xp()),
-                    null);
-        }
-        fresh = fresh.withSorceryPoints(sorcery.most(fresh));
+        fresh = subclasses.settled(fresh.withSorceryPoints(sorcery.most(fresh)));
         heroes.put(id, new Entry(fresh, old == null ? 0 : old.rev(), true));
         without.remove(id);
         changed.accept(player);
         Scheduling.async(plugin, () -> write(id));
+        if (subclasses.choosing(fresh)) {
+            messages.send(player, "dnd.subclass.waiting");
+        }
         return Optional.of(fresh);
     }
 
@@ -237,12 +240,27 @@ public final class HeroService implements IDndService {
         return loadouts.toppedUp(grown, hero).withSorceryPoints(grown.sorceryPoints() + Math.max(0, morePoints));
     }
 
+    /** A sorcerer's origin, chosen once. Empty when it may not be chosen. */
+    public Optional<Hero> chooseSubclass(Player player, de.raindancer.modules.dnd.model.Subclass subclass) {
+        Optional<Hero> hero = of(player.getUniqueId());
+        if (hero.isEmpty() || !subclasses.mayChoose(hero.get(), subclass)) {
+            return Optional.empty();
+        }
+        return change(player, now -> subclasses.mayChoose(now, subclass) ? now.withSubclass(subclass) : now);
+    }
+
     private void levelledUp(Player player, Hero before, Hero now) {
         effects.play(player.getUniqueId(), Cues.REWARD);
         player.showTitle(Title.title(messages.get("dnd.level-up-title", "level", String.valueOf(now.level())),
                 messages.get("dnd.level-up-subtitle", "class", now.heroClass().title())));
         messages.send(player, "dnd.level-up", "level", String.valueOf(now.level()), "class",
                 now.heroClass().title());
+        if (now.subclass() != null && now.subclass() != before.subclass()) {
+            messages.send(player, "dnd.subclass.gained", "subclass", now.subclass().title());
+        }
+        if (subclasses.choosing(now) && !subclasses.choosing(before)) {
+            messages.send(player, "dnd.subclass.waiting");
+        }
         if (now.improvements() > before.improvements()) {
             messages.send(player, "dnd.improvement-earned", "points", String.valueOf(now.improvements()));
         }

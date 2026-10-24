@@ -168,6 +168,20 @@ public final class TargetService implements IDndService {
         return attribute == null ? 20.0 : attribute.getValue();
     }
 
+    /** Feet and head free, something solid underneath within three blocks — the spot to stand on, or null. */
+    public static Location standable(Location around) {
+        for (int down = 0; down <= 3; down++) {
+            Location feet = around.clone().subtract(0, down, 0);
+            org.bukkit.block.Block foot = feet.getBlock();
+            org.bukkit.block.Block head = foot.getRelative(0, 1, 0);
+            org.bukkit.block.Block ground = foot.getRelative(0, -1, 0);
+            if (foot.isPassable() && head.isPassable() && !ground.isPassable() && !foot.isLiquid()) {
+                return foot.getLocation().add(0.5, 0, 0.5);
+            }
+        }
+        return null;
+    }
+
     /** The point at the middle of a creature, where particles look right. */
     public static Location middleOf(Entity entity) {
         return entity.getLocation().add(0, entity.getHeight() / 2, 0);

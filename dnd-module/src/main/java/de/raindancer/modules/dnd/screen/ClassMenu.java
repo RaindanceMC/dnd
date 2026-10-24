@@ -42,10 +42,8 @@ public final class ClassMenu extends Menu implements IDndScreen {
     @Override
     protected void render() {
         Optional<Hero> hero = services.heroes().of(viewer.getUniqueId());
-        boolean keeps = services.config().classChangeKeepsLevel();
         set(MenuLayout.HEADER_SUBJECT, Icons.of(Material.ENCHANTED_BOOK, "<gold>Choose your class",
                 hero.isEmpty() ? "<gray>Pick one to begin at level 1."
-                        : keeps ? "<gray>Changing keeps your level."
                         : "<red>Changing starts you again at level 1."));
         int column = 1;
         for (HeroClass heroClass : HeroClass.values()) {
@@ -86,11 +84,8 @@ public final class ClassMenu extends Menu implements IDndScreen {
             become(heroClass);
             return;
         }
-        List<String> consequences = services.config().classChangeKeepsLevel()
-                ? List.of("<gray>You keep level " + hero.get().level() + ".",
-                "<gray>Your ability scores start again from the class's own.")
-                : List.of("<red>You start again at level 1.", "<gray>Your " + hero.get().heroClass().title()
-                + " levels are gone.");
+        List<String> consequences = List.of("<red>You start again at level 1.", "<gray>Your "
+                + hero.get().heroClass().title() + " levels are gone.");
         new ConfirmScreen(viewer, services.brand(), this, "<red>Become a " + heroClass.title() + "?",
                 consequences, () -> become(heroClass)).open();
     }

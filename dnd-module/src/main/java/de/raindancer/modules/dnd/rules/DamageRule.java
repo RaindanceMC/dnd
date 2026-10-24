@@ -52,17 +52,59 @@ public final class DamageRule implements IDndRule {
     }
 
     /**
-     * @param critical  roll every die twice
-     * @param empowered roll again, once, any die that came up below half
+     * How the dice are rolled.
+     *
+     * @param doubled   a critical hit: every die twice
+     * @param rerollLow Empowered Spell: any die below half rolled again, once
+     * @param bombard   Spell Bombardment: the first die to show its highest is rolled again and added
+     * @param highest   every die shows its highest — Overchannel, Supreme Healing
      */
+    public record Rolling(boolean doubled, boolean rerollLow, boolean bombard, boolean highest) {
+
+        public static final Rolling PLAIN = new Rolling(false, false, false, false);
+
+        public Rolling critical(boolean on) {
+            return new Rolling(on, rerollLow, bombard, highest);
+        }
+
+        public Rolling empowered(boolean on) {
+            return new Rolling(doubled, on, bombard, highest);
+        }
+
+        public Rolling bombarding() {
+            return bombarding(true);
+        }
+
+        public Rolling bombarding(boolean on) {
+            return new Rolling(doubled, rerollLow, on, highest);
+        }
+
+        public Rolling maxed() {
+            return maxed(true);
+        }
+
+        public Rolling maxed(boolean on) {
+            return new Rolling(doubled, rerollLow, bombard, on);
+        }
+    }
+
     public int roll(List<Dice> dice, boolean critical, boolean empowered, RandomGenerator random) {
+        return roll(dice, Rolling.PLAIN.critical(critical).empowered(empowered), random);
+    }
+
+    public int roll(List<Dice> dice, Rolling how, RandomGenerator random) {
         int total = 0;
+        boolean bombarded = false;
         for (Dice one : dice) {
-            int count = critical ? one.count() * 2 : one.count();
+            int count = how.doubled() ? one.count() * 2 : one.count();
             for (int die = 0; die < count; die++) {
-                int face = face(one.sides(), random);
-                if (empowered && face < (one.sides() + 1) / 2.0) {
+                int face = how.highest() ? one.sides() : face(one.sides(), random);
+                if (!how.highest() && how.rerollLow() && face < (one.sides() + 1) / 2.0) {
                     face = face(one.sides(), random);
+                }
+                if (how.bombard() && !bombarded && one.sides() > 0 && face == one.sides()) {
+                    bombarded = true;
+                    face += face(one.sides(), random);
                 }
                 total += face;
             }
@@ -98,8 +140,14 @@ public final class DamageRule implements IDndRule {
      */
     public int healing(Spell spell, int slotLevel, int castingModifier, boolean discipleOfLife,
                        RandomGenerator random) {
+        return healing(spell, slotLevel, castingModifier, discipleOfLife, false, random);
+    }
+
+    /** @param supreme Supreme Healing: the dice roll their highest */
+    public int healing(Spell spell, int slotLevel, int castingModifier, boolean discipleOfLife, boolean supreme,
+                       RandomGenerator random) {
         List<Dice> dice = dice(spell, slotLevel, 1);
-        int healed = roll(dice, false, false, random);
+        int healed = roll(dice, Rolling.PLAIN.maxed(supreme), random);
         if (spell.damage().count() > 0 && spell.damage().bonus() == 0) {
             healed += castingModifier;
         }

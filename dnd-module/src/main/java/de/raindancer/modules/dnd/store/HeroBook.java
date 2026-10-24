@@ -5,6 +5,7 @@ import de.raindancer.modules.dnd.model.AbilityScores;
 import de.raindancer.modules.dnd.model.Feature;
 import de.raindancer.modules.dnd.model.Hero;
 import de.raindancer.modules.dnd.model.HeroClass;
+import de.raindancer.modules.dnd.model.Subclass;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -78,7 +79,8 @@ public final class HeroBook {
                             AbilityScores.decode(row.getString("scores")), row.getInt("improvements"),
                             decodeLoadout(row.getString("loadout")), decodeSlots(row.getString("slots_spent")),
                             row.getInt("sorcery_points"), row.getInt("hit_dice_spent"),
-                            decodeUsed(row.getString("used")), row.getLong("long_rest_at"));
+                            decodeUsed(row.getString("used")), row.getLong("long_rest_at"),
+                            Subclass.byId(row.getString("subclass")).orElse(null));
                     return Loaded.found(hero, row.getLong("rev"));
                 }
             }
@@ -113,8 +115,8 @@ public final class HeroBook {
     private static long insert(Connection connection, Hero hero) throws SQLException {
         try (PreparedStatement insert = connection.prepareStatement("""
                 INSERT INTO hero (class, level, xp, scores, improvements, loadout, slots_spent, sorcery_points,
-                                  hit_dice_spent, used, long_rest_at, player, rev)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+                                  hit_dice_spent, used, long_rest_at, subclass, player, rev)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
                 ON CONFLICT (player) DO NOTHING""")) {
             bind(insert, hero);
             return insert.executeUpdate() > 0 ? 1 : 0;
@@ -125,10 +127,10 @@ public final class HeroBook {
         try (PreparedStatement update = connection.prepareStatement("""
                 UPDATE hero SET class = ?, level = ?, xp = ?, scores = ?, improvements = ?, loadout = ?,
                                 slots_spent = ?, sorcery_points = ?, hit_dice_spent = ?, used = ?, long_rest_at = ?,
-                                rev = rev + 1
+                                subclass = ?, rev = rev + 1
                 WHERE player = ? AND rev = ?""")) {
             bind(update, hero);
-            update.setLong(13, expectedRev);
+            update.setLong(14, expectedRev);
             return update.executeUpdate() > 0 ? expectedRev + 1 : 0;
         }
     }
@@ -145,7 +147,8 @@ public final class HeroBook {
         statement.setInt(9, hero.hitDiceSpent());
         statement.setString(10, encodeUsed(hero.used()));
         statement.setLong(11, hero.longRestAt());
-        statement.setString(12, hero.player().toString());
+        statement.setString(12, hero.subclass() == null ? "" : hero.subclass().id());
+        statement.setString(13, hero.player().toString());
     }
 
     static List<String> decodeLoadout(String text) {

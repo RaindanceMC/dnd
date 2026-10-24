@@ -23,6 +23,11 @@ public final class CheckRule implements IDndRule {
         return Math.min(first, 1 + random.nextInt(20));
     }
 
+    /** The higher of two dice. */
+    public int d20WithAdvantage(RandomGenerator random) {
+        return Math.max(1 + random.nextInt(20), 1 + random.nextInt(20));
+    }
+
     public Roll attack(int die, int bonus, int armourClass) {
         return new Roll(die, bonus, armourClass, true);
     }

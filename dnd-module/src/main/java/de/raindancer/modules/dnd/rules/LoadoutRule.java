@@ -42,7 +42,7 @@ public final class LoadoutRule implements IDndRule {
         }
         spells.sort(Comparator.comparingInt(Spell::level));
         found.addAll(spells);
-        for (Feature feature : Feature.of(hero.heroClass(), hero.level())) {
+        for (Feature feature : Feature.of(hero)) {
             if (feature.active()) {
                 found.add(feature);
             }

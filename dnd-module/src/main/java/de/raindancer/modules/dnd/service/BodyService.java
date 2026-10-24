@@ -1,7 +1,12 @@
 package de.raindancer.modules.dnd.service;
 
 import de.raindancer.modules.dnd.DndSettings;
+import de.raindancer.modules.dnd.model.Ability;
+import de.raindancer.modules.dnd.model.AbilityScores;
+import de.raindancer.modules.dnd.model.Feature;
 import de.raindancer.modules.dnd.model.Hero;
+import de.raindancer.modules.dnd.model.MagicItem;
+import de.raindancer.modules.dnd.store.ItemTags;
 import de.raindancer.modules.dnd.rules.HealthRule;
 import de.raindancer.modules.dnd.rules.MartialRule;
 import org.bukkit.NamespacedKey;
@@ -33,6 +38,14 @@ public final class BodyService implements IDndService {
     public static final NamespacedKey MAGE_ARMOR = new NamespacedKey(NAMESPACE, "mage_armor");
     public static final NamespacedKey AID = new NamespacedKey(NAMESPACE, "aid");
     public static final NamespacedKey HASTE = new NamespacedKey(NAMESPACE, "haste");
+    static final NamespacedKey ITEM_ARMOUR = new NamespacedKey(NAMESPACE, "item_armour");
+    static final NamespacedKey ITEM_SPEED = new NamespacedKey(NAMESPACE, "item_speed");
+    static final NamespacedKey ITEM_JUMP = new NamespacedKey(NAMESPACE, "item_jump");
+    static final NamespacedKey CLASS_JUMP = new NamespacedKey(NAMESPACE, "class_jump");
+    static final NamespacedKey CLASS_FALL = new NamespacedKey(NAMESPACE, "class_fall");
+
+    /** A Boots of Striding's jump: about three times the height. */
+    private static final double STRIDING_JUMP = 0.31;
 
     private final HealthRule health;
     private final MartialRule martial;
@@ -50,15 +63,26 @@ public final class BodyService implements IDndService {
 
     /** Puts the class's modifiers on, or takes them off when there is no hero or the world has no adventurers. */
     public void refresh(Player player, Optional<Hero> hero) {
-        boolean active = hero.isPresent() && settings.worksIn(player.getWorld().getName());
+        boolean here = settings.worksIn(player.getWorld().getName());
+        boolean ring = here && isItem(player.getInventory().getItemInOffHand(), MagicItem.RING_OF_PROTECTION);
+        boolean amulet = here && isItem(player.getInventory().getItemInOffHand(), MagicItem.AMULET_OF_HEALTH);
+        boolean boots = here && isItem(player.getInventory().getBoots(), MagicItem.BOOTS_OF_STRIDING);
+        set(player, Attribute.ARMOR, ITEM_ARMOUR, ring ? 2 : 0, AttributeModifier.Operation.ADD_NUMBER);
+        set(player, Attribute.MOVEMENT_SPEED, ITEM_SPEED, boots ? 0.1 : 0, AttributeModifier.Operation.ADD_SCALAR);
+        set(player, Attribute.JUMP_STRENGTH, ITEM_JUMP, boots ? STRIDING_JUMP : 0,
+                AttributeModifier.Operation.ADD_NUMBER);
+        boolean active = hero.isPresent() && here;
+        boolean climber = active && Feature.SECOND_STORY_WORK.has(hero.get());
+        set(player, Attribute.JUMP_STRENGTH, CLASS_JUMP, climber ? 0.1 : 0, AttributeModifier.Operation.ADD_NUMBER);
+        set(player, Attribute.SAFE_FALL_DISTANCE, CLASS_FALL, climber ? 3 : 0, AttributeModifier.Operation.ADD_NUMBER);
         if (!active) {
-            set(player, Attribute.MAX_HEALTH, HEALTH, 0, AttributeModifier.Operation.ADD_NUMBER);
+            set(player, Attribute.MAX_HEALTH, HEALTH, amulet ? 6 : 0, AttributeModifier.Operation.ADD_NUMBER);
             set(player, Attribute.ARMOR, ARMOUR, 0, AttributeModifier.Operation.ADD_NUMBER);
             set(player, Attribute.MOVEMENT_SPEED, SPEED, 0, AttributeModifier.Operation.ADD_SCALAR);
             clampHealth(player);
             return;
         }
-        Hero now = hero.get();
+        Hero now = amulet ? withConstitution(hero.get(), 19) : hero.get();
         set(player, Attribute.MAX_HEALTH, HEALTH, health.bonusHealth(now, settings.healthPercent()),
                 AttributeModifier.Operation.ADD_NUMBER);
         ItemStack chest = player.getInventory().getChestplate();
@@ -80,6 +104,17 @@ public final class BodyService implements IDndService {
         return instance != null && instance.getModifier(key) != null;
     }
 
+    private static boolean isItem(ItemStack stack, MagicItem wanted) {
+        return ItemTags.itemOf(stack).filter(found -> found == wanted).isPresent();
+    }
+
+    /** The hero as an Amulet of Health has them: Constitution at least {@code score}. */
+    private static Hero withConstitution(Hero hero, int score) {
+        java.util.Map<Ability, Integer> scores = hero.scores().asMap();
+        scores.put(Ability.CONSTITUTION, Math.max(score, scores.get(Ability.CONSTITUTION)));
+        return hero.withScores(AbilityScores.of(scores), hero.improvements());
+    }
+
     /** Takes off every modifier a spell lent, for a long rest. */
     public void endLoans(LivingEntity entity) {
         lend(entity, Attribute.ARMOR, MAGE_ARMOR, 0);
@@ -89,8 +124,19 @@ public final class BodyService implements IDndService {
 
     /** Everything this module ever put on a player, gone — for the module stopping. */
     public void strip(Player player) {
-        refresh(player, Optional.empty());
-        endLoans(player);
+        for (Attribute attribute : java.util.List.of(Attribute.MAX_HEALTH, Attribute.ARMOR, Attribute.MOVEMENT_SPEED,
+                Attribute.JUMP_STRENGTH, Attribute.SAFE_FALL_DISTANCE, Attribute.SCALE, Attribute.GRAVITY)) {
+            AttributeInstance instance = player.getAttribute(attribute);
+            if (instance == null) {
+                continue;
+            }
+            for (AttributeModifier modifier : java.util.List.copyOf(instance.getModifiers())) {
+                if (NAMESPACE.equals(modifier.getKey().getNamespace())) {
+                    instance.removeModifier(modifier);
+                }
+            }
+        }
+        clampHealth(player);
     }
 
     private static void set(LivingEntity entity, Attribute attribute, NamespacedKey key, double amount,

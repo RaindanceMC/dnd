@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 public final class AdventurerCommand implements IDndCommand {
 
     private static final List<String> PLAYER_WORDS = List.of("rest", "stance", "spells", "class");
-    private static final List<String> ADMIN_WORDS = List.of("level", "xp", "rest", "reset");
+    private static final List<String> ADMIN_WORDS = List.of("level", "xp", "rest", "reset", "give", "surge");
 
     private final Supplier<DndServices> services;
 
@@ -107,8 +107,59 @@ public final class AdventurerCommand implements IDndCommand {
                 }));
                 live.messages().send(sender, "dnd.admin.reset", "player", target.getName());
             });
+            case "give" -> give(live, sender, target, args);
+            case "surge" -> Scheduling.entity(live.plugin(), target, () -> {
+                Optional<de.raindancer.modules.dnd.model.Hero> hero = live.heroes().of(target.getUniqueId());
+                if (hero.isEmpty()) {
+                    live.messages().send(sender, "dnd.admin.no-hero", "player", target.getName());
+                    return;
+                }
+                de.raindancer.modules.dnd.model.Surge surge;
+                if (args.length >= 4) {
+                    int roll;
+                    try {
+                        roll = Integer.parseInt(args[3]);
+                    } catch (NumberFormatException notANumber) {
+                        live.messages().send(sender, "dnd.admin.not-a-number", "value", args[3]);
+                        return;
+                    }
+                    surge = de.raindancer.modules.dnd.model.WildSurgeTable.entry(roll);
+                    live.surges().happen(target, hero.get(), surge);
+                } else {
+                    surge = live.surges().surge(target, hero.get());
+                }
+                live.messages().send(sender, "dnd.admin.surged", "player", target.getName(), "number",
+                        String.valueOf(surge.number()));
+            });
             default -> live.messages().send(sender, "dnd.admin.usage");
         }
+    }
+
+    private static void give(DndServices live, CommandSender sender, Player target, String[] args) {
+        if (args.length < 4) {
+            live.messages().send(sender, "dnd.admin.usage");
+            return;
+        }
+        Optional<de.raindancer.modules.dnd.model.MagicItem> item = de.raindancer.modules.dnd.model.MagicItem
+                .byId(args[3]);
+        if (item.isEmpty()) {
+            live.messages().send(sender, "dnd.admin.unknown-item", "value", args[3]);
+            return;
+        }
+        de.raindancer.modules.dnd.model.Spell spell = null;
+        if (item.get() == de.raindancer.modules.dnd.model.MagicItem.SPELL_SCROLL) {
+            Optional<de.raindancer.modules.dnd.model.Spell> named = args.length >= 5
+                    ? de.raindancer.modules.dnd.model.Spell.byId(args[4]) : Optional.empty();
+            if (named.isEmpty()) {
+                live.messages().send(sender, "dnd.admin.unknown-spell", "value", args.length >= 5 ? args[4] : "");
+                return;
+            }
+            spell = named.get();
+        }
+        org.bukkit.inventory.ItemStack stack = live.itemForge().make(item.get(), spell);
+        Scheduling.entity(live.plugin(), target, () -> target.getInventory().addItem(stack).values()
+                .forEach(left -> target.getWorld().dropItemNaturally(target.getLocation(), left)));
+        live.messages().send(sender, "dnd.admin.given", "player", target.getName(), "item", item.get().title());
     }
 
     private static Optional<Long> number(DndServices live, CommandSender sender, String[] args) {
@@ -156,6 +207,14 @@ public final class AdventurerCommand implements IDndCommand {
         }
         if (args.length == 3) {
             return PlayerTargets.suggest(services.get().server(), source.getSender(), args[2], who -> true);
+        }
+        if (args.length == 4 && args[1].equalsIgnoreCase("give")) {
+            return java.util.Arrays.stream(de.raindancer.modules.dnd.model.MagicItem.values())
+                    .map(de.raindancer.modules.dnd.model.MagicItem::id).filter(id -> id.startsWith(started)).toList();
+        }
+        if (args.length == 5 && args[1].equalsIgnoreCase("give")) {
+            return java.util.Arrays.stream(de.raindancer.modules.dnd.model.Spell.values())
+                    .map(de.raindancer.modules.dnd.model.Spell::id).filter(id -> id.startsWith(started)).toList();
         }
         return List.of();
     }

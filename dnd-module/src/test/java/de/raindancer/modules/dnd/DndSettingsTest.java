@@ -17,7 +17,6 @@ class DndSettingsTest {
         assertThat(defaults.worlds()).isEmpty();
         assertThat(defaults.xpPercent()).isEqualTo(100);
         assertThat(defaults.healthPercent()).isEqualTo(25);
-        assertThat(defaults.classChangeKeepsLevel()).isFalse();
         assertThat(defaults.spellDamagePercent()).isEqualTo(100);
         assertThat(defaults.playerDamagePercent()).isEqualTo(50);
         assertThat(defaults.showRolls()).isTrue();
@@ -26,6 +25,8 @@ class DndSettingsTest {
         assertThat(defaults.shortRestSeconds()).isEqualTo(30);
         assertThat(defaults.longRestMinutes()).isEqualTo(15);
         assertThat(defaults.stanceNeedsSneak()).isFalse();
+        assertThat(defaults.wildSurgePercent()).isEqualTo(5);
+        assertThat(defaults.lootPercent()).isEqualTo(100);
     }
 
     @Test
@@ -41,10 +42,12 @@ class DndSettingsTest {
     @Test
     @DisplayName("every with… changes its own component and nothing else")
     void withers() {
-        DndSettings changed = defaults.withXpPercent(200).withHealthPercent(50).withClassChangeKeepsLevel(true)
+        DndSettings changed = defaults.withXpPercent(200).withHealthPercent(50)
                 .withSpellDamagePercent(80).withPlayerDamagePercent(10).withShowRolls(false).withActionMillis(1)
-                .withBonusActionMillis(2).withShortRestSeconds(3).withLongRestMinutes(4).withStanceNeedsSneak(true);
-        assertThat(changed).isEqualTo(new DndSettings(List.of(), 200, 50, true, 80, 10, false, 1, 2, 3, 4, true));
+                .withBonusActionMillis(2).withShortRestSeconds(3).withLongRestMinutes(4).withStanceNeedsSneak(true).withWildSurgePercent(50)
+                .withLootPercent(7);
+        assertThat(changed).isEqualTo(new DndSettings(List.of(), 200, 50, 80, 10, false, 1, 2, 3, 4, true, 50,
+                7));
         assertThat(defaults.withXpPercent(5).healthPercent()).isEqualTo(defaults.healthPercent());
     }
 }

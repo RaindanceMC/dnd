@@ -24,7 +24,8 @@ public final class DndDatabase {
                 long_rest_at INTEGER NOT NULL,
                 rev INTEGER NOT NULL
             )
-            """);
+            """,
+            "ALTER TABLE hero ADD COLUMN subclass TEXT NOT NULL DEFAULT ''");
 
     private DndDatabase() {
     }

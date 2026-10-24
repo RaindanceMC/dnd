@@ -39,10 +39,6 @@ public record DndSettings(
         @Key("health-percent")
         int healthPercent,
 
-        @In("dnd") @Title("Changing class keeps the level")
-        @Describe("Off: a new class starts again at level 1. On: the level and experience carry over.")
-        @Key("class-change-keeps-level")
-        boolean classChangeKeepsLevel,
 
         @In("dnd/combat") @Title("Spell damage") @Range(min = 0, max = 1000)
         @Describe("Percent of what the dice roll that a spell actually does. Monsters have about the hit "
@@ -87,10 +83,22 @@ public record DndSettings(
         @Describe("Off: F (swap hands) enters and leaves the casting stance for anybody with a class. On: only "
                 + "sneak and F does, and plain F swaps hands as usual.")
         @Key("stance.sneak-to-enter")
-        boolean stanceNeedsSneak) {
+        boolean stanceNeedsSneak,
 
-    public static final DndSettings DEFAULTS = new DndSettings(List.of(), 100, 25, false, 100, 50, true, 1200, 500,
-            30, 15, false);
+        @In("dnd/combat") @Title("Wild magic surge chance") @Range(min = 0, max = 100)
+        @Describe("Percent chance that a Wild Magic sorcerer's spell from a slot sets off a surge. The book "
+                + "says 5 (a 1 on a d20); 0 leaves only Tides of Chaos to set one off.")
+        @Key("combat.wild-surge-percent")
+        int wildSurgePercent,
+
+        @In("dnd") @Title("Magic item drops") @Range(min = 0, max = 1000)
+        @Describe("Percent of the normal chance that a monster drops a magic item. 0 switches drops off; "
+                + "bosses always drop one unless this is 0.")
+        @Key("loot-percent")
+        int lootPercent) {
+
+    public static final DndSettings DEFAULTS = new DndSettings(List.of(), 100, 25, 100, 50, true, 1200, 500,
+            30, 15, false, 5, 100);
 
     public boolean worksIn(String world) {
         if (worlds == null || worlds.isEmpty()) {
@@ -101,71 +109,79 @@ public record DndSettings(
     }
 
     public DndSettings withWorlds(List<String> value) {
-        return new DndSettings(value, xpPercent, healthPercent, classChangeKeepsLevel, spellDamagePercent,
+        return new DndSettings(value, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak);
+                stanceNeedsSneak, wildSurgePercent, lootPercent);
     }
 
     public DndSettings withXpPercent(int value) {
-        return new DndSettings(worlds, value, healthPercent, classChangeKeepsLevel, spellDamagePercent,
+        return new DndSettings(worlds, value, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak);
+                stanceNeedsSneak, wildSurgePercent, lootPercent);
     }
 
     public DndSettings withHealthPercent(int value) {
-        return new DndSettings(worlds, xpPercent, value, classChangeKeepsLevel, spellDamagePercent,
+        return new DndSettings(worlds, xpPercent, value, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak);
+                stanceNeedsSneak, wildSurgePercent, lootPercent);
     }
 
-    public DndSettings withClassChangeKeepsLevel(boolean value) {
-        return new DndSettings(worlds, xpPercent, healthPercent, value, spellDamagePercent, playerDamagePercent,
-                showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes, stanceNeedsSneak);
-    }
 
     public DndSettings withSpellDamagePercent(int value) {
-        return new DndSettings(worlds, xpPercent, healthPercent, classChangeKeepsLevel, value, playerDamagePercent,
-                showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes, stanceNeedsSneak);
+        return new DndSettings(worlds, xpPercent, healthPercent, value, playerDamagePercent,
+                showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes, stanceNeedsSneak, wildSurgePercent, lootPercent);
     }
 
     public DndSettings withPlayerDamagePercent(int value) {
-        return new DndSettings(worlds, xpPercent, healthPercent, classChangeKeepsLevel, spellDamagePercent, value,
-                showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes, stanceNeedsSneak);
+        return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent, value,
+                showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes, stanceNeedsSneak, wildSurgePercent, lootPercent);
     }
 
     public DndSettings withShowRolls(boolean value) {
-        return new DndSettings(worlds, xpPercent, healthPercent, classChangeKeepsLevel, spellDamagePercent,
+        return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, value, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak);
+                stanceNeedsSneak, wildSurgePercent, lootPercent);
     }
 
     public DndSettings withActionMillis(int value) {
-        return new DndSettings(worlds, xpPercent, healthPercent, classChangeKeepsLevel, spellDamagePercent,
+        return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, value, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak);
+                stanceNeedsSneak, wildSurgePercent, lootPercent);
     }
 
     public DndSettings withBonusActionMillis(int value) {
-        return new DndSettings(worlds, xpPercent, healthPercent, classChangeKeepsLevel, spellDamagePercent,
+        return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, value, shortRestSeconds, longRestMinutes,
-                stanceNeedsSneak);
+                stanceNeedsSneak, wildSurgePercent, lootPercent);
     }
 
     public DndSettings withShortRestSeconds(int value) {
-        return new DndSettings(worlds, xpPercent, healthPercent, classChangeKeepsLevel, spellDamagePercent,
+        return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, value, longRestMinutes,
-                stanceNeedsSneak);
+                stanceNeedsSneak, wildSurgePercent, lootPercent);
     }
 
     public DndSettings withLongRestMinutes(int value) {
-        return new DndSettings(worlds, xpPercent, healthPercent, classChangeKeepsLevel, spellDamagePercent,
+        return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, value,
-                stanceNeedsSneak);
+                stanceNeedsSneak, wildSurgePercent, lootPercent);
+    }
+
+    public DndSettings withWildSurgePercent(int value) {
+        return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
+                playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
+                stanceNeedsSneak, value, lootPercent);
+    }
+
+    public DndSettings withLootPercent(int value) {
+        return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
+                playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
+                stanceNeedsSneak, wildSurgePercent, value);
     }
 
     public DndSettings withStanceNeedsSneak(boolean value) {
-        return new DndSettings(worlds, xpPercent, healthPercent, classChangeKeepsLevel, spellDamagePercent,
+        return new DndSettings(worlds, xpPercent, healthPercent, spellDamagePercent,
                 playerDamagePercent, showRolls, actionMillis, bonusActionMillis, shortRestSeconds, longRestMinutes,
-                value);
+                value, wildSurgePercent, lootPercent);
     }
 }

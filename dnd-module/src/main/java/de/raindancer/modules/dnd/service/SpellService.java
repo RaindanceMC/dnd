@@ -22,7 +22,6 @@ import de.raindancer.modules.dnd.util.Living;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Block;
 import org.bukkit.damage.DamageSource;
 import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Enemy;
@@ -53,8 +52,33 @@ public final class SpellService implements IDndService {
 
     static final NamespacedKey HELD_JUMP = new NamespacedKey(BodyService.NAMESPACE, "held");
 
+    /**
+     * What a cast carries beyond the hero's own numbers.
+     *
+     * @param dc        a scroll's save DC instead of the caster's, or null
+     * @param attack    a scroll's attack bonus instead of the caster's, or null
+     * @param advantage Tides of Chaos: the attack roll is made twice and the better kept
+     * @param maxDice   Overchannel: the damage dice roll their highest
+     */
+    public record Extras(Integer dc, Integer attack, boolean advantage, boolean maxDice) {
+
+        public static final Extras NONE = new Extras(null, null, false, false);
+
+        public static Extras fromItem(int dc, int attack) {
+            return new Extras(dc, attack, false, false);
+        }
+    }
+
     /** A spell about to be cast: who, what, from which slot, bent how. */
-    public record Cast(Player caster, Hero hero, Spell spell, int slotLevel, Metamagic metamagic) {
+    public record Cast(Player caster, Hero hero, Spell spell, int slotLevel, Metamagic metamagic, Extras extras) {
+
+        public Cast(Player caster, Hero hero, Spell spell, int slotLevel, Metamagic metamagic) {
+            this(caster, hero, spell, slotLevel, metamagic, Extras.NONE);
+        }
+
+        public Cast {
+            extras = extras == null ? Extras.NONE : extras;
+        }
 
         boolean bent(Metamagic which) {
             return metamagic == which;
@@ -93,6 +117,7 @@ public final class SpellService implements IDndService {
     private final RandomGenerator random;
 
     private volatile DndSettings settings = DndSettings.DEFAULTS;
+    private volatile java.util.function.ToIntFunction<Player> saveBonusFromItems = player -> 0;
 
     public SpellService(Plugin plugin, Messages messages, TargetService targets, SpellCues cues, CheckRule checks,
                         DamageRule damage, MobRule mobs, FeatureRule features, HeroService heroes,
@@ -112,6 +137,11 @@ public final class SpellService implements IDndService {
         this.concentration = concentration;
         this.random = random;
         concentration.onPulse(this::pulse);
+    }
+
+    /** What a player's magic items add to their saving throws — a Ring of Protection. */
+    public void saveBonusFromItems(java.util.function.ToIntFunction<Player> lookup) {
+        this.saveBonusFromItems = lookup == null ? player -> 0 : lookup;
     }
 
     @Override
@@ -148,7 +178,8 @@ public final class SpellService implements IDndService {
 
     private Predicate<LivingEntity> foes(Cast cast) {
         Predicate<LivingEntity> foes = targets.foes(cast.caster());
-        if (cast.bent(Metamagic.CAREFUL)) {
+        boolean sculpted = Feature.SCULPT_SPELLS.has(cast.hero()) && cast.spell().save().isPresent();
+        if (cast.bent(Metamagic.CAREFUL) || sculpted) {
             return foes.and(entity -> !(entity instanceof Player));
         }
         return foes;
@@ -214,9 +245,10 @@ public final class SpellService implements IDndService {
 
     /** An attack roll against the target's armour class, and the damage when it hits. */
     private Outcome attack(Cast cast, LivingEntity target, boolean tell) {
-        int bonus = checks.spellAttackBonus(cast.hero());
+        int bonus = cast.extras().attack() != null ? cast.extras().attack() : checks.spellAttackBonus(cast.hero());
         int armourClass = armourClassOf(target);
-        Roll roll = checks.attack(checks.d20(random, false), bonus, armourClass);
+        int die = cast.extras().advantage() ? checks.d20WithAdvantage(random) : checks.d20(random, false);
+        Roll roll = checks.attack(die, bonus, armourClass);
         if (tell && settings.showRolls()) {
             String key = roll.critical() ? "dnd.roll.attack-critical" : roll.fumble() ? "dnd.roll.attack-fumble"
                     : roll.succeeded() ? "dnd.roll.attack-hit" : "dnd.roll.attack-miss";
@@ -224,10 +256,15 @@ public final class SpellService implements IDndService {
                     "total", String.valueOf(roll.total()), "ac", String.valueOf(armourClass));
         }
         if (!roll.succeeded()) {
+            if (cast.spell().isCantrip() && Feature.POTENT_CANTRIP.has(cast.hero())) {
+                int half = damage.roll(damage.dice(cast.spell(), cast.slotLevel(), cast.hero().level()),
+                        rolling(cast, false), random) / 2;
+                return new Outcome(0, 0, 1, hurt(cast, target, half, false), 0);
+            }
             return new Outcome(0, 0, 1, 0, 0);
         }
-        int rolled = damage.roll(damage.dice(cast.spell(), cast.slotLevel(), cast.hero().level()), roll.critical(),
-                cast.bent(Metamagic.EMPOWERED), random);
+        int rolled = damage.roll(damage.dice(cast.spell(), cast.slotLevel(), cast.hero().level()),
+                rolling(cast, roll.critical()), random) + extraDamage(cast);
         double dealt = hurt(cast, target, rolled, false);
         sideEffects(cast, target);
         return new Outcome(1, 0, 0, dealt, 0);
@@ -251,7 +288,8 @@ public final class SpellService implements IDndService {
         for (int dart = 0; dart < darts; dart++) {
             LivingEntity target = aimedAt.get(dart % aimedAt.size());
             cues.ray(cast.caster().getEyeLocation(), TargetService.middleOf(target), cast.spell().kind());
-            int rolled = damage.roll(List.of(cast.spell().damage()), false, cast.bent(Metamagic.EMPOWERED), random);
+            int rolled = damage.roll(List.of(cast.spell().damage()), rolling(cast, false), random)
+                    + (dart == 0 ? extraDamage(cast) : 0);
             outcome = outcome.plus(new Outcome(1, 0, 0, hurt(cast, target, rolled, false), 0));
         }
         return Optional.of(outcome);
@@ -293,8 +331,8 @@ public final class SpellService implements IDndService {
                 }
                 continue;
             }
-            int rolled = damage.roll(damage.dice(spell, cast.slotLevel(), cast.hero().level()), false,
-                    cast.bent(Metamagic.EMPOWERED), random);
+            int rolled = damage.roll(damage.dice(spell, cast.slotLevel(), cast.hero().level()), rolling(cast, false),
+                    random) + extraDamage(cast);
             int left = damage.afterSave(rolled, spell, save.succeeded(), evades(target));
             double dealt = hurt(cast, target, left, spell == Spell.HARM);
             outcome = outcome.plus(save.succeeded() ? new Outcome(0, 1, 0, dealt, 0) : new Outcome(1, 0, 0, dealt, 0));
@@ -404,8 +442,8 @@ public final class SpellService implements IDndService {
     /** Everybody caught rolls their own save; the dice are rolled once for all, as at the table. */
     private Outcome saveAll(Cast cast, List<LivingEntity> caught, Location from) {
         Spell spell = cast.spell();
-        int rolled = damage.roll(damage.dice(spell, cast.slotLevel(), cast.hero().level()), false,
-                cast.bent(Metamagic.EMPOWERED), random);
+        int rolled = damage.roll(damage.dice(spell, cast.slotLevel(), cast.hero().level()), rolling(cast, false),
+                random) + extraDamage(cast);
         Outcome outcome = Outcome.nothing();
         boolean tell = caught.size() <= 3;
         for (int index = 0; index < caught.size(); index++) {
@@ -436,6 +474,7 @@ public final class SpellService implements IDndService {
         double total = 0;
         for (LivingEntity target : healed) {
             total += heal(cast, target, healing(cast));
+            blessedHealer(cast, target);
             if (spell == Spell.HEAL) {
                 onTarget(target, () -> cleanse(target, true));
             }
@@ -467,14 +506,45 @@ public final class SpellService implements IDndService {
             for (Player ally : allies) {
                 total += heal(cast, ally, each);
             }
+            if (allies.size() > 1) {
+                blessedHealer(cast, allies.get(1));
+            }
         }
         cues.ring(cast.caster().getLocation(), Math.min(spell.radius(), 6), DamageKind.HEALING);
         return Optional.of(new Outcome(allies.size(), 0, 0, 0, total));
     }
 
     private int healing(Cast cast) {
-        boolean disciple = Feature.DISCIPLE_OF_LIFE.has(cast.hero().heroClass(), cast.hero().level());
-        return damage.healing(cast.spell(), cast.slotLevel(), checks.castingModifier(cast.hero()), disciple, random);
+        boolean disciple = Feature.DISCIPLE_OF_LIFE.has(cast.hero());
+        boolean supreme = Feature.SUPREME_HEALING.has(cast.hero());
+        return damage.healing(cast.spell(), cast.slotLevel(), checks.castingModifier(cast.hero()), disciple, supreme,
+                random);
+    }
+
+    /** Blessed Healer: healing somebody else heals the cleric too. */
+    private void blessedHealer(Cast cast, LivingEntity healed) {
+        if (!healed.equals(cast.caster()) && Feature.BLESSED_HEALER.has(cast.hero()) && cast.slotLevel() >= 1) {
+            heal(cast, cast.caster(), 2 + cast.slotLevel());
+        }
+    }
+
+    /** How the damage dice are rolled for this cast. */
+    private DamageRule.Rolling rolling(Cast cast, boolean critical) {
+        boolean overchannel = cast.extras().maxDice() && cast.spell().level() >= 1 && cast.spell().level() <= 5;
+        return DamageRule.Rolling.PLAIN.critical(critical).empowered(cast.bent(Metamagic.EMPOWERED))
+                .bombarding(Feature.SPELL_BOMBARDMENT.has(cast.hero())).maxed(overchannel);
+    }
+
+    /** Empowered Evocation and Elemental Affinity: an ability modifier on top of the dice. */
+    private int extraDamage(Cast cast) {
+        int extra = 0;
+        if (Feature.EMPOWERED_EVOCATION.has(cast.hero())) {
+            extra += Math.max(0, cast.hero().modifier(Ability.INTELLIGENCE));
+        }
+        if (Feature.ELEMENTAL_AFFINITY.has(cast.hero()) && cast.spell().kind() == DamageKind.FIRE) {
+            extra += Math.max(0, cast.hero().modifier(Ability.CHARISMA));
+        }
+        return extra;
     }
 
     private double heal(Cast cast, LivingEntity target, double amount) {
@@ -655,18 +725,20 @@ public final class SpellService implements IDndService {
         return Optional.of(new Outcome(1, 0, 0, 0, 0));
     }
 
-    /** Feet and head free, something solid underneath within three blocks — the spot to stand on, or null. */
     private static Location standable(Location around) {
-        for (int down = 0; down <= 3; down++) {
-            Location feet = around.clone().subtract(0, down, 0);
-            Block foot = feet.getBlock();
-            Block head = foot.getRelative(0, 1, 0);
-            Block ground = foot.getRelative(0, -1, 0);
-            if (foot.isPassable() && head.isPassable() && !ground.isPassable() && !foot.isLiquid()) {
-                return foot.getLocation().add(0.5, 0, 0.5);
-            }
+        return TargetService.standable(around);
+    }
+
+    /**
+     * A blast of this spell at a point, with the caster caught in it too — a wild surge's fireball.
+     */
+    public Outcome explodeAt(Cast cast, Location centre, boolean casterToo) {
+        List<LivingEntity> caught = new ArrayList<>(targets.around(centre, cast.spell().radius(), foes(cast)));
+        if (casterToo && !caught.contains(cast.caster())) {
+            caught.addFirst(cast.caster());
         }
-        return null;
+        cues.ring(centre, cast.spell().radius(), cast.spell().kind());
+        return saveAll(cast, caught, centre);
     }
 
     private Optional<Outcome> aura(Cast cast) {
@@ -704,10 +776,16 @@ public final class SpellService implements IDndService {
     /** A saving throw by the target against the caster's DC. */
     private Roll save(Cast cast, LivingEntity target, Ability ability, boolean first, boolean tell) {
         boolean heightened = first && cast.bent(Metamagic.HEIGHTENED);
-        int dc = checks.spellDc(cast.hero());
+        int dc = cast.extras().dc() != null ? cast.extras().dc() : checks.spellDc(cast.hero());
         Optional<Hero> theirs = target instanceof Player player ? heroes.of(player.getUniqueId()) : Optional.empty();
         int bonus = theirs.map(hero -> checks.saveBonus(hero, ability))
                 .orElseGet(() -> mobs.of(target.getType()).saveBonus());
+        if (target instanceof Player player) {
+            bonus += saveBonusFromItems.applyAsInt(player);
+        }
+        if (conditions.has(cast.caster().getUniqueId(), Condition.BENT_LUCK)) {
+            bonus -= Dice.of(1, 4).roll(random);
+        }
         Roll roll = checks.save(checks.d20(random, heightened), bonus, dc);
         if (!roll.succeeded() && theirs.isPresent() && target instanceof Player player
                 && features.mayUse(theirs.get(), Feature.INDOMITABLE)) {
@@ -727,7 +805,7 @@ public final class SpellService implements IDndService {
         if (!(target instanceof Player player)) {
             return false;
         }
-        return heroes.of(player.getUniqueId()).filter(hero -> Feature.EVASION.has(hero.heroClass(), hero.level()))
+        return heroes.of(player.getUniqueId()).filter(hero -> Feature.EVASION.has(hero))
                 .isPresent();
     }
 

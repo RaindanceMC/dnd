@@ -46,6 +46,9 @@ public final class CombatService implements IDndService {
     private final RandomGenerator random;
 
     private final Cooldowns<UUID> sneakAttacks = new Cooldowns<>();
+    private final Cooldowns<UUID> divineStrikes = new Cooldowns<>();
+    private final Cooldowns<UUID> retaliations = new Cooldowns<>();
+    private volatile java.util.function.ToIntFunction<org.bukkit.inventory.ItemStack> weaponBonus = item -> 0;
     private final Cooldowns<UUID> dodges = new Cooldowns<>();
 
     private volatile DndSettings settings = DndSettings.DEFAULTS;
@@ -64,7 +67,14 @@ public final class CombatService implements IDndService {
         this.mobs = mobs;
         this.random = random;
         sneakAttacks.every(TURN);
+        divineStrikes.every(TURN);
+        retaliations.every(Duration.ofSeconds(1));
         dodges.every(DODGE);
+    }
+
+    /** What a magic weapon adds; the item service knows. */
+    public void weaponBonus(java.util.function.ToIntFunction<org.bukkit.inventory.ItemStack> lookup) {
+        this.weaponBonus = lookup == null ? item -> 0 : lookup;
     }
 
     @Override
@@ -81,16 +91,18 @@ public final class CombatService implements IDndService {
 
     /** A melee blow by a player: what it does with their class behind it. */
     public double melee(Player attacker, LivingEntity target, double base) {
+        double armed = base + weaponBonus.applyAsInt(attacker.getInventory().getItemInMainHand());
         Optional<Hero> found = active(attacker);
         if (found.isEmpty()) {
-            return base;
+            return armed;
         }
+        base = armed;
         Hero hero = found.get();
         UUID id = attacker.getUniqueId();
         boolean unseen = attacker.hasPotionEffect(PotionEffectType.INVISIBILITY);
         double damage = martial.melee(hero, base, conditions.has(id, Condition.RAGING),
                 conditions.has(id, Condition.RECKLESS));
-        if (Feature.SNEAK_ATTACK.has(hero.heroClass(), hero.level()) && sneakAttacks.isReady(id)) {
+        if (Feature.SNEAK_ATTACK.has(hero) && sneakAttacks.isReady(id)) {
             boolean busy = target instanceof Mob mob && mob.getTarget() != null && !attacker.equals(mob.getTarget());
             if (martial.sneakAttackApplies(attacker.isSneaking(), unseen, busy, degreesFromBehind(attacker, target))) {
                 int extra = Dice.of(features.sneakAttackDice(hero.level()), 6).roll(random);
@@ -99,6 +111,15 @@ public final class CombatService implements IDndService {
                 actionBars.show(id, "dnd-cast", messages.get("dnd.sneak-attack", "damage", String.valueOf(extra)),
                         Duration.ofMillis(1500), ActionBarPriority.NORMAL);
             }
+        }
+        if (random.nextDouble() < martial.critChance(hero)) {
+            damage *= 2;
+            actionBars.show(id, "dnd-cast", messages.get("dnd.critical"), Duration.ofMillis(1200),
+                    ActionBarPriority.NORMAL);
+        }
+        int divine = martial.divineStrikeDice(hero);
+        if (divine > 0 && divineStrikes.tryUse(id)) {
+            damage += Dice.of(divine, 8).roll(random);
         }
         if (conditions.clear(id, Condition.HIDDEN) || unseen) {
             concentration.on(id).filter(focus -> focus.spell() == Spell.INVISIBILITY)
@@ -128,19 +149,27 @@ public final class CombatService implements IDndService {
      * @param explosion a creeper, TNT, a fireball's blast
      */
     public double incoming(Player victim, double damage, boolean physical, boolean explosion) {
+        return incoming(victim, damage, physical, explosion, false);
+    }
+
+    /** @param fire flames, lava, a burning floor */
+    public double incoming(Player victim, double damage, boolean physical, boolean explosion, boolean fire) {
         Optional<Hero> found = active(victim);
         UUID id = victim.getUniqueId();
         double left = damage;
         if (found.isPresent()) {
             Hero hero = found.get();
-            boolean dodge = physical && Feature.UNCANNY_DODGE.has(hero.heroClass(), hero.level())
+            boolean dodge = physical && Feature.UNCANNY_DODGE.has(hero)
                     && dodges.tryUse(id);
             left = martial.incoming(damage, conditions.has(id, Condition.RAGING), physical,
                     conditions.has(id, Condition.RECKLESS), conditions.has(id, Condition.SHIELDED), dodge);
             if (dodge) {
                 messages.send(victim, "dnd.uncanny-dodge");
             }
-            if (explosion && Feature.EVASION.has(hero.heroClass(), hero.level())) {
+            if (fire && Feature.ELEMENTAL_AFFINITY.has(hero)) {
+                left /= 2;
+            }
+            if (explosion && Feature.EVASION.has(hero)) {
                 boolean saved = checks.save(checks.d20(random, false), checks.saveBonus(hero, Ability.DEXTERITY),
                         EXPLOSION_DC).succeeded();
                 left = saved ? 0 : left / 2;
@@ -152,6 +181,20 @@ public final class CombatService implements IDndService {
             messages.send(victim, "dnd.death-ward");
         }
         return left;
+    }
+
+    /** Retaliation: a raging berserker hit in melee hits straight back. */
+    public void retaliate(Player victim, LivingEntity attacker) {
+        Optional<Hero> found = active(victim);
+        if (found.isEmpty() || attacker.equals(victim) || !Feature.RETALIATION.has(found.get())
+                || !conditions.has(victim.getUniqueId(), Condition.RAGING)
+                || !retaliations.tryUse(victim.getUniqueId())) {
+            return;
+        }
+        double back = martial.retaliation(found.get());
+        org.bukkit.damage.DamageSource source = org.bukkit.damage.DamageSource.builder(
+                org.bukkit.damage.DamageType.MAGIC).withCausingEntity(victim).withDirectEntity(victim).build();
+        attacker.damage(back, source);
     }
 
     /** After a hit has landed: concentration is tested. */
@@ -173,6 +216,8 @@ public final class CombatService implements IDndService {
 
     public void forget(UUID player) {
         sneakAttacks.forget(player);
+        divineStrikes.forget(player);
+        retaliations.forget(player);
         dodges.forget(player);
         conditions.forget(player);
     }

@@ -54,16 +54,86 @@ public enum Feature implements Castable {
     METAMAGIC("Metamagic", HeroClass.SORCERER, 3, false, Recharge.NONE, Material.BREWING_STAND,
             "Bend a spell with sorcery points: the ninth stance slot picks how.", false),
 
-    DISCIPLE_OF_LIFE("Disciple of Life", HeroClass.CLERIC, 1, false, Recharge.NONE, Material.GOLDEN_APPLE,
-            "Your healing spells heal 2 more, and one more per slot level.", false),
+
     TURN_UNDEAD("Channel Divinity: Turn Undead", HeroClass.CLERIC, 2, true, Recharge.SHORT_REST, Material.BONE_MEAL,
             "Undead near you must make a Wisdom save or flee, weakened; from level 5 the weakest are destroyed.", false),
-    PRESERVE_LIFE("Channel Divinity: Preserve Life", HeroClass.CLERIC, 2, true, Recharge.SHORT_REST,
+    PRESERVE_LIFE("Channel Divinity: Preserve Life", Subclass.LIFE, 2, true, Recharge.SHORT_REST,
             Material.GLISTERING_MELON_SLICE,
-            "Five times your level in healing, shared among the players near you, up to half their health each.", false);
+            "Five times your level in healing, shared among the players near you, up to half their health each.", false),
+
+    // ---- subclasses
+    IMPROVED_CRITICAL("Improved Critical", Subclass.CHAMPION, 3, false, Recharge.NONE, Material.GOLDEN_SWORD,
+            "One melee blow in ten is a critical hit that does double damage.", false),
+    REMARKABLE_ATHLETE("Remarkable Athlete", Subclass.CHAMPION, 7, false, Recharge.NONE, Material.LEATHER_BOOTS,
+            "You run a little faster and jump a little higher.", false),
+    DUELING("Additional Fighting Style: Dueling", Subclass.CHAMPION, 10, false, Recharge.NONE, Material.IRON_SWORD,
+            "Two more damage on every melee blow.", false),
+    SUPERIOR_CRITICAL("Superior Critical", Subclass.CHAMPION, 15, false, Recharge.NONE, Material.DIAMOND_SWORD,
+            "Three melee blows in twenty are critical hits.", false),
+    SURVIVOR("Survivor", Subclass.CHAMPION, 18, false, Recharge.NONE, Material.TOTEM_OF_UNDYING,
+            "Below half health you regain health every few seconds.", false),
+
+    FRENZY("Frenzy", Subclass.BERSERKER, 3, false, Recharge.NONE, Material.BLAZE_POWDER,
+            "Raging, you swing much faster; when the rage ends you are exhausted for a while.", false),
+    MINDLESS_RAGE("Mindless Rage", Subclass.BERSERKER, 6, false, Recharge.NONE, Material.WITHER_ROSE,
+            "Raging, nothing blinds, confuses or darkens you.", false),
+    INTIMIDATING_PRESENCE("Intimidating Presence", Subclass.BERSERKER, 10, true, Recharge.NONE, Material.SKELETON_SKULL,
+            "The creature you glare at makes a Wisdom save or flees, weakened, for half a minute.", false),
+    RETALIATION("Retaliation", Subclass.BERSERKER, 14, false, Recharge.NONE, Material.CACTUS,
+            "Raging, whatever hits you in melee is hit straight back.", false),
+
+    FAST_HANDS("Fast Hands", Subclass.THIEF, 3, false, Recharge.NONE, Material.LEAD,
+            "Cunning Action waits half as long.", false),
+    SECOND_STORY_WORK("Second-Story Work", Subclass.THIEF, 3, false, Recharge.NONE, Material.LADDER,
+            "You jump higher and fall further unhurt.", false),
+    SUPREME_SNEAK("Supreme Sneak", Subclass.THIEF, 9, false, Recharge.NONE, Material.BLACK_DYE,
+            "Hiding lasts twice as long, and you move fast while hidden.", false),
+    USE_MAGIC_DEVICE("Use Magic Device", Subclass.THIEF, 13, false, Recharge.NONE, Material.PAPER,
+            "You can read any spell scroll, whatever class it was written for.", false),
+    THIEFS_REFLEXES("Thief's Reflexes", Subclass.THIEF, 17, false, Recharge.NONE, Material.RABBIT_FOOT,
+            "Every wait after an action is a quarter shorter.", false),
+
+    SCULPT_SPELLS("Sculpt Spells", Subclass.EVOCATION, 2, false, Recharge.NONE, Material.SHIELD,
+            "Your area spells pass harmlessly around other players.", false),
+    POTENT_CANTRIP("Potent Cantrip", Subclass.EVOCATION, 6, false, Recharge.NONE, Material.BLAZE_POWDER,
+            "A cantrip that misses still does half its damage.", false),
+    EMPOWERED_EVOCATION("Empowered Evocation", Subclass.EVOCATION, 10, false, Recharge.NONE, Material.FIRE_CHARGE,
+            "Your damaging spells add your Intelligence modifier.", false),
+    OVERCHANNEL("Overchannel", Subclass.EVOCATION, 14, true, Recharge.LONG_REST, Material.END_CRYSTAL,
+            "Your next 1st- to 5th-level spell deals the most its dice can.", true),
+
+    WILD_MAGIC_SURGE("Wild Magic Surge", Subclass.WILD_MAGIC, 1, false, Recharge.NONE, Material.CHORUS_FLOWER,
+            "Every spell you cast from a slot has a small chance to set off a wild magic surge.", false),
+    TIDES_OF_CHAOS("Tides of Chaos", Subclass.WILD_MAGIC, 1, true, Recharge.LONG_REST, Material.HEART_OF_THE_SEA,
+            "Advantage on your next spell attack. Your next spell from a slot then surges, and Tides return.", true),
+    BEND_LUCK("Bend Luck", Subclass.WILD_MAGIC, 6, true, Recharge.NONE, Material.RABBIT_FOOT,
+            "Two sorcery points: for six seconds, creatures saving against you subtract a d4.", true),
+    CONTROLLED_CHAOS("Controlled Chaos", Subclass.WILD_MAGIC, 14, false, Recharge.NONE, Material.CHORUS_FRUIT,
+            "A surge is rolled twice, and the kinder of the two happens.", false),
+    SPELL_BOMBARDMENT("Spell Bombardment", Subclass.WILD_MAGIC, 18, false, Recharge.NONE, Material.TNT,
+            "Once per spell, a damage die that rolls its highest is rolled again and added.", false),
+
+    DRACONIC_RESILIENCE("Draconic Resilience", Subclass.DRACONIC, 1, false, Recharge.NONE, Material.TURTLE_SCUTE,
+            "One more hit point per level, and dragon scales for armour without a chestplate.", false),
+    ELEMENTAL_AFFINITY("Elemental Affinity", Subclass.DRACONIC, 6, false, Recharge.NONE, Material.MAGMA_CREAM,
+            "Fire spells add your Charisma modifier, and fire does you half.", false),
+    DRAGON_WINGS("Dragon Wings", Subclass.DRACONIC, 14, true, Recharge.NONE, Material.ELYTRA,
+            "Spread your wings and fly; use it again to fold them.", true),
+    DRACONIC_PRESENCE("Draconic Presence", Subclass.DRACONIC, 18, true, Recharge.NONE, Material.DRAGON_HEAD,
+            "Five sorcery points: every hostile creature near you makes a Wisdom save or flees in terror.", false),
+
+    DISCIPLE_OF_LIFE("Disciple of Life", Subclass.LIFE, 1, false, Recharge.NONE, Material.GOLDEN_APPLE,
+            "Your healing spells heal 2 more, and one more per slot level.", false),
+    BLESSED_HEALER("Blessed Healer", Subclass.LIFE, 6, false, Recharge.NONE, Material.GLISTERING_MELON_SLICE,
+            "Healing somebody else heals you too: 2 plus the slot level.", false),
+    DIVINE_STRIKE("Divine Strike", Subclass.LIFE, 8, false, Recharge.NONE, Material.GOLDEN_SWORD,
+            "Once a second and a half, a melee blow adds 1d8 radiant; 2d8 from level 14.", false),
+    SUPREME_HEALING("Supreme Healing", Subclass.LIFE, 17, false, Recharge.NONE, Material.ENCHANTED_GOLDEN_APPLE,
+            "Your healing dice always roll their highest.", false);
 
     private final String title;
     private final HeroClass heroClass;
+    private final Subclass subclass;
     private final int level;
     private final boolean active;
     private final Recharge recharge;
@@ -73,8 +143,19 @@ public enum Feature implements Castable {
 
     Feature(String title, HeroClass heroClass, int level, boolean active, Recharge recharge, Material icon,
             String summary, boolean bonusAction) {
+        this(title, heroClass, null, level, active, recharge, icon, summary, bonusAction);
+    }
+
+    Feature(String title, Subclass subclass, int level, boolean active, Recharge recharge, Material icon,
+            String summary, boolean bonusAction) {
+        this(title, subclass.heroClass(), subclass, level, active, recharge, icon, summary, bonusAction);
+    }
+
+    Feature(String title, HeroClass heroClass, Subclass subclass, int level, boolean active, Recharge recharge,
+            Material icon, String summary, boolean bonusAction) {
         this.title = title;
         this.heroClass = heroClass;
+        this.subclass = subclass;
         this.level = level;
         this.active = active;
         this.recharge = recharge;
@@ -95,6 +176,11 @@ public enum Feature implements Castable {
 
     public HeroClass heroClass() {
         return heroClass;
+    }
+
+    /** The subclass it belongs to, or empty for one every member of the class gets. */
+    public java.util.Optional<Subclass> subclass() {
+        return java.util.Optional.ofNullable(subclass);
     }
 
     /** The class level it is gained at. */
@@ -131,14 +217,35 @@ public enum Feature implements Castable {
         return this == PRESERVE_LIFE ? TURN_UNDEAD : this;
     }
 
+    /** Whether the class alone gives it at that level; subclass features never count here. */
     public boolean has(HeroClass someone, int atLevel) {
-        return someone == heroClass && atLevel >= level;
+        return subclass == null && someone == heroClass && atLevel >= level;
     }
 
+    /** Whether this hero has it: their class, their level, and their subclass if it is one. */
+    public boolean has(Hero hero) {
+        if (hero == null || hero.heroClass() != heroClass || hero.level() < level) {
+            return false;
+        }
+        return subclass == null || subclass == hero.subclass();
+    }
+
+    /** Every feature a class alone gives at that level. */
     public static List<Feature> of(HeroClass heroClass, int atLevel) {
         List<Feature> found = new ArrayList<>();
         for (Feature feature : values()) {
             if (feature.has(heroClass, atLevel)) {
+                found.add(feature);
+            }
+        }
+        return found;
+    }
+
+    /** Every feature this hero has, subclass included. */
+    public static List<Feature> of(Hero hero) {
+        List<Feature> found = new ArrayList<>();
+        for (Feature feature : values()) {
+            if (feature.has(hero)) {
                 found.add(feature);
             }
         }

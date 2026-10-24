@@ -41,7 +41,10 @@ public final class CombatListener implements IDndListener {
                 || cause == EntityDamageEvent.DamageCause.PROJECTILE;
         boolean explosion = cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION
                 || cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION;
-        event.setDamage(services.combat().incoming(victim, event.getDamage(), physical, explosion));
+        boolean fire = cause == EntityDamageEvent.DamageCause.FIRE || cause == EntityDamageEvent.DamageCause.FIRE_TICK
+                || cause == EntityDamageEvent.DamageCause.LAVA || cause == EntityDamageEvent.DamageCause.HOT_FLOOR
+                || cause == EntityDamageEvent.DamageCause.CAMPFIRE;
+        event.setDamage(services.combat().incoming(victim, event.getDamage(), physical, explosion, fire));
         services.resting().interrupt(victim, "dnd.rest.hurt");
     }
 
@@ -52,8 +55,35 @@ public final class CombatListener implements IDndListener {
         }
     }
 
+    /** Retaliation, once a melee blow on a raging berserker has landed. */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onStruck(EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof Player victim && event.getDamager() instanceof LivingEntity attacker
+                && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+            services.combat().retaliate(victim, attacker);
+        }
+    }
+
+    /** What a surge summoned drops nothing; a monster an adventurer killed may drop a magic item. */
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onDrops(EntityDeathEvent event) {
+        if (de.raindancer.modules.dnd.service.SurgeService.isSummoned(event.getEntity())) {
+            event.getDrops().clear();
+            event.setDroppedExp(0);
+            return;
+        }
+        Player killer = event.getEntity().getKiller();
+        if (killer != null && !(event.getEntity() instanceof Player)
+                && services.heroes().of(killer.getUniqueId()).isPresent()) {
+            services.loot().roll(killer, event.getEntity()).ifPresent(event.getDrops()::add);
+        }
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(EntityDeathEvent event) {
+        if (de.raindancer.modules.dnd.service.SurgeService.isSummoned(event.getEntity())) {
+            return;
+        }
         Player killer = event.getEntity().getKiller();
         if (killer != null) {
             services.combat().killed(killer, event.getEntity());

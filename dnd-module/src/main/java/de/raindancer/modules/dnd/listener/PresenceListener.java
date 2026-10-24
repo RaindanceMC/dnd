@@ -39,6 +39,7 @@ public final class PresenceListener implements IDndListener {
         Player player = event.getPlayer();
         services.stance().leave(player, true);
         services.concentration().forget(player);
+        services.features().foldWings(player);
         UUID id = player.getUniqueId();
         forget(id);
         services.heroes().left(id);
@@ -50,6 +51,7 @@ public final class PresenceListener implements IDndListener {
         if (!services.config().worksIn(player.getWorld().getName())) {
             services.stance().leave(player, false);
             services.concentration().end(player, null);
+            services.features().foldWings(player);
         }
         services.body().refresh(player, services.heroes().of(player.getUniqueId()));
     }
@@ -76,6 +78,8 @@ public final class PresenceListener implements IDndListener {
         services.combat().forget(player);
         services.resting().forget(player);
         services.stance().forget(player);
+        services.features().forget(player);
+        services.surges().forget(player);
         services.core().actionBars().forget(player);
     }
 

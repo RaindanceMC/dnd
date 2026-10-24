@@ -11,7 +11,8 @@ import de.raindancer.modules.dnd.model.Hero;
 public final class HealthRule implements IDndRule {
 
     public int perLevel(Hero hero) {
-        return Math.max(1, hero.heroClass().hitDie() / 2 + 1 + hero.modifier(Ability.CONSTITUTION));
+        int resilience = de.raindancer.modules.dnd.model.Feature.DRACONIC_RESILIENCE.has(hero) ? 1 : 0;
+        return Math.max(1, hero.heroClass().hitDie() / 2 + 1 + hero.modifier(Ability.CONSTITUTION)) + resilience;
     }
 
     public double bonusHealth(Hero hero, int scalePercent) {

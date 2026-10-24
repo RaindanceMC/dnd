@@ -13,6 +13,7 @@ public final class MartialRule implements IDndRule {
 
     public static final double RECKLESS = 1.25;
     public static final double SHIELD = 0.6;
+    public static final int DUELING = 2;
 
     private final FeatureRule features;
 
@@ -33,7 +34,10 @@ public final class MartialRule implements IDndRule {
         if (raging && hero.heroClass() == HeroClass.BARBARIAN) {
             damage += features.rageDamage(hero.level());
         }
-        if (Feature.EXTRA_ATTACK.has(hero.heroClass(), hero.level())) {
+        if (Feature.DUELING.has(hero)) {
+            damage += DUELING;
+        }
+        if (Feature.EXTRA_ATTACK.has(hero)) {
             damage *= 1.0 + features.extraAttackBonus(hero.level());
         }
         if (reckless) {
@@ -66,10 +70,13 @@ public final class MartialRule implements IDndRule {
 
     /** Armour points added: Defense with a chestplate, Unarmored Defense without one. */
     public double armourBonus(Hero hero, boolean wearsChestplate) {
-        if (Feature.FIGHTING_STYLE.has(hero.heroClass(), hero.level())) {
+        if (Feature.FIGHTING_STYLE.has(hero)) {
             return wearsChestplate ? 2.0 : 0.0;
         }
-        if (Feature.UNARMORED_DEFENSE.has(hero.heroClass(), hero.level()) && !wearsChestplate) {
+        if (Feature.DRACONIC_RESILIENCE.has(hero)) {
+            return wearsChestplate ? 0.0 : 6.0;
+        }
+        if (Feature.UNARMORED_DEFENSE.has(hero) && !wearsChestplate) {
             int toughness = hero.modifier(Ability.DEXTERITY) + hero.modifier(Ability.CONSTITUTION);
             return Math.max(0, Math.min(12, toughness * 2));
         }
@@ -78,7 +85,29 @@ public final class MartialRule implements IDndRule {
 
     /** Movement speed added, as a fraction of the normal. */
     public double speedBonus(Hero hero) {
-        return Feature.FAST_MOVEMENT.has(hero.heroClass(), hero.level()) ? 0.1 : 0.0;
+        double bonus = Feature.FAST_MOVEMENT.has(hero) ? 0.1 : 0.0;
+        return Feature.REMARKABLE_ATHLETE.has(hero) ? bonus + 0.05 : bonus;
+    }
+
+    /** The chance a melee blow is a critical hit doing double, beyond Minecraft's own jumping crits. */
+    public double critChance(Hero hero) {
+        if (Feature.SUPERIOR_CRITICAL.has(hero)) {
+            return 0.15;
+        }
+        return Feature.IMPROVED_CRITICAL.has(hero) ? 0.10 : 0.0;
+    }
+
+    /** What Retaliation hits back with. */
+    public double retaliation(Hero hero) {
+        return 2 + hero.modifier(Ability.STRENGTH) + features.rageDamage(hero.level());
+    }
+
+    /** Divine Strike's dice: 1d8 from level 8, 2d8 from 14. */
+    public int divineStrikeDice(Hero hero) {
+        if (!Feature.DIVINE_STRIKE.has(hero)) {
+            return 0;
+        }
+        return hero.level() >= 14 ? 2 : 1;
     }
 
     @Override
