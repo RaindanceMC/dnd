@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.raindancer.modules</groupId>
+        <artifactId>dnd-build</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>dnd-module</artifactId>
+    <version>${dnd-module.version}</version>
+    <packaging>jar</packaging>
+
+    <name>Rain's Flexible Modules — Adventurers</name>
+    <description>
+        Tabletop-style classes on a survival server: pick a class, level from 1 to 20, spend spell slots,
+        sorcery points, rage and second winds, cast spells from a casting stance, and recover on short and
+        long rests. Rules adapted from the System Reference Document 5.1 (CC BY 4.0).
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.raindancer.modules</groupId>
+            <artifactId>modules-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.raindancer.modules</groupId>
+            <artifactId>modules-api</artifactId>
+            <type>test-jar</type>
+            <version>${modules-api.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.49.1.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,110 @@
+# Rain's Adventurers — every line this module says.
+#
+# Offered as a floor: anything an owner already wrote in their own messages.yml wins. Every placeholder a line asks
+# for is supplied where it is sent.
+dnd:
+
+  usage: "<gray>/adventurer  ·  /adventurer rest | stance | spells | class"
+  only-a-player: "<red>Only somebody standing in the world can have a class."
+  not-allowed: "<red>Adventuring is not for you on this server, it seems."
+  welcome: "<gold>Adventure awaits.</gold> <gray>Type <white>/adventurer</white> to choose a class."
+  no-class: "<red>You have no class yet. <white>/adventurer</white> to choose one."
+  still-loading: "<yellow>Your adventurer is still being read. Give it a second."
+  unreadable: "<red>Your adventurer could not be read right now, so nothing about it can change. Tell staff."
+  class-chosen: "<gold>You are a <white><class></white> now.</gold> <gray>Press <white>F</white> to take up your casting stance."
+  xp-gained: "<green>+<xp> XP</green> <dark_gray>(<source>)"
+  level-up-title: "<gold>Level <level>"
+  level-up-subtitle: "<yellow>Your <class> grows stronger"
+  level-up: "<gold>Level <level>!</gold> <gray>Your <class> has learned from the road."
+  improvement-earned: "<aqua>You have <white><points></white> ability point(s) to spend on your character sheet."
+  learned: "<light_purple>New:</light_purple> <white><name></white> <gray>is in your spellbook."
+  indomitable: "<gold>Indomitable!</gold> <gray>You shrug off what should have stopped you."
+  sneak-attack: "<red>Sneak Attack</red> <gray>+<white><damage></white>"
+  uncanny-dodge: "<yellow>Uncanny Dodge</yellow> <gray>— you take half."
+  death-ward: "<gold>Death Ward holds.</gold> <gray>One hit point, and still standing."
+
+  stance:
+    entered: "<light_purple>Casting stance.</light_purple> <gray>Click a slot to cast; sneak and click to use your highest slot. <white>F</white> to leave."
+    left: "<gray>You lower your hands. Your hotbar is back."
+    not-here: "<red>The weave is silent in this world."
+    could-not-keep: "<red>Your hotbar could not be set aside safely, so the stance was not taken up. Nothing was moved."
+
+  cast:
+    no-target: "<red><spell> needs something to aim at."
+    no-slot: "<red>No spell slot high enough is left for <spell>. Rest to win them back."
+    not-yours: "<red>That is not a spell or feature you can use now."
+    held: "<red>You are held fast and cannot cast."
+    wait: "<gray>Next action in <white><seconds>s"
+    wait-bonus: "<gray>Next bonus action in <white><seconds>s"
+    used: "<gold><name>"
+    harm: "<light_purple><spell></light_purple> <dark_gray>(<slot>)</dark_gray> <gray><hit> hit · <saved> saved · <missed> missed · <white><damage></white> damage"
+    heal: "<light_purple><spell></light_purple> <dark_gray>(<slot>)</dark_gray> <green>+<healed> health</green> <gray>for <hit>"
+    done: "<light_purple><spell></light_purple> <dark_gray>(<slot>)"
+    too-strong: "<gray>The word finds no purchase: that creature is too strong for <spell>."
+    lethargy: "<gray>Haste ends, and a wave of lethargy washes over you."
+    no-room: "<red>There is nowhere to stand over there."
+    visible: "<gray>Your <spell> fades as you act."
+
+  roll:
+    attack-hit: "<dark_gray>d20 <white><die></white> <bonus> = <white><total></white> against AC <ac>: <green>hit"
+    attack-miss: "<dark_gray>d20 <white><die></white> <bonus> = <white><total></white> against AC <ac>: <red>miss"
+    attack-critical: "<dark_gray>d20 <gold><die></gold> <bonus> = <white><total></white> against AC <ac>: <gold>critical hit!"
+    attack-fumble: "<dark_gray>d20 <red><die></red> <bonus> = <white><total></white> against AC <ac>: <red>a natural 1"
+    save-made: "<dark_gray><name> <ability> save: d20 <white><die></white> <bonus> = <white><total></white> against DC <dc>: <yellow>saved"
+    save-failed: "<dark_gray><name> <ability> save: d20 <white><die></white> <bonus> = <white><total></white> against DC <dc>: <green>failed"
+
+  metamagic:
+    does-not-fit: "<yellow><metamagic> does not bend <spell>, so it is cast as it is."
+    too-few-points: "<red><metamagic> costs <cost> sorcery point(s) and you have fewer. Click slot 9 to change it."
+    used: "<light_purple><metamagic></light_purple> <gray>bends your <spell>."
+
+  concentration:
+    broken: "<red>Your concentration breaks:</red> <gray><spell> ends."
+    ended: "<gray><spell> runs out."
+
+  feature:
+    none-left: "<red>No <name> left. Rest to win it back."
+    wait: "<gray><name> again in <white><seconds>s"
+    reckless: "<red>Reckless!</red> <gray>Hit harder; get hit harder."
+    rage: "<red>You rage!</red> <gray>+<bonus> melee damage, and blows do half."
+    already-raging: "<red>You are already raging."
+    second-wind: "<green>Second Wind:</green> <gray>+<white><health></white> health."
+    already-healthy: "<gray>You are not hurt."
+    action-surge: "<gold>Action Surge!</gold> <gray>Every wait is over."
+    nothing-to-recover: "<gray>You have no spent slots that Arcane Recovery could win back."
+    no-undead: "<gray>No undead near enough to turn."
+    turned: "<gold>Channel Divinity:</gold> <gray><turned> of <count> undead flee, <destroyed> destroyed."
+    nobody-low: "<gray>Nobody near you is below half their health."
+    preserve-life: "<gold>Preserve Life:</gold> <gray><white><health></white> health for <count> player(s)."
+
+  rest:
+    already: "<gray>You are already resting."
+    short-started: "<gray>You sit down for a short rest. Stay still and unhurt for <white><seconds></white> seconds."
+    short-bar: "<gray>Short rest: <white><seconds>s"
+    moved: "<yellow>You got up, so the rest is over. Nothing was restored."
+    hurt: "<red>Something hurt you, so the rest is over."
+    short-done: "<green>Rested.</green> <gray>Spent <white><dice></white> hit dice for <white><health></white> health; short-rest features are back."
+    long-done: "<green>A long rest.</green> <gray>Full health, every slot and every use is back."
+    long-too-soon: "<gray>Too soon after your last long rest; another one in <white><minutes></white> minute(s)."
+
+  hud:
+    caster: "<light_purple><name></light_purple>  <dark_gray><slots>"
+    sorcerer: "<light_purple><name></light_purple>  <dark_gray><slots></dark_gray>  <aqua>SP <points>/<most>"
+    martial: "<gold><name>"
+
+  font:
+    cannot-make: "<red>A <level>-level slot costs <cost> sorcery points, and you do not have them."
+    cannot-burn: "<red>No <level>-level slot to give up, or your sorcery points are full."
+
+  admin:
+    not-allowed: "<red>Only staff can do that."
+    usage: "<gray>/adventurer admin level|xp <player> <number>  ·  /adventurer admin rest|reset <player>"
+    not-online: "<red><player> is not online here."
+    one-at-a-time: "<red>One player at a time, please."
+    not-a-number: "<red><value> is not a number."
+    no-hero: "<red><player> has no class yet."
+    level-set: "<green><player> is level <level> now."
+    xp-given: "<green><player> got <xp> XP."
+    rested: "<green><player> had a long rest."
+    reset: "<green><player>'s adventurer is gone; they can choose a class again."
+    you-were-reset: "<yellow>Your adventurer was reset by staff. Type <white>/adventurer</white> to begin again."

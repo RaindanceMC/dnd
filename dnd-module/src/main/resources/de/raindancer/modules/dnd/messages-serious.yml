@@ -1,0 +1,25 @@
+# Rain's Adventurers — the same lines said plainly, for a server whose Message tone is SERIOUS.
+# Only lines that differ are here; everything else is the same in both tones.
+dnd:
+  welcome: "<gray>Type <white>/adventurer</white> to choose a class."
+  class-chosen: "<green>Class set: <white><class></white>.</green> <gray>Press <white>F</white> for the casting stance."
+  level-up-subtitle: "<gray><class>"
+  level-up: "<green>Level <level> reached as <class>."
+  indomitable: "<gray>Indomitable: the saving throw was rolled again."
+  death-ward: "<gray>Death Ward: left at one hit point."
+  stance:
+    entered: "<gray>Casting stance on. Click a slot to cast, sneak and click for the highest slot, <white>F</white> to leave."
+    left: "<gray>Casting stance off. Hotbar restored."
+    not-here: "<red>Classes are switched off in this world."
+  cast:
+    too-strong: "<gray>The target has more than 100 health; <spell> has no effect."
+    lethargy: "<gray>Haste ended: slowed for a few seconds."
+  feature:
+    reckless: "<gray>Reckless Attack: more damage dealt and taken for 8 seconds."
+    rage: "<gray>Rage: +<bonus> melee damage, half damage taken from blows."
+    action-surge: "<gray>Action Surge: all waits reset."
+  rest:
+    moved: "<yellow>Short rest cancelled: you moved."
+    hurt: "<red>Short rest cancelled: you took damage."
+    short-done: "<green>Short rest done: <dice> hit dice spent, <health> health restored."
+    long-done: "<green>Long rest done: health, slots and uses restored."

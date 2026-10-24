@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.raindancer.modules</groupId>
+        <artifactId>dnd-build</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>dnd-standalone</artifactId>
+    <!-- Published at the plugin's own version. -->
+    <version>${plugin.version}</version>
+    <packaging>jar</packaging>
+
+    <name>Rain's Adventurers</name>
+    <description>
+        Rain's Adventurers, as a plugin of its own: the dnd module and the standard wrapper, shaded together.
+    </description>
+
+    <properties>
+        <!-- The name the server sees, and the name of its data folder. -->
+        <plugin.name>RainsAdventurers</plugin.name>
+
+        <!-- 0.1.0: the first release — six classes (fighter, barbarian, rogue, wizard, sorcerer, cleric),
+             levels 1 to 20, spell slots, sorcery points and metamagic, the casting stance, short and long rests. -->
+        <plugin.version>0.1.0</plugin.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.raindancer.modules</groupId>
+            <artifactId>dnd-module</artifactId>
+            <version>${dnd-module.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.raindancer.modules</groupId>
+            <artifactId>modules-wrapper</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${plugin.name}-${plugin.version}</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <!-- The descriptor names the version, and a version written twice is one that drifts. -->
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+            </plugin>
+            <!--
+              StandaloneJarTest reads the jar this build produces, so it has to run after it exists.
+              Surefire bound to a later phase rather than failsafe, which is one more plugin to have
+              cached — this build has to work offline.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>after-the-jar-exists</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skipTests>false</skipTests>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
