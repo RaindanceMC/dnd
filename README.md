@@ -15,7 +15,19 @@ Part of [RaindanceMC](https://github.com/RaindanceMC); built on [RainsCore](http
 | ![A sorcerer's origin](docs/screenshots/7-origins.png) | ![A wild surge](docs/screenshots/8-surge-poppies.png) |
 | ![After a few surges](docs/screenshots/9-surge-aftermath.png) | ![Magic items](docs/screenshots/10-items.png) |
 
-Taken with the real client by `AdventurersScreenshotsTest` in [e2e](https://github.com/RaindanceMC/e2e).
+Its own looks (0.3.0) — every magic item modelled in Blockbench, a 32px icon for every spell, feature and class, the
+designed character sheet:
+
+| | |
+|---|---|
+| ![Magic items, in Blockbench](docs/screenshots/11-items-blockbench.png) | ![Every icon](docs/screenshots/12-icons.png) |
+| ![Potions on a wall](docs/screenshots/14-wall-close.png) | ![Gear on a wall](docs/screenshots/15-wall-gear.png) |
+| ![The character sheet](docs/screenshots/16-sheet.png) | ![Spell icons](docs/screenshots/17-spell-icons.png) |
+
+Taken with the real client by `AdventurersScreenshotsTest` and `AdventurersLooksScreenshotsTest` in
+[e2e](https://github.com/RaindanceMC/e2e). The art is made in `dnd-module/art/`: `items/` (Blockbench models, built
+through Blockbench's MCP plugin by `build.py`), `icons/` (`render.py`), `weapons/` (`runes.py`), `gui/` (`sheet.py`),
+then `pack.py` writes the index the plugin ships from.
 
 ## Playing
 

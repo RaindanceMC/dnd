@@ -69,7 +69,8 @@ public final class ClassMenu extends Menu implements IDndScreen {
                 .orElse("none, class features instead"));
         lore.add("");
         lore.add("<yellow>Click<gray> to become one");
-        return Icons.of(heroClass.icon(), "<gold>" + heroClass.title(), lore);
+        return de.raindancer.modules.dnd.store.DndPack.dress(Icons.of(heroClass.icon(), "<gold>" + heroClass.title(),
+                lore), de.raindancer.modules.dnd.store.DndPack.classIcon(heroClass));
     }
 
     private void pick(HeroClass heroClass) {

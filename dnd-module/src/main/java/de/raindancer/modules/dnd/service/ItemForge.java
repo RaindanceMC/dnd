@@ -64,7 +64,8 @@ public final class ItemForge implements IDndService {
             ItemTags.charges(meta, MagicItem.WAND_CHARGES, clock.getAsLong());
         }
         meta.lore(lore);
-        meta.setEnchantmentGlintOverride(true);
+        // The glint washes over a modelled item's own colours; a rune weapon keeps it, it is still the vanilla blade.
+        meta.setEnchantmentGlintOverride(item.isWeapon());
         if (meta instanceof PotionMeta potion) {
             potion.setColor(switch (item) {
                 case POTION_OF_HEROISM -> Color.fromRGB(0xF2C94C);
@@ -77,6 +78,8 @@ public final class ItemForge implements IDndService {
         }
         ItemTags.stamp(meta, item, spell);
         stack.setItemMeta(meta);
+        de.raindancer.modules.dnd.store.DndPack.itemModel(item, spell, material)
+                .ifPresent(path -> de.raindancer.modules.dnd.store.DndPack.dress(stack, path));
         if (item.isPotion()) {
             stack.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay()
                     .addHiddenComponents(DataComponentTypes.POTION_CONTENTS).build());

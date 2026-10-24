@@ -11,6 +11,8 @@ import de.raindancer.modules.dnd.model.Hero;
 import de.raindancer.modules.dnd.rules.FeatureRule;
 import de.raindancer.modules.dnd.rules.ProgressionRule;
 import de.raindancer.modules.dnd.service.IconForge;
+import de.raindancer.modules.dnd.store.DndPack;
+import org.bukkit.inventory.ItemStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
@@ -33,9 +35,81 @@ public final class SheetMenu extends Menu implements IDndScreen {
         this.services = services;
     }
 
+    /** Where every button sits, matching the frames painted on the sheet's background (art/gui/sheet.py). */
+    static final int LEVEL = 2;
+    static final int PORTRAIT = 4;
+    static final int HIT_DICE = 6;
+    static final int[] ABILITIES = {10, 11, 12, 14, 15, 16};
+    static final int[] LEDGER = {19, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 34};
+    static final int SPELLBOOK = 37;
+    static final int STANCE = 39;
+    static final int REST = 41;
+    static final int ORIGIN = 43;
+
+    /** The background glyph and the spaces around it, in the pack's "sheet" font. */
+    private static final String BACKGROUND = "\uF808\uE000\uF8A9";
+    private static final net.kyori.adventure.key.Key FONT = net.kyori.adventure.key.Key.key(DndPack.NAMESPACE, "sheet");
+    private static final net.kyori.adventure.text.format.TextColor INK =
+            net.kyori.adventure.text.format.TextColor.color(0x4A3220);
+
     @Override
     protected Component title() {
         return MINI.deserialize("<dark_gray>Character sheet");
+    }
+
+    /** Whether this viewer sees the painted sheet: only with the pack on, or the title would show its glyphs. */
+    private boolean designed() {
+        return services.core().resourcePacks().isWearing(viewer.getUniqueId());
+    }
+
+    @Override
+    public Component windowTitle() {
+        if (!designed()) {
+            return super.windowTitle();
+        }
+        String heading = services.heroes().of(viewer.getUniqueId())
+                .map(hero -> hero.heroClass().title() + ", level " + hero.level())
+                .orElse("Character sheet");
+        return Component.text(BACKGROUND).font(FONT).color(net.kyori.adventure.text.format.NamedTextColor.WHITE)
+                .append(Component.text(heading).font(net.kyori.adventure.key.Key.key("minecraft", "default"))
+                        .color(INK));
+    }
+
+    /** On the painted sheet the page itself is the background: no filler panes over it. */
+    @Override
+    protected void decorate() {
+        if (!designed()) {
+            super.decorate();
+        }
+    }
+
+    @Override
+    public void open() {
+        super.open();
+        veil();
+    }
+
+    @Override
+    public void refresh() {
+        super.refresh();
+        veil();
+    }
+
+    /** The chrome row's filler panes become invisible, so the painted leather strip shows instead. */
+    private void veil() {
+        if (!designed()) {
+            return;
+        }
+        for (int slot = 0; slot < getInventory().getSize(); slot++) {
+            ItemStack item = getInventory().getItem(slot);
+            if (item != null && (item.getType() == Material.GRAY_STAINED_GLASS_PANE
+                    || item.getType() == Material.BLACK_STAINED_GLASS_PANE)) {
+                ItemStack blank = DndPack.dress(new ItemStack(Material.PAPER), "ui/blank");
+                blank.setData(io.papermc.paper.datacomponent.DataComponentTypes.TOOLTIP_DISPLAY,
+                        io.papermc.paper.datacomponent.item.TooltipDisplay.tooltipDisplay().hideTooltip(true).build());
+                getInventory().setItem(slot, blank);
+            }
+        }
     }
 
     @Override
@@ -47,7 +121,7 @@ public final class SheetMenu extends Menu implements IDndScreen {
     protected void render() {
         Optional<Hero> found = services.heroes().of(viewer.getUniqueId());
         if (found.isEmpty()) {
-            set(MenuLayout.HEADER_SUBJECT, Icons.of(Material.BOOK, "<gray>No class yet",
+            set(PORTRAIT, Icons.of(Material.BOOK, "<gray>No class yet",
                     "<yellow>Click<gray> to choose one"), click -> new ClassMenu(services, viewer, this).open());
             return;
         }
@@ -76,7 +150,7 @@ public final class SheetMenu extends Menu implements IDndScreen {
             progress.add(bar);
             progress.add("<dark_gray>Defeat monsters to gain more.");
         }
-        set(MenuLayout.HEADER_LEFT, Icons.of(Material.EXPERIENCE_BOTTLE,
+        set(LEVEL, Icons.of(Material.EXPERIENCE_BOTTLE,
                 "<green>Level " + hero.level() + " " + hero.heroClass().title(), progress));
 
         List<String> lore = new ArrayList<>();
@@ -88,17 +162,17 @@ public final class SheetMenu extends Menu implements IDndScreen {
         var armour = viewer.getAttribute(org.bukkit.attribute.Attribute.ARMOR);
         lore.add("<gray>Armour class: <white>" + services.checks().playerArmourClass(
                 armour == null ? 0 : (int) Math.round(armour.getValue()), hero.modifier(Ability.DEXTERITY)));
-        set(MenuLayout.HEADER_SUBJECT, Icons.head(viewer, "<white>" + viewer.getName(), lore));
+        set(PORTRAIT, Icons.head(viewer, "<white>" + viewer.getName(), lore));
 
         int left = hero.level() - hero.hitDiceSpent();
-        set(MenuLayout.HEADER_RIGHT, Icons.of(Material.RED_DYE, "<red>Hit dice",
+        set(HIT_DICE, Icons.of(Material.RED_DYE, "<red>Hit dice",
                 "<gray>Left: <white>" + left + "</white> of " + hero.level() + " (d" + hero.heroClass().hitDie() + ")",
                 "<dark_gray>Spent on a short rest to heal;",
                 "<dark_gray>half come back on a long rest."));
     }
 
     private void abilities(Hero hero) {
-        int column = 1;
+        int index = 0;
         for (Ability ability : Ability.values()) {
             int score = hero.scores().score(ability);
             int modifier = hero.modifier(ability);
@@ -121,7 +195,7 @@ public final class SheetMenu extends Menu implements IDndScreen {
                 case WISDOM -> Material.COMPASS;
                 case CHARISMA -> Material.NAME_TAG;
             };
-            band(MenuLayout.WHO, column++, Icons.of(icon, "<white>" + ability.title() + " " + score, lore),
+            set(ABILITIES[index++], Icons.of(icon, "<white>" + ability.title() + " " + score, lore),
                     click -> raise(ability));
         }
     }
@@ -137,7 +211,7 @@ public final class SheetMenu extends Menu implements IDndScreen {
     }
 
     private void resources(Hero hero) {
-        int column = 1;
+        int column = 0;
         if (hero.heroClass().castsSpells()) {
             List<String> lore = new ArrayList<>();
             for (int level = 1; level <= 9; level++) {
@@ -148,10 +222,10 @@ public final class SheetMenu extends Menu implements IDndScreen {
                 }
             }
             lore.add("<dark_gray>A long rest brings them all back.");
-            band(MenuLayout.RULES, column++, Icons.of(Material.AMETHYST_SHARD, "<light_purple>Spell slots", lore));
+            set(LEDGER[column++], Icons.of(Material.AMETHYST_SHARD, "<light_purple>Spell slots", lore));
         }
         if (services.sorcery().most(hero) > 0) {
-            band(MenuLayout.RULES, column++, Icons.of(Material.AMETHYST_CLUSTER, "<light_purple>Sorcery points",
+            set(LEDGER[column++], Icons.of(Material.AMETHYST_CLUSTER, "<light_purple>Sorcery points",
                     "<gray>Left: <white>" + hero.sorceryPoints() + "</white> of " + services.sorcery().most(hero),
                     "<dark_gray>Spent on metamagic and on making slots.",
                     "<dark_gray>A long rest refills them."));
@@ -167,24 +241,25 @@ public final class SheetMenu extends Menu implements IDndScreen {
             for (String line : wrapped(feature.summary())) {
                 lore.add("<dark_gray>" + line);
             }
-            if (column <= 7) {
-                band(MenuLayout.RULES, column++, Icons.of(feature.icon(), "<gold>" + feature.title(), lore));
+            if (column < LEDGER.length) {
+                set(LEDGER[column++], DndPack.dress(Icons.of(feature.icon(), "<gold>" + feature.title(), lore),
+                        DndPack.iconOf(feature)));
             }
         }
     }
 
     private void doors(Hero hero) {
-        band(MenuLayout.LAND, 1, Icons.of(Material.WRITABLE_BOOK, "<aqua>Spellbook",
+        set(SPELLBOOK, Icons.of(Material.WRITABLE_BOOK, "<aqua>Spellbook",
                 "<gray>Choose what sits on your casting stance.", "<yellow>Click<gray> to open"),
                 click -> new LoadoutMenu(services, viewer, this).open());
-        band(MenuLayout.LAND, 2, Icons.of(Material.BLAZE_ROD, "<aqua>Casting stance",
+        set(STANCE, Icons.of(Material.BLAZE_ROD, "<aqua>Casting stance",
                 "<gray>Your hotbar becomes your spells and features;",
                 "<gray>click one to cast it. <white>F</white> enters and leaves.",
                 "<yellow>Click<gray> to take it up now"), click -> {
                     viewer.closeInventory();
                     services.stance().enter(viewer, hero);
                 });
-        band(MenuLayout.LAND, 3, Icons.of(Material.RED_BED, "<aqua>Short rest",
+        set(REST, Icons.of(Material.RED_BED, "<aqua>Short rest",
                 "<gray>Stand still for " + services.config().shortRestSeconds() + " seconds to spend hit dice",
                 "<gray>and win back what a short rest restores.",
                 "<gray>Sleep through a night for a long rest.", "<yellow>Click<gray> to rest"), click -> {
@@ -192,14 +267,18 @@ public final class SheetMenu extends Menu implements IDndScreen {
                     services.resting().startShort(viewer);
                 });
         if (services.subclasses().choosing(hero)) {
-            band(MenuLayout.LAND, 5, Icons.of(Material.CHORUS_FLOWER, "<light_purple>Choose your origin",
+            set(ORIGIN, Icons.of(Material.CHORUS_FLOWER, "<light_purple>Choose your origin",
                     "<gray>Wild Magic or the Draconic Bloodline.", "<yellow>Click<gray> to choose"),
                     click -> new SubclassMenu(services, viewer, this).open());
+            return;
         }
-        boolean sorcerer = Feature.FONT_OF_MAGIC.has(hero);
-        band(MenuLayout.LAND, 4, sorcerer, Icons.of(Material.AMETHYST_CLUSTER, "<aqua>Font of Magic",
-                        "<gray>Turn sorcery points into spell slots and back.", "<yellow>Click<gray> to open"),
-                "Sorcerers from level 2", click -> new FontOfMagicMenu(services, viewer, this).open());
+        ItemStack font = Icons.of(Material.AMETHYST_CLUSTER, "<aqua>Font of Magic",
+                "<gray>Turn sorcery points into spell slots and back.", "<yellow>Click<gray> to open");
+        if (Feature.FONT_OF_MAGIC.has(hero)) {
+            set(ORIGIN, font, click -> new FontOfMagicMenu(services, viewer, this).open());
+        } else {
+            set(ORIGIN, Icons.locked(font, "Sorcerers from level 2"));
+        }
     }
 
     private static List<String> wrapped(String text) {

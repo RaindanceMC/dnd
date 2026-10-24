@@ -1,0 +1,6 @@
+{
+ "parent": "minecraft:item/generated",
+ "textures": {
+  "layer0": "rainsadventurers:item/spell/finger_of_death"
+ }
+}

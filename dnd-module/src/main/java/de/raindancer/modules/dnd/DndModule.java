@@ -53,6 +53,7 @@ import de.raindancer.modules.dnd.service.SpellService;
 import de.raindancer.modules.dnd.service.StanceService;
 import de.raindancer.modules.dnd.service.TargetService;
 import de.raindancer.modules.dnd.store.DndDatabase;
+import de.raindancer.modules.dnd.store.DndPack;
 import de.raindancer.modules.dnd.store.HeroBook;
 import de.raindancer.modules.dnd.store.StanceStash;
 import de.raindancer.modules.dnd.util.PermissionNodes;
@@ -75,7 +76,7 @@ import java.util.random.RandomGenerator;
  */
 public final class DndModule implements FlexModule {
 
-    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.2.1")
+    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.3.0")
             .describedAs("Classes, levels, spell slots, sorcery points and spells cast from a casting stance.")
             .by("Raindancer118");
 
@@ -198,6 +199,8 @@ public final class DndModule implements FlexModule {
         context.listener(new ItemListener(services));
 
         DndCommands.ready(services);
+        DndPack.contribute(context.plugin(), context.core());
+        context.closeWith(() -> DndPack.withdraw(context.core()));
 
         var hudTimer = Scheduling.globalTimer(context.plugin(), HUD_TICKS, HUD_TICKS, task -> {
             for (Player player : server.getOnlinePlayers()) {

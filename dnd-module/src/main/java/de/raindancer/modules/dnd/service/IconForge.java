@@ -11,6 +11,7 @@ import de.raindancer.modules.dnd.model.Spell;
 import de.raindancer.modules.dnd.rules.DamageRule;
 import de.raindancer.modules.dnd.rules.FeatureRule;
 import de.raindancer.modules.dnd.rules.SpellSlotRule;
+import de.raindancer.modules.dnd.store.DndPack;
 import de.raindancer.modules.dnd.store.IconTags;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -113,6 +114,11 @@ public final class IconForge implements IDndService {
         ItemStack stack = Icons.of(castable.icon(), colour + castable.title(), lore);
         stack.setAmount(amount);
         hideExtras(stack);
+        if (castable instanceof Spell spell) {
+            DndPack.dress(stack, DndPack.iconOf(spell));
+        } else if (castable instanceof Feature feature) {
+            DndPack.dress(stack, DndPack.iconOf(feature));
+        }
         return stack;
     }
 
@@ -131,7 +137,7 @@ public final class IconForge implements IDndService {
         ItemStack stack = Icons.of(Material.GRAY_STAINED_GLASS_PANE, "<dark_gray>Empty slot " + (slot + 1),
                 List.of("<gray>Put a spell or feature here from", "<gray>your spellbook: click slot 9."));
         IconTags.stamp(stack, IconTags.EMPTY);
-        return stack;
+        return DndPack.dress(stack, DndPack.EMPTY);
     }
 
     /** The ninth slot. A sorcerer with metamagic sees what is armed; everybody else their sheet. */
@@ -160,7 +166,7 @@ public final class IconForge implements IDndService {
         }
         hideExtras(stack);
         IconTags.stamp(stack, IconTags.SHEET);
-        return stack;
+        return DndPack.dress(stack, metamagic ? DndPack.metamagicIcon(armed) : DndPack.SHEET);
     }
 
     private static void hideExtras(ItemStack stack) {

@@ -70,7 +70,8 @@ public final class SubclassMenu extends Menu implements IDndScreen {
         }
         lore.add("");
         lore.add("<yellow>Click<gray> to choose it, for good");
-        return Icons.of(subclass.icon(), "<light_purple>" + subclass.title(), lore);
+        return de.raindancer.modules.dnd.store.DndPack.dress(Icons.of(subclass.icon(),
+                "<light_purple>" + subclass.title(), lore), de.raindancer.modules.dnd.store.DndPack.subclassIcon(subclass));
     }
 
     private void choose(Subclass subclass) {

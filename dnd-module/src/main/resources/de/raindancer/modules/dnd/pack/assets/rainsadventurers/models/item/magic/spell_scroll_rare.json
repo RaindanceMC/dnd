@@ -1,0 +1,7 @@
+{
+ "parent": "rainsadventurers:item/magic/spell_scroll",
+ "textures": {
+  "0": "rainsadventurers:item/magic/spell_scroll_rare",
+  "particle": "rainsadventurers:item/magic/spell_scroll_rare"
+ }
+}

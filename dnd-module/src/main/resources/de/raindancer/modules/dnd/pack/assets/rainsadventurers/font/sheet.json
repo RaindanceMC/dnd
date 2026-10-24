@@ -1,0 +1,20 @@
+{
+ "providers": [
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/sheet.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue000"
+   ]
+  },
+  {
+   "type": "space",
+   "advances": {
+    "\uf808": -8,
+    "\uf8a9": -169
+   }
+  }
+ ]
+}

@@ -1,0 +1,6 @@
+{
+ "parent": "minecraft:item/generated",
+ "textures": {
+  "layer0": "rainsadventurers:item/feature/wild_magic_surge"
+ }
+}
