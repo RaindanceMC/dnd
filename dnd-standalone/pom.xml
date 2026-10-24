@@ -29,7 +29,8 @@
         <!-- 0.2.0: subclasses (Champion, Berserker, Thief, Evocation, Life, and the sorcerer's choice of Wild Magic
              with its own d100 surge table or Draconic Bloodline); magic items — potions, spell scrolls, +1 to +3
              weapons, a wand, ring, amulet, boots, a bag — dropped by monsters by rarity. -->
-        <plugin.version>0.2.0</plugin.version>
+        <!-- 0.2.1: /adventurer stance and /adventurer rest close an open menu first. -->
+        <plugin.version>0.2.1</plugin.version>
     </properties>
 
     <dependencies>
