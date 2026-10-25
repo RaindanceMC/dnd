@@ -23,7 +23,7 @@ sections:
   - question: What is the Potion of Mach Fuck?
     title: Potion of Mach Fuck
     text: |
-      The one magic potion you <b>brew</b> instead of finding: put a <white>dragon head</white> into a brewing stand over any ordinary drinkable potion (a water bottle works too). Drink it, open your elytra, and for {setting:dnd:mach.seconds|seconds} you fly wherever you look at {setting:dnd:mach.blocks-per-second|number} blocks a second. Steer by looking.
+      The one magic potion you <b>brew</b> instead of finding: put a <white>dragon head</white> into a brewing stand over any ordinary drinkable potion (a water bottle works too). Drink it with an elytra on: for {setting:dnd:mach.seconds|seconds} it keeps you flying — opening the elytra again whenever it folds, lifting you off the ground first — wherever you look at {setting:dnd:mach.blocks-per-second|number} blocks a second. Steer by looking.
       Crashing into a wall or the ground does not hurt while it works and for five seconds after, so you can land. The land ahead cannot load that fast, so much of the trip is empty sky. It never drops from monsters.
   - question: How do spell scrolls work?
     title: Scrolls

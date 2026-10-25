@@ -33,7 +33,7 @@ public final class AdventurerAdvancements {
         child("lithobraking", "mach_fuck", Material.COBBLESTONE, "Lithobraking",
                 "Hit a wall or the ground at Mach Fuck and live", AdvancementFrame.TASK);
         child("wasted_potential", "hold_my_elytra", Material.GLASS_BOTTLE, "Wasted Potential",
-                "Let a Potion of Mach Fuck wear off without ever opening your elytra", AdvancementFrame.TASK);
+                "Let a Potion of Mach Fuck wear off without an elytra on", AdvancementFrame.TASK);
         child("double_shot", "mach_fuck", Material.HONEY_BOTTLE, "Double Shot",
                 "Drink a second Potion of Mach Fuck while the first still works", AdvancementFrame.TASK);
         child("triple_batch", "hold_my_elytra", Material.BREWING_STAND, "Triple Batch",

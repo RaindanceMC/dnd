@@ -11,6 +11,7 @@ import de.raindancer.modules.dnd.rules.MachRule;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.Map;
@@ -20,8 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.LongSupplier;
 
 /**
- * The Potion of Mach Fuck in somebody: while it works and they glide, they are flung along where they look every tick,
- * and steer by looking. Crashes and falls are forgiven until a little after it wears off. Runs on the player's own
+ * The Potion of Mach Fuck in somebody: while it works they are kept gliding and flung along where they look every
+ * tick, and steer by looking. Crashes and falls are forgiven until a little after it wears off. Runs on the player's own
  * thread, once a tick from {@link #tick}.
  */
 public final class MachService implements IDndService {
@@ -29,6 +30,8 @@ public final class MachService implements IDndService {
     /** A move further than this in a tick is a teleport, not flying; it does not count towards the distance. */
     private static final double TELEPORT = 200;
     private static final String BAR = "dnd-mach";
+    /** Upwards off the ground, a few blocks: room for the elytra to open. */
+    private static final double LIFT = 1.0;
 
     private final Messages messages;
     private final ActionBars actionBars;
@@ -129,6 +132,7 @@ public final class MachService implements IDndService {
         }
         flight.last = here;
         if (!player.isGliding()) {
+            keepFlying(player);
             return;
         }
         Vector look = here.getDirection();
@@ -144,6 +148,23 @@ public final class MachService implements IDndService {
             advancements.machFlown(player.getUniqueId(), flight.flown);
         }
         player.getWorld().spawnParticle(Particle.CLOUD, here, 2, 0.2, 0.2, 0.2, 0.01);
+    }
+
+    /**
+     * As long as it works it keeps them flying: an elytra that folded opens again, and somebody standing is lifted off
+     * first. Not in a boat or a minecart, not under water, and not without an elytra on.
+     */
+    private static void keepFlying(Player player) {
+        ItemStack chest = player.getInventory().getChestplate();
+        if (chest == null || !chest.hasData(io.papermc.paper.datacomponent.DataComponentTypes.GLIDER)
+                || player.isInsideVehicle() || player.isInWater() || player.isFlying()) {
+            return;
+        }
+        if (player.isOnGround()) {
+            player.setVelocity(new Vector(0, LIFT, 0));
+        } else {
+            player.setGliding(true);
+        }
     }
 
     /** Whether a wall or the ground should not hurt now: the potion works, or wore off only just. */
