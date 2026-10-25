@@ -41,13 +41,13 @@ public final class MachListener implements IDndListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBrew(BrewEvent event) {
-        boolean mach = event.getResults().stream().anyMatch(MachListener::isMach);
-        if (!mach) {
+        int potions = (int) event.getResults().stream().filter(MachListener::isMach).count();
+        if (potions == 0) {
             return;
         }
         Location stand = event.getBlock().getLocation().add(0.5, 0.5, 0.5);
         for (Player near : stand.getNearbyPlayers(BREWER_REACH)) {
-            advancements.brewedMach(near.getUniqueId());
+            advancements.brewedMach(near.getUniqueId(), potions);
         }
     }
 
@@ -62,6 +62,7 @@ public final class MachListener implements IDndListener {
                 || event.getCause() == EntityDamageEvent.DamageCause.FALL)
                 && mach.shielded(player)) {
             event.setCancelled(true);
+            advancements.lithobraked(player.getUniqueId());
         }
     }
 

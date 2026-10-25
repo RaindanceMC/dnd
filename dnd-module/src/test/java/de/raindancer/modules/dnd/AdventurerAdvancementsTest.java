@@ -52,7 +52,8 @@ class AdventurerAdvancementsTest {
     @Test
     @DisplayName("the whole tab loads")
     void allLoad() {
-        for (String id : new String[]{"root", "hold_my_elytra", "mach_fuck", "low_orbit"}) {
+        for (String id : new String[]{"root", "hold_my_elytra", "mach_fuck", "low_orbit", "lithobraking",
+                "wasted_potential", "double_shot", "triple_batch", "hellfire_express"}) {
             assertThat(advancements.isLoaded("rainsadventurers:" + id)).as(id).isTrue();
         }
     }
@@ -63,7 +64,7 @@ class AdventurerAdvancementsTest {
         adventurers.drank(ALICE);
         assertThat(advancements.has(ALICE, "rainsadventurers:root")).isTrue();
 
-        adventurers.brewedMach(ALICE);
+        adventurers.brewedMach(ALICE, 1);
         assertThat(advancements.has(ALICE, "rainsadventurers:hold_my_elytra")).isTrue();
 
         adventurers.machFlown(ALICE, 9_999);
@@ -71,5 +72,25 @@ class AdventurerAdvancementsTest {
         assertThat(advancements.has(ALICE, "rainsadventurers:low_orbit")).isFalse();
         adventurers.machFlown(ALICE, 10_000);
         assertThat(advancements.has(ALICE, "rainsadventurers:low_orbit")).isTrue();
+    }
+
+    @Test
+    @DisplayName("the potion's other stories: a crash forgiven, one wasted, two at once, three brewed together, the Nether")
+    void machMore() {
+        for (String moment : new String[]{"lithobraking", "wasted_potential", "double_shot", "triple_batch",
+                "hellfire_express"}) {
+            assertThat(advancements.has(ALICE, "rainsadventurers:" + moment)).as(moment).isFalse();
+        }
+        adventurers.lithobraked(ALICE);
+        adventurers.wastedMach(ALICE);
+        adventurers.doubleShot(ALICE);
+        adventurers.brewedMach(ALICE, 2);
+        assertThat(advancements.has(ALICE, "rainsadventurers:triple_batch")).as("two is not three").isFalse();
+        adventurers.brewedMach(ALICE, 3);
+        adventurers.machInTheNether(ALICE);
+        for (String moment : new String[]{"lithobraking", "wasted_potential", "double_shot", "triple_batch",
+                "hellfire_express"}) {
+            assertThat(advancements.has(ALICE, "rainsadventurers:" + moment)).as(moment).isTrue();
+        }
     }
 }

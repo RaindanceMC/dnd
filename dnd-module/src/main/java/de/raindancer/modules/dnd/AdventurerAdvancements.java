@@ -30,15 +30,45 @@ public final class AdventurerAdvancements {
                 "Glide with a Potion of Mach Fuck in you", AdvancementFrame.GOAL);
         child("low_orbit", "mach_fuck", Material.FIREWORK_ROCKET, "Low Earth Orbit",
                 "Fly " + (int) ORBIT_BLOCKS + " blocks on a single Potion of Mach Fuck", AdvancementFrame.CHALLENGE);
+        child("lithobraking", "mach_fuck", Material.COBBLESTONE, "Lithobraking",
+                "Hit a wall or the ground at Mach Fuck and live", AdvancementFrame.TASK);
+        child("wasted_potential", "hold_my_elytra", Material.GLASS_BOTTLE, "Wasted Potential",
+                "Let a Potion of Mach Fuck wear off without ever opening your elytra", AdvancementFrame.TASK);
+        child("double_shot", "mach_fuck", Material.HONEY_BOTTLE, "Double Shot",
+                "Drink a second Potion of Mach Fuck while the first still works", AdvancementFrame.TASK);
+        child("triple_batch", "hold_my_elytra", Material.BREWING_STAND, "Triple Batch",
+                "Brew three Potions of Mach Fuck at once", AdvancementFrame.GOAL);
+        child("hellfire_express", "mach_fuck", Material.NETHERRACK, "Hellfire Express",
+                "Fly a Potion of Mach Fuck through the Nether", AdvancementFrame.GOAL);
     }
 
     public void drank(UUID player) {
         advancements.award(player, ROOT);
     }
 
-    public void brewedMach(UUID player) {
+    /** A brewing stand near the player brewed {@code potions} Potions of Mach Fuck at once. */
+    public void brewedMach(UUID player, int potions) {
         advancements.award(player, ROOT);
         advancements.award(player, PLUGIN + ":hold_my_elytra");
+        if (potions >= 3) {
+            advancements.award(player, PLUGIN + ":triple_batch");
+        }
+    }
+
+    public void lithobraked(UUID player) {
+        advancements.award(player, PLUGIN + ":lithobraking");
+    }
+
+    public void wastedMach(UUID player) {
+        advancements.award(player, PLUGIN + ":wasted_potential");
+    }
+
+    public void doubleShot(UUID player) {
+        advancements.award(player, PLUGIN + ":double_shot");
+    }
+
+    public void machInTheNether(UUID player) {
+        advancements.award(player, PLUGIN + ":hellfire_express");
     }
 
     /** Flying on the potion, {@code blocks} so far on this one. */

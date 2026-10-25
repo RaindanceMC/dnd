@@ -45,6 +45,7 @@ public final class MachService implements IDndService {
         double flown;
         int ticks;
         boolean over;
+        boolean glided;
 
         Flight(long drankAt) {
             this.drankAt = drankAt;
@@ -67,7 +68,11 @@ public final class MachService implements IDndService {
     }
 
     public void drank(Player player) {
-        flights.put(player.getUniqueId(), new Flight(clock.getAsLong()));
+        long now = clock.getAsLong();
+        Flight before = flights.put(player.getUniqueId(), new Flight(now));
+        if (before != null && rule.working(before.drankAt, now, settings.machSeconds())) {
+            advancements.doubleShot(player.getUniqueId());
+        }
         messages.send(player, "dnd.item.mach", "seconds", String.valueOf(settings.machSeconds()),
                 "speed", String.valueOf(settings.machBlocksPerSecond()));
         effects.play(player.getUniqueId(), Cues.ABILITY);
@@ -109,6 +114,9 @@ public final class MachService implements IDndService {
             if (!flight.over) {
                 flight.over = true;
                 messages.send(player, "dnd.item.mach-over");
+                if (!flight.glided) {
+                    advancements.wastedMach(player.getUniqueId());
+                }
             }
             return;
         }
@@ -127,7 +135,11 @@ public final class MachService implements IDndService {
         double[] velocity = rule.velocity(new double[]{look.getX(), look.getY(), look.getZ()},
                 settings.machBlocksPerSecond());
         player.setVelocity(new Vector(velocity[0], velocity[1], velocity[2]));
+        flight.glided = true;
         if (flight.ticks++ % 10 == 0) {
+            if (here.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER) {
+                advancements.machInTheNether(player.getUniqueId());
+            }
             player.getWorld().spawnParticle(Particle.EXPLOSION, here, 1);
             advancements.machFlown(player.getUniqueId(), flight.flown);
         }
