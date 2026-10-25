@@ -102,4 +102,18 @@ class HeroBookTest {
                 .hasSize(1);
         assertThat(HeroBook.decodeLoadout("a,,b")).containsExactly("a", "", "b");
     }
+
+    @Test
+    @DisplayName("the top is the most experienced first, a tie going to the higher level, cut to the size asked")
+    void top() {
+        UUID bo = UUID.randomUUID();
+        UUID cy = UUID.randomUUID();
+        book.save(Hero.fresh(ana, HeroClass.SORCERER, List.of()).withLevel(3, 1_000, 0), 0);
+        book.save(Hero.fresh(bo, HeroClass.SORCERER, List.of()).withLevel(7, 23_500, 0), 0);
+        book.save(Hero.fresh(cy, HeroClass.SORCERER, List.of()).withLevel(2, 400, 0), 0);
+        assertThat(book.top(2)).extracting(HeroBook.Standing::player).containsExactly(bo, ana);
+        assertThat(book.top(2).getFirst().level()).isEqualTo(7);
+        assertThat(book.top(2).getFirst().heroClass()).isEqualTo(HeroClass.SORCERER);
+        assertThat(book.top(10)).hasSize(3);
+    }
 }

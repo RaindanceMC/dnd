@@ -76,7 +76,7 @@ import java.util.random.RandomGenerator;
  */
 public final class DndModule implements FlexModule {
 
-    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.6.0")
+    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.7.0")
             .describedAs("Classes, levels, spell slots, sorcery points and spells cast from a casting stance.")
             .by("Raindancer118");
 
@@ -231,6 +231,20 @@ public final class DndModule implements FlexModule {
         for (Player player : server.getOnlinePlayers()) {
             stance.restore(player);
             heroes.joined(player);
+        }
+
+        // Screens for /screen — Core 2.10.0; on an older Core there are simply none.
+        try {
+            var screens = context.core().screens();
+            if (screens != null) {
+                new de.raindancer.modules.dnd.service.AdventurerScreens(heroes, progression, book::top,
+                        player -> context.core().identities().nameOf(player), System::currentTimeMillis)
+                        .register(screens, context.plugin());
+                context.closeWith(() -> de.raindancer.modules.dnd.service.AdventurerScreens.KINDS
+                        .forEach(screens::unregister));
+            }
+        } catch (LinkageError olderCore) {
+            log.info("RainsCore is older than 2.10.0: no adventurer screens until it is updated.");
         }
 
         log.info("Adventurers are up: {} classes, {} spells; heroes are kept in {}.",

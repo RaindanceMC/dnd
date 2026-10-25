@@ -53,6 +53,10 @@ public final class HeroBook {
         }
     }
 
+    /** A hero's place in the top: who, what class, how far. */
+    public record Standing(UUID player, HeroClass heroClass, int level, long xp) {
+    }
+
     private final Database database;
 
     public HeroBook(Database database) {
@@ -100,6 +104,27 @@ public final class HeroBook {
         }
         return written[0] > 0 ? new Saved(Saved.Status.WRITTEN, written[0])
                 : new Saved(Saved.Status.CONFLICT, expectedRev);
+    }
+
+    /** The most experienced heroes, most first; a tie goes to the higher level. Empty when the database cannot be read. */
+    public List<Standing> top(int most) {
+        return database.read(connection -> {
+            try (PreparedStatement select = connection.prepareStatement(
+                    "SELECT player, class, level, xp FROM hero ORDER BY xp DESC, level DESC, player LIMIT ?")) {
+                select.setInt(1, Math.max(1, most));
+                List<Standing> found = new ArrayList<>();
+                try (ResultSet row = select.executeQuery()) {
+                    while (row.next()) {
+                        Optional<HeroClass> heroClass = HeroClass.named(row.getString(2));
+                        if (heroClass.isPresent()) {
+                            found.add(new Standing(UUID.fromString(row.getString(1)), heroClass.get(),
+                                    row.getInt(3), row.getLong(4)));
+                        }
+                    }
+                }
+                return List.copyOf(found);
+            }
+        }).orElse(List.of());
     }
 
     /** Takes the hero out entirely, whatever revision it is at. */
