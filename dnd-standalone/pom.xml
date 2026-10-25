@@ -32,7 +32,8 @@
         <!-- 0.2.1: /adventurer stance and /adventurer rest close an open menu first. -->
         <!-- 0.3.0: its own looks — a 32px icon for every spell, feature, class, subclass and metamagic; 3D models
              for every magic item, made in Blockbench; rune overlays for +1 to +3 swords and axes. -->
-        <plugin.version>0.7.0</plugin.version>
+        <!-- 0.8.0: the Potion of Mach Fuck — brewed from a dragon head and any plain potion, a rocket flask of its own; drunk and gliding, wherever you look at mach.blocks-per-second (600) for mach.seconds (20), crashes and falls forgiven until five seconds after; never loot. An advancement tab: Rain's Adventurers, Hold My Elytra, Mach Fuck, Low Earth Orbit. -->
+        <plugin.version>0.8.0</plugin.version>
     </properties>
 
     <dependencies>

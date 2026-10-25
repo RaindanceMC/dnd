@@ -56,4 +56,17 @@ class LootRuleTest {
             }
         }
     }
+
+    @Test
+    @DisplayName("the Potion of Mach Fuck is only ever brewed, never found")
+    void machIsBrewed() {
+        SplittableRandom random = new SplittableRandom(1);
+        for (int go = 0; go < 2_000; go++) {
+            assertThat(rule.item(MagicItem.POTION_OF_MACH_FUCK.rarity(), random).item())
+                    .isNotEqualTo(MagicItem.POTION_OF_MACH_FUCK);
+        }
+        assertThat(MagicItem.POTION_OF_MACH_FUCK.lootable()).isFalse();
+        assertThat(MagicItem.POTION_OF_SPEED.lootable()).isTrue();
+        assertThat(MagicItem.POTION_OF_MACH_FUCK.isPotion()).isTrue();
+    }
 }

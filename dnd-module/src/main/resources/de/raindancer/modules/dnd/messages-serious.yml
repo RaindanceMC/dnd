@@ -23,3 +23,5 @@ dnd:
     hurt: "<red>Short rest cancelled: you took damage."
     short-done: "<green>Short rest done: <dice> hit dice spent, <health> health restored."
     long-done: "<green>Long rest done: health, slots and uses restored."
+  item:
+    mach: "<gray>Mach potion: while gliding, <white><seconds></white> seconds at <white><speed></white> blocks a second where you look. No crash or fall damage."

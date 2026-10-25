@@ -70,6 +70,7 @@ public final class ItemForge implements IDndService {
             potion.setColor(switch (item) {
                 case POTION_OF_HEROISM -> Color.fromRGB(0xF2C94C);
                 case POTION_OF_SPEED -> Color.fromRGB(0x56CCF2);
+                case POTION_OF_MACH_FUCK -> Color.fromRGB(0x5B1A8C);
                 default -> Color.fromRGB(0xD7263D);
             });
         }

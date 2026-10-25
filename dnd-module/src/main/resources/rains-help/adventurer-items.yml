@@ -7,8 +7,8 @@ icon: POTION
 category: Items & enchantments
 order: 44
 module: dnd
-aliases: [magic-items, loot, potions, scrolls, wand, rings, adventurer-loot, bag-of-holding]
-keywords: [healing, heroism, speed, spell, scroll, wand, charges, ring, protection, amulet, health, boots, bag, holding, weapon, plus, rarity]
+aliases: [magic-items, loot, potions, mach-fuck, scrolls, wand, rings, adventurer-loot, bag-of-holding]
+keywords: [healing, heroism, speed, mach, dragon, brewing, elytra, spell, scroll, wand, charges, ring, protection, amulet, health, boots, bag, holding, weapon, plus, rarity]
 related: [adventurer, adventurer-spells]
 sections:
   - question: Where do magic items come from?
@@ -20,6 +20,11 @@ sections:
     title: Potions
     text: |
       Drink them like any potion. <white>Healing</white> heals 2d4+2, <white>Greater</white> 4d4+4, <white>Superior</white> 8d4+8 and <white>Supreme</white> 10d4+20. <white>Heroism</white>: ten temporary hit points and a minute of blessed strength. <white>Speed</white>: a minute of haste, faster legs and hands, harder skin.
+  - question: What is the Potion of Mach Fuck?
+    title: Potion of Mach Fuck
+    text: |
+      The one magic potion you <b>brew</b> instead of finding: put a <white>dragon head</white> into a brewing stand over any ordinary drinkable potion (a water bottle works too). Drink it, open your elytra, and for {setting:dnd:mach.seconds|seconds} you fly wherever you look at {setting:dnd:mach.blocks-per-second|number} blocks a second. Steer by looking.
+      Crashing into a wall or the ground does not hurt while it works and for five seconds after, so you can land. The land ahead cannot load that fast, so much of the trip is empty sky. It never drops from monsters.
   - question: How do spell scrolls work?
     title: Scrolls
     text: |

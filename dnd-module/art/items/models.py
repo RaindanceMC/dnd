@@ -104,6 +104,27 @@ def vial():
     return parts
 
 
+def rocket_flask():
+    """A slim flask on four fins, like a rocket on its pad: the Potion of Mach Fuck."""
+    parts = []
+    parts += round_y("base", 8, 8, 0, 1.0, 2.4, "iron")
+    parts += round_y("liquid", 8, 8, 1.2, 8.6, 1.9, "liquid")
+    parts += round_y("glass", 8, 8, 1.0, 10.0, 2.2, "glass")
+    parts += round_y("nose", 8, 8, 10.0, 11.4, 1.5, "glass")
+    parts += round_y("neck", 8, 8, 11.4, 12.6, 0.9, "glass_rim")
+    parts += round_y("lip", 8, 8, 12.6, 13.1, 1.3, "iron")
+    parts += round_y("band", 8, 8, 5.0, 5.8, 2.35, "rune")
+    parts.append(box("stopper", (7.2, 13.1, 7.2), (8.8, 14.9, 8.8), "ruby", None,
+                     {"angle": 45, "axis": "y", "origin": [8, 14, 8]}))
+    for i, (dx, dz) in enumerate(((1, 0), (-1, 0), (0, 1), (0, -1))):
+        x, z = 8 + dx * 2.9, 8 + dz * 2.9
+        half_x, half_z = (0.9, 0.18) if dx else (0.18, 0.9)
+        parts.append(box("fin_%d" % i, (x - half_x, 0, z - half_z), (x + half_x, 3.4, z + half_z), "iron"))
+        parts.append(box("fin_tip_%d" % i, (x - half_x * 0.6, 3.4, z - half_z * 0.6),
+                         (x + half_x * 0.6, 4.4, z + half_z * 0.6), "ruby"))
+    return parts
+
+
 # ---------------------------------------------------------------- the rest
 
 def scroll():
@@ -280,6 +301,7 @@ POTIONS = {
     "potion_of_supreme_healing": ("tall_bottle_amethyst", {"liquid": "#d0168f"}),
     "potion_of_heroism": ("vial", {"liquid": "#e9a51e"}),
     "potion_of_speed": ("vial", {"liquid": "#22b4dc"}),
+    "potion_of_mach_fuck": ("rocket_flask", {"liquid": "#5b1a8c"}),
 }
 
 SCROLL_SEALS = {"common": "#b02029", "uncommon": "#2f8f3a", "rare": "#2b5fd0", "very_rare": "#8a2fc9",
@@ -291,6 +313,7 @@ SHAPES = {
     "tall_bottle_ruby": tall_bottle("ruby"),
     "tall_bottle_amethyst": tall_bottle("amethyst"),
     "vial": vial(),
+    "rocket_flask": rocket_flask(),
     "spell_scroll": scroll(),
     "wand_of_magic_missiles": wand(),
     "ring_of_protection": ring(),

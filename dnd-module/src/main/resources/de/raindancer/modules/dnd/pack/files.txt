@@ -63,6 +63,7 @@ assets/rainsadventurers/items/magic/boots_of_striding.json
 assets/rainsadventurers/items/magic/potion_of_greater_healing.json
 assets/rainsadventurers/items/magic/potion_of_healing.json
 assets/rainsadventurers/items/magic/potion_of_heroism.json
+assets/rainsadventurers/items/magic/potion_of_mach_fuck.json
 assets/rainsadventurers/items/magic/potion_of_speed.json
 assets/rainsadventurers/items/magic/potion_of_superior_healing.json
 assets/rainsadventurers/items/magic/potion_of_supreme_healing.json
@@ -223,6 +224,7 @@ assets/rainsadventurers/models/item/magic/boots_of_striding.json
 assets/rainsadventurers/models/item/magic/potion_of_greater_healing.json
 assets/rainsadventurers/models/item/magic/potion_of_healing.json
 assets/rainsadventurers/models/item/magic/potion_of_heroism.json
+assets/rainsadventurers/models/item/magic/potion_of_mach_fuck.json
 assets/rainsadventurers/models/item/magic/potion_of_speed.json
 assets/rainsadventurers/models/item/magic/potion_of_superior_healing.json
 assets/rainsadventurers/models/item/magic/potion_of_supreme_healing.json
@@ -397,6 +399,8 @@ assets/rainsadventurers/textures/item/magic/potion_of_healing.png
 assets/rainsadventurers/textures/item/magic/potion_of_healing.png.mcmeta
 assets/rainsadventurers/textures/item/magic/potion_of_heroism.png
 assets/rainsadventurers/textures/item/magic/potion_of_heroism.png.mcmeta
+assets/rainsadventurers/textures/item/magic/potion_of_mach_fuck.png
+assets/rainsadventurers/textures/item/magic/potion_of_mach_fuck.png.mcmeta
 assets/rainsadventurers/textures/item/magic/potion_of_speed.png
 assets/rainsadventurers/textures/item/magic/potion_of_speed.png.mcmeta
 assets/rainsadventurers/textures/item/magic/potion_of_superior_healing.png

@@ -62,7 +62,7 @@ public final class LootRule implements IDndRule {
     public Drop item(Rarity rarity, RandomGenerator random) {
         List<MagicItem> items = new ArrayList<>();
         for (MagicItem item : MagicItem.values()) {
-            if (item != MagicItem.SPELL_SCROLL && item.rarity() == rarity) {
+            if (item != MagicItem.SPELL_SCROLL && item.lootable() && item.rarity() == rarity) {
                 items.add(item);
             }
         }

@@ -19,6 +19,8 @@ public enum MagicItem {
             "Ten temporary hit points and a minute of blessed strength."),
     POTION_OF_SPEED("Potion of Speed", Rarity.VERY_RARE, Material.POTION, Dice.NONE,
             "A minute of haste: faster legs, faster hands, harder skin."),
+    POTION_OF_MACH_FUCK("Potion of Mach Fuck", Rarity.LEGENDARY, Material.POTION, Dice.NONE,
+            "Brewed from a dragon's head. Drink it, glide, and you go wherever you look, far too fast."),
     SPELL_SCROLL("Spell Scroll", Rarity.COMMON, Material.PAPER, Dice.NONE,
             "Read it to cast the spell written on it, if it is on your class's list. It crumbles afterwards."),
     WEAPON_PLUS_ONE("+1 Weapon", Rarity.UNCOMMON, Material.IRON_SWORD, Dice.flat(1),
@@ -84,6 +86,11 @@ public enum MagicItem {
 
     public boolean isPotion() {
         return material == Material.POTION;
+    }
+
+    /** Whether monsters drop it; a brewed one only ever comes out of a brewing stand. */
+    public boolean lootable() {
+        return this != POTION_OF_MACH_FUCK;
     }
 
     public boolean isWeapon() {

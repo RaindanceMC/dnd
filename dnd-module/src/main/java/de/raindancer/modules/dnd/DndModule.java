@@ -76,7 +76,7 @@ import java.util.random.RandomGenerator;
  */
 public final class DndModule implements FlexModule {
 
-    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.7.0")
+    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.8.0")
             .describedAs("Classes, levels, spell slots, sorcery points and spells cast from a casting stance.")
             .by("Raindancer118");
 
@@ -197,6 +197,7 @@ public final class DndModule implements FlexModule {
         context.listener(new CombatListener(services));
         context.listener(new RestListener(services));
         context.listener(new ItemListener(services));
+        enableMach(context, settings, messages, itemForge);
 
         DndCommands.ready(services);
         DndPack.contribute(context.plugin(), context.core());
@@ -272,6 +273,58 @@ public final class DndModule implements FlexModule {
         @Override
         public void spellbook(Player viewer) {
             new LoadoutMenu(services, viewer, null).open();
+        }
+    }
+
+    /**
+     * The Potion of Mach Fuck: a dragon head brewed into a plain potion makes it (a mix of the server's brewer,
+     * taken back when the module stops), and a timer flies whoever has it in them.
+     */
+    private void enableMach(ModuleContext context, SettingsStore<DndSettings> settings,
+                            de.raindancer.core.ui.messages.Messages messages, ItemForge itemForge) {
+        AdventurerAdvancements advancements = new AdventurerAdvancements(context.core().advancements());
+        advancements.define();
+        de.raindancer.modules.dnd.rules.MachRule rule = new de.raindancer.modules.dnd.rules.MachRule();
+        de.raindancer.modules.dnd.service.MachService mach = new de.raindancer.modules.dnd.service.MachService(
+                messages, context.core().actionBars(), context.core().effects(), advancements, rule,
+                System::currentTimeMillis);
+        mach.settings(settings.current());
+        settings.onChange(mach::settings);
+        context.listener(new de.raindancer.modules.dnd.listener.MachListener(mach, advancements));
+
+        org.bukkit.NamespacedKey key = new org.bukkit.NamespacedKey(DndPack.NAMESPACE, "mach_fuck");
+        var brewer = server.getPotionBrewer();
+        brewer.removePotionMix(key);
+        brewer.addPotionMix(new io.papermc.paper.potion.PotionMix(key,
+                itemForge.make(de.raindancer.modules.dnd.model.MagicItem.POTION_OF_MACH_FUCK, null),
+                io.papermc.paper.potion.PotionMix.createPredicateChoice(bottle -> rule.brewsFrom(bottle.getType(),
+                        de.raindancer.modules.dnd.store.ItemTags.itemOf(bottle).isPresent())),
+                new org.bukkit.inventory.RecipeChoice.MaterialChoice(org.bukkit.Material.DRAGON_HEAD)));
+        context.closeWith(() -> brewer.removePotionMix(key));
+
+        de.raindancer.modules.dnd.service.MachWorlds worlds = new de.raindancer.modules.dnd.service.MachWorlds();
+        Scheduling.global(context.plugin(), () -> worlds.restoreAll(server.getWorlds()));
+        context.closeWith(() -> worlds.restoreAll(server.getWorlds()));
+        var timer = Scheduling.globalTimer(context.plugin(), 1, 1, task -> {
+            java.util.Set<org.bukkit.World> flying = new java.util.HashSet<>();
+            for (java.util.UUID id : mach.working()) {
+                Player player = server.getPlayer(id);
+                if (player != null) {
+                    flying.add(player.getWorld());
+                }
+            }
+            worlds.flyingIn(flying, server.getWorlds());
+            for (java.util.UUID id : mach.active()) {
+                Player player = server.getPlayer(id);
+                if (player == null) {
+                    mach.forget(id);
+                } else {
+                    Scheduling.entity(context.plugin(), player, () -> mach.tick(player));
+                }
+            }
+        });
+        if (timer != null) {
+            context.closeWith(timer::cancel);
         }
     }
 
