@@ -14,7 +14,7 @@ import json
 import os
 import sys
 
-sys.path.insert(0, "/tmp/bbmcp")
+sys.path.insert(0, os.path.expanduser("~/.claude/tools/bbmcp"))
 import bb  # noqa: E402  a tiny MCP client for Blockbench's endpoint
 import paint  # noqa: E402
 from models import POTIONS, SCROLL_SEALS, SHAPES  # noqa: E402
