@@ -11,77 +11,53 @@ import de.raindancer.modules.api.ModuleInfo;
 import de.raindancer.modules.dnd.listener.CombatListener;
 import de.raindancer.modules.dnd.listener.ItemListener;
 import de.raindancer.modules.dnd.listener.PresenceListener;
-import de.raindancer.modules.dnd.listener.RestListener;
-import de.raindancer.modules.dnd.listener.StanceListener;
-import de.raindancer.modules.dnd.rules.CheckRule;
-import de.raindancer.modules.dnd.rules.ConcentrationRule;
-import de.raindancer.modules.dnd.rules.DamageRule;
-import de.raindancer.modules.dnd.rules.FeatureRule;
-import de.raindancer.modules.dnd.rules.HealthRule;
+import de.raindancer.modules.dnd.model.AdventurerTree;
+import de.raindancer.modules.dnd.rules.FightRule;
 import de.raindancer.modules.dnd.rules.ItemRule;
 import de.raindancer.modules.dnd.rules.LootRule;
-import de.raindancer.modules.dnd.rules.SubclassRule;
-import de.raindancer.modules.dnd.rules.SurgeRule;
-import de.raindancer.modules.dnd.rules.LoadoutRule;
-import de.raindancer.modules.dnd.rules.MartialRule;
-import de.raindancer.modules.dnd.rules.MetamagicRule;
 import de.raindancer.modules.dnd.rules.MobRule;
+import de.raindancer.modules.dnd.rules.PerkRule;
 import de.raindancer.modules.dnd.rules.ProgressionRule;
-import de.raindancer.modules.dnd.rules.RestRule;
-import de.raindancer.modules.dnd.rules.SorceryRule;
-import de.raindancer.modules.dnd.rules.SpellSlotRule;
-import de.raindancer.modules.dnd.screen.ClassMenu;
-import de.raindancer.modules.dnd.screen.LoadoutMenu;
-import de.raindancer.modules.dnd.screen.SheetMenu;
+import de.raindancer.modules.dnd.screen.SkillTreeMenu;
 import de.raindancer.modules.dnd.service.BodyService;
-import de.raindancer.modules.dnd.service.CastingService;
 import de.raindancer.modules.dnd.service.CombatService;
-import de.raindancer.modules.dnd.service.ConcentrationService;
-import de.raindancer.modules.dnd.service.ConditionService;
-import de.raindancer.modules.dnd.service.FeatureService;
 import de.raindancer.modules.dnd.service.HeroService;
-import de.raindancer.modules.dnd.service.HudService;
 import de.raindancer.modules.dnd.service.IDndService;
-import de.raindancer.modules.dnd.service.IconForge;
 import de.raindancer.modules.dnd.service.ItemForge;
 import de.raindancer.modules.dnd.service.ItemService;
 import de.raindancer.modules.dnd.service.LootService;
-import de.raindancer.modules.dnd.service.SurgeService;
-import de.raindancer.modules.dnd.service.RestService;
+import de.raindancer.modules.dnd.service.ScrollService;
 import de.raindancer.modules.dnd.service.SpellCues;
-import de.raindancer.modules.dnd.service.SpellService;
-import de.raindancer.modules.dnd.service.StanceService;
 import de.raindancer.modules.dnd.service.TargetService;
 import de.raindancer.modules.dnd.store.DndDatabase;
 import de.raindancer.modules.dnd.store.DndPack;
 import de.raindancer.modules.dnd.store.HeroBook;
-import de.raindancer.modules.dnd.store.StanceStash;
 import de.raindancer.modules.dnd.util.PermissionNodes;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.SplittableRandom;
 import java.util.random.RandomGenerator;
 
 /**
- * Tabletop-style adventurers on a survival server.
+ * Adventurers on a survival server: levels from defeating monsters, a skill point every level for a skill tree of
+ * five branches — hearts, blows, arrows, quick feet and magic, with feats like Dual Wielder — and magic items that
+ * monsters drop.
  *
- * <p>Shipped through the standard wrapper this is {@code RainsAdventurers}. A player chooses one of six classes and
- * levels from 1 to 20 by defeating monsters. Casters spend spell slots, sorcerers sorcery points and metamagic, the
- * fighting classes rage, surge and sneak attack. F takes up the casting stance, where the hotbar is the hero's spells
- * and features; a short rest is standing still a while, a long rest a night's sleep. Rules after the System
- * Reference Document 5.1 (CC BY 4.0).
+ * <p>Shipped through the standard wrapper this is {@code RainsAdventurers}. Before 0.11.0 it was tabletop classes and
+ * spells; a hero from then keeps their level and experience and finds every point free to spend.
  */
 public final class DndModule implements FlexModule {
 
-    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.10.0")
-            .describedAs("Classes, levels, spell slots, sorcery points and spells cast from a casting stance.")
+    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.11.0")
+            .describedAs("Levels from defeating monsters, a skill tree to spend them in, and magic items.")
             .by("Raindancer118");
 
-    private static final long HUD_TICKS = 10L;
     private static final long SECOND_TICKS = 20L;
+    private static final long MEND_SECONDS = 5L;
     private static final long FLUSH_SECONDS = 10L;
 
     private LogChannel log;
@@ -120,82 +96,37 @@ public final class DndModule implements FlexModule {
         var actionBars = context.core().actionBars();
 
         ProgressionRule progression = new ProgressionRule();
-        SpellSlotRule slots = new SpellSlotRule();
-        SorceryRule sorcery = new SorceryRule(slots);
-        FeatureRule features = new FeatureRule();
-        HealthRule health = new HealthRule();
-        CheckRule checks = new CheckRule(progression);
-        DamageRule damage = new DamageRule(progression);
-        RestRule rests = new RestRule(sorcery, health);
-        LoadoutRule loadouts = new LoadoutRule(slots);
-        MetamagicRule metamagic = new MetamagicRule();
-        MartialRule martial = new MartialRule(features);
+        PerkRule perks = new PerkRule(AdventurerTree.shipped(),
+                () -> Duration.ofHours(Math.max(0, settings.current().unlearnHours())));
         MobRule mobs = new MobRule();
-        ConcentrationRule concentrationRule = new ConcentrationRule();
-        SubclassRule subclasses = new SubclassRule();
-        SurgeRule surgeRule = new SurgeRule();
-        LootRule lootRule = new LootRule();
         ItemRule itemRule = new ItemRule();
 
-        HeroService heroes = new HeroService(context.plugin(), server, log, book, progression, loadouts, sorcery,
-                messages, effects, actionBars, subclasses);
-        BodyService body = new BodyService(health, martial);
-        ConditionService conditions = new ConditionService(System::currentTimeMillis);
-        IconForge icons = new IconForge(slots, features, damage);
-        StanceService stance = new StanceService(messages, effects, new StanceStash(), icons, loadouts, metamagic);
+        HeroService heroes = new HeroService(context.plugin(), server, log, book, progression, perks, messages,
+                effects, actionBars);
+        BodyService body = new BodyService(perks);
         TargetService targets = new TargetService(context.core().combat());
         SpellCues cues = new SpellCues(effects);
         cues.define();
-        ConcentrationService concentration = new ConcentrationService(messages, effects, checks, concentrationRule,
-                random, System::currentTimeMillis);
-        SpellService spells = new SpellService(context.plugin(), messages, targets, cues, checks, damage, mobs,
-                features, heroes, conditions, body, concentration, random);
-        FeatureService featureService = new FeatureService(context.plugin(), messages, effects, targets, cues,
-                conditions, features, slots, checks, mobs, random);
-        SurgeService surges = new SurgeService(context.plugin(), messages, effects, heroes, spells, body, conditions,
-                targets, cues, sorcery, surgeRule, random);
-        featureService.onTides(surges::owe);
-        CastingService casting = new CastingService(messages, effects, actionBars, heroes, stance, spells,
-                featureService, concentration, conditions, slots, features, metamagic, loadouts);
-        casting.surgesWith(surges);
-        surges.onResetWaits(player -> casting.endWaits(player.getUniqueId()));
+        CombatService combat = new CombatService(context.plugin(), messages, actionBars, effects, heroes, perks,
+                new FightRule(), mobs, System::currentTimeMillis);
         ItemForge itemForge = new ItemForge(System::currentTimeMillis);
-        ItemService items = new ItemService(messages, effects, heroes, itemForge, itemRule, cues, random,
+        ScrollService scrolls = new ScrollService(context.plugin(), targets, cues, itemRule);
+        ItemService items = new ItemService(messages, effects, combat, itemForge, itemRule, scrolls, cues, random,
                 System::currentTimeMillis);
-        items.castWith(casting::castFromItem);
-        spells.saveBonusFromItems(items::saveBonus);
-        LootService loot = new LootService(messages, effects, itemForge, lootRule, mobs, random);
-        CombatService combat = new CombatService(messages, actionBars, heroes, conditions, concentration, martial,
-                features, checks, mobs, random);
-        combat.weaponBonus(items::weaponBonus);
-        RestService resting = new RestService(messages, effects, actionBars, heroes, body, conditions, rests, health,
-                System::currentTimeMillis);
-        HudService hud = new HudService(messages, actionBars, stance, slots, sorcery);
+        LootService loot = new LootService(messages, effects, itemForge, new LootRule(), mobs, random);
 
-        List<IDndService> all = List.of(heroes, body, conditions, icons, stance, targets, cues, concentration, spells,
-                featureService, casting, combat, resting, hud, surges, itemForge, items, loot);
+        List<IDndService> all = List.of(heroes, body, targets, cues, combat, itemForge, scrolls, items, loot);
         all.forEach(service -> service.settings(settings.current()));
         all.forEach(service -> settings.onChange(service::settings));
 
         services = new DndServices(context.plugin(), server, log, messages, context.chat().brand(), context.core(),
-                settings::current, settings, progression, slots, sorcery, features, health, checks, rests, loadouts,
-                metamagic, heroes, body, stance, casting, combat, concentration, conditions, resting, hud, icons,
-                featureService, surges, items, loot, itemForge, subclasses, new LiveScreens());
+                settings::current, settings, progression, perks, heroes, body, combat, items, loot, itemForge,
+                new LiveScreens());
 
-        heroes.onChange(player -> {
-            Optional<de.raindancer.modules.dnd.model.Hero> hero = heroes.of(player.getUniqueId());
-            body.refresh(player, hero);
-            hero.ifPresentOrElse(found -> stance.redraw(player, found), () -> {
-                if (stance.isIn(player.getUniqueId())) {
-                    stance.leave(player, true);
-                }
-            });
-        });
+        heroes.onChange(player -> body.refresh(player, heroes.of(player.getUniqueId())));
 
         context.listener(new PresenceListener(services));
-        context.listener(new StanceListener(services));
         context.listener(new CombatListener(services));
-        context.listener(new RestListener(services));
         context.listener(new ItemListener(services));
         enableMach(context, settings, messages, itemForge);
 
@@ -203,34 +134,26 @@ public final class DndModule implements FlexModule {
         DndPack.contribute(context.plugin(), context.core());
         context.closeWith(() -> DndPack.withdraw(context.core()));
 
-        var hudTimer = Scheduling.globalTimer(context.plugin(), HUD_TICKS, HUD_TICKS, task -> {
-            for (Player player : server.getOnlinePlayers()) {
-                if (stance.isIn(player.getUniqueId())) {
-                    Scheduling.entity(context.plugin(), player,
-                            () -> heroes.of(player.getUniqueId()).ifPresent(hero -> hud.show(player, hero)));
-                }
-            }
-        });
+        long[] seconds = {0};
         var secondTimer = Scheduling.globalTimer(context.plugin(), SECOND_TICKS, SECOND_TICKS, task -> {
+            boolean mend = ++seconds[0] % MEND_SECONDS == 0;
             for (Player player : server.getOnlinePlayers()) {
                 Scheduling.entity(context.plugin(), player, () -> {
-                    Optional<de.raindancer.modules.dnd.model.Hero> hero = heroes.of(player.getUniqueId());
-                    concentration.tick(player);
-                    resting.tick(player);
-                    featureService.tick(player, hero);
-                    body.refresh(player, hero);
+                    // An off hand changes without an event (a click in the inventory): the body is looked at often.
+                    body.refresh(player, heroes.of(player.getUniqueId()));
+                    if (mend) {
+                        combat.mend(player);
+                    }
                 });
             }
         });
         var flushTimer = Scheduling.asyncTimer(context.plugin(), FLUSH_SECONDS, FLUSH_SECONDS, task -> heroes.flush());
-        for (var timer : List.of(Optional.ofNullable(hudTimer), Optional.ofNullable(secondTimer),
-                Optional.ofNullable(flushTimer))) {
+        for (var timer : List.of(Optional.ofNullable(secondTimer), Optional.ofNullable(flushTimer))) {
             timer.ifPresent(scheduled -> context.closeWith(scheduled::cancel));
         }
 
         // A reload while players are online: they did not join, so they are read now.
         for (Player player : server.getOnlinePlayers()) {
-            stance.restore(player);
             heroes.joined(player);
         }
 
@@ -248,31 +171,20 @@ public final class DndModule implements FlexModule {
             log.info("RainsCore is older than 2.10.0: no adventurer screens until it is updated.");
         }
 
-        log.info("Adventurers are up: {} classes, {} spells; heroes are kept in {}.",
-                de.raindancer.modules.dnd.model.HeroClass.values().length,
-                de.raindancer.modules.dnd.model.Spell.values().length, database.describe());
+        log.info("Adventurers are up: a skill tree of {} nodes; heroes are kept in {}.",
+                AdventurerTree.shipped().nodes().size(), database.describe());
     }
 
     /** Opening this module's screens, without the command knowing the menu classes. */
     private final class LiveScreens implements IDndScreensOpener {
 
         @Override
-        public void sheet(Player viewer) {
-            if (services.heroes().of(viewer.getUniqueId()).isEmpty()) {
-                classes(viewer);
+        public void tree(Player viewer) {
+            if (services.heroes().ensure(viewer).isEmpty()) {
+                services.messages().send(viewer, "dnd.still-reading");
                 return;
             }
-            new SheetMenu(services, viewer, null).open();
-        }
-
-        @Override
-        public void classes(Player viewer) {
-            new ClassMenu(services, viewer, null).open();
-        }
-
-        @Override
-        public void spellbook(Player viewer) {
-            new LoadoutMenu(services, viewer, null).open();
+            new SkillTreeMenu(services, viewer, null).open();
         }
     }
 
@@ -296,7 +208,7 @@ public final class DndModule implements FlexModule {
         var brewer = server.getPotionBrewer();
         brewer.removePotionMix(key);
         brewer.addPotionMix(new io.papermc.paper.potion.PotionMix(key,
-                itemForge.make(de.raindancer.modules.dnd.model.MagicItem.POTION_OF_MACH_FUCK, null),
+                itemForge.make(de.raindancer.modules.dnd.model.MagicItem.POTION_OF_MACH_FUCK),
                 io.papermc.paper.potion.PotionMix.createPredicateChoice(bottle -> rule.brewsFrom(bottle.getType(),
                         de.raindancer.modules.dnd.store.ItemTags.itemOf(bottle).isPresent())),
                 new org.bukkit.inventory.RecipeChoice.MaterialChoice(org.bukkit.Material.DRAGON_HEAD)));
@@ -333,17 +245,13 @@ public final class DndModule implements FlexModule {
         return DndCommands.declared();
     }
 
-    /** Every stance ends and every hotbar goes back before anything is torn down; then every hero is written. */
+    /** Every modifier goes before anything is torn down; then every hero is written. */
     @Override
     public void disable() {
         if (services != null && server != null) {
             for (Player player : server.getOnlinePlayers()) {
-                services.stance().leave(player, true);
-                services.concentration().forget(player);
-                services.features().foldWings(player);
                 services.body().strip(player);
             }
-            services.surges().cleanUp();
             services.heroes().flush();
         }
         DndCommands.stopped();

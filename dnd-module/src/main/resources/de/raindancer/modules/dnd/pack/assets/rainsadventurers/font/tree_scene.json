@@ -1,0 +1,56 @@
+{
+ "providers": [
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/vitality.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue000"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/might.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue001"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/marksman.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue002"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/shadow.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue003"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/arcana.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue004"
+   ]
+  },
+  {
+   "type": "space",
+   "advances": {
+    "\uf808": -8,
+    "\uf8a9": -169
+   }
+  }
+ ]
+}

@@ -6,31 +6,14 @@ import de.raindancer.core.platform.log.LogChannel;
 import de.raindancer.core.ui.chat.Brand;
 import de.raindancer.core.ui.effect.Effects;
 import de.raindancer.core.ui.messages.Messages;
-import de.raindancer.modules.dnd.rules.CheckRule;
-import de.raindancer.modules.dnd.rules.FeatureRule;
-import de.raindancer.modules.dnd.rules.HealthRule;
-import de.raindancer.modules.dnd.rules.LoadoutRule;
-import de.raindancer.modules.dnd.rules.MetamagicRule;
+import de.raindancer.modules.dnd.rules.PerkRule;
 import de.raindancer.modules.dnd.rules.ProgressionRule;
-import de.raindancer.modules.dnd.rules.RestRule;
-import de.raindancer.modules.dnd.rules.SorceryRule;
-import de.raindancer.modules.dnd.rules.SpellSlotRule;
-import de.raindancer.modules.dnd.rules.SubclassRule;
 import de.raindancer.modules.dnd.service.BodyService;
-import de.raindancer.modules.dnd.service.CastingService;
 import de.raindancer.modules.dnd.service.CombatService;
-import de.raindancer.modules.dnd.service.ConcentrationService;
-import de.raindancer.modules.dnd.service.ConditionService;
 import de.raindancer.modules.dnd.service.HeroService;
-import de.raindancer.modules.dnd.service.HudService;
-import de.raindancer.modules.dnd.service.FeatureService;
-import de.raindancer.modules.dnd.service.IconForge;
 import de.raindancer.modules.dnd.service.ItemForge;
 import de.raindancer.modules.dnd.service.ItemService;
 import de.raindancer.modules.dnd.service.LootService;
-import de.raindancer.modules.dnd.service.SurgeService;
-import de.raindancer.modules.dnd.service.RestService;
-import de.raindancer.modules.dnd.service.StanceService;
 import org.bukkit.Server;
 import org.bukkit.plugin.Plugin;
 
@@ -49,31 +32,14 @@ public record DndServices(
         SettingsStore<DndSettings> store,
 
         ProgressionRule progression,
-        SpellSlotRule slots,
-        SorceryRule sorcery,
-        FeatureRule featureRule,
-        HealthRule health,
-        CheckRule checks,
-        RestRule rests,
-        LoadoutRule loadouts,
-        MetamagicRule metamagic,
+        PerkRule perks,
 
         HeroService heroes,
         BodyService body,
-        StanceService stance,
-        CastingService casting,
         CombatService combat,
-        ConcentrationService concentration,
-        ConditionService conditions,
-        RestService resting,
-        HudService hud,
-        IconForge icons,
-        FeatureService features,
-        SurgeService surges,
         ItemService items,
         LootService loot,
         ItemForge itemForge,
-        SubclassRule subclasses,
         IDndScreensOpener screens) {
 
     public DndSettings config() {

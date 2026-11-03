@@ -4,6 +4,7 @@ import de.raindancer.core.platform.command.PlayerLookup;
 import de.raindancer.core.platform.command.PlayerTargets;
 import de.raindancer.core.platform.util.Scheduling;
 import de.raindancer.modules.dnd.DndServices;
+import de.raindancer.modules.dnd.model.Scroll;
 import de.raindancer.modules.dnd.util.PermissionNodes;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.command.CommandSender;
@@ -16,14 +17,11 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-/**
- * {@code /adventurer} opens the character sheet. {@code rest}, {@code stance} and {@code spells} are there because
- * typing them is faster than two clicks; {@code admin} because it names another player.
- */
+/** {@code /adventurer} opens the skill tree; {@code admin} is for staff, because it names another player. */
 public final class AdventurerCommand implements IDndCommand {
 
-    private static final List<String> PLAYER_WORDS = List.of("rest", "stance", "spells", "class");
-    private static final List<String> ADMIN_WORDS = List.of("level", "xp", "rest", "reset", "give", "surge");
+    private static final List<String> PLAYER_WORDS = List.of("tree");
+    private static final List<String> ADMIN_WORDS = List.of("level", "xp", "unlearn", "reset", "give");
 
     private final Supplier<DndServices> services;
 
@@ -49,21 +47,7 @@ public final class AdventurerCommand implements IDndCommand {
             return;
         }
         switch (first) {
-            case "" -> live.screens().sheet(player);
-            case "class" -> live.screens().classes(player);
-            case "spells" -> live.screens().spellbook(player);
-            case "rest" -> {
-                player.closeInventory();
-                live.resting().startShort(player);
-            }
-            case "stance" -> live.heroes().of(player.getUniqueId()).ifPresentOrElse(hero -> {
-                player.closeInventory();
-                if (live.stance().isIn(player.getUniqueId())) {
-                    live.stance().leave(player, false);
-                } else {
-                    live.stance().enter(player, hero);
-                }
-            }, () -> live.messages().send(player, "dnd.no-class"));
+            case "", "tree" -> live.screens().tree(player);
             default -> live.messages().send(player, "dnd.usage");
         }
     }
@@ -90,7 +74,7 @@ public final class AdventurerCommand implements IDndCommand {
                                     "level", String.valueOf(hero.level())),
                             () -> live.messages().send(sender, "dnd.admin.no-hero", "player", target.getName()))));
             case "xp" -> number(live, sender, args).ifPresent(amount -> Scheduling.entity(live.plugin(), target, () -> {
-                if (live.heroes().of(target.getUniqueId()).isEmpty()) {
+                if (live.heroes().ensure(target).isEmpty()) {
                     live.messages().send(sender, "dnd.admin.no-hero", "player", target.getName());
                     return;
                 }
@@ -98,13 +82,14 @@ public final class AdventurerCommand implements IDndCommand {
                 live.messages().send(sender, "dnd.admin.xp-given", "player", target.getName(), "xp",
                         String.valueOf(amount));
             }));
-            case "rest" -> Scheduling.entity(live.plugin(), target, () -> {
-                live.resting().longRest(target, true);
-                live.messages().send(sender, "dnd.admin.rested", "player", target.getName());
+            case "unlearn" -> Scheduling.entity(live.plugin(), target, () -> {
+                // Staff unlearn for free, whenever: the wait is for the player's own choice.
+                live.heroes().change(target, hero -> hero.unlearnt(0)).ifPresentOrElse(hero -> {
+                    live.messages().send(sender, "dnd.admin.unlearnt", "player", target.getName());
+                    live.messages().send(target, "dnd.tree.unlearnt-by-staff");
+                }, () -> live.messages().send(sender, "dnd.admin.no-hero", "player", target.getName()));
             });
             case "reset" -> Scheduling.entity(live.plugin(), target, () -> {
-                live.stance().leave(target, true);
-                live.concentration().forget(target);
                 live.heroes().reset(target.getUniqueId(), () -> Scheduling.entity(live.plugin(), target, () -> {
                     live.body().refresh(target, Optional.empty());
                     live.messages().send(target, "dnd.admin.you-were-reset");
@@ -112,29 +97,6 @@ public final class AdventurerCommand implements IDndCommand {
                 live.messages().send(sender, "dnd.admin.reset", "player", target.getName());
             });
             case "give" -> give(live, sender, target, args);
-            case "surge" -> Scheduling.entity(live.plugin(), target, () -> {
-                Optional<de.raindancer.modules.dnd.model.Hero> hero = live.heroes().of(target.getUniqueId());
-                if (hero.isEmpty()) {
-                    live.messages().send(sender, "dnd.admin.no-hero", "player", target.getName());
-                    return;
-                }
-                de.raindancer.modules.dnd.model.Surge surge;
-                if (args.length >= 4) {
-                    int roll;
-                    try {
-                        roll = Integer.parseInt(args[3]);
-                    } catch (NumberFormatException notANumber) {
-                        live.messages().send(sender, "dnd.admin.not-a-number", "value", args[3]);
-                        return;
-                    }
-                    surge = de.raindancer.modules.dnd.model.WildSurgeTable.entry(roll);
-                    live.surges().happen(target, hero.get(), surge);
-                } else {
-                    surge = live.surges().surge(target, hero.get());
-                }
-                live.messages().send(sender, "dnd.admin.surged", "player", target.getName(), "number",
-                        String.valueOf(surge.number()));
-            });
             default -> live.messages().send(sender, "dnd.admin.usage");
         }
     }
@@ -150,17 +112,26 @@ public final class AdventurerCommand implements IDndCommand {
             live.messages().send(sender, "dnd.admin.unknown-item", "value", args[3]);
             return;
         }
-        de.raindancer.modules.dnd.model.Spell spell = null;
+        org.bukkit.inventory.ItemStack stack;
         if (item.get() == de.raindancer.modules.dnd.model.MagicItem.SPELL_SCROLL) {
-            Optional<de.raindancer.modules.dnd.model.Spell> named = args.length >= 5
-                    ? de.raindancer.modules.dnd.model.Spell.byId(args[4]) : Optional.empty();
+            Optional<Scroll> named = args.length >= 5 ? Scroll.byId(args[4]) : Optional.empty();
             if (named.isEmpty()) {
-                live.messages().send(sender, "dnd.admin.unknown-spell", "value", args.length >= 5 ? args[4] : "");
+                live.messages().send(sender, "dnd.admin.unknown-scroll", "value", args.length >= 5 ? args[4] : "");
                 return;
             }
-            spell = named.get();
+            int tier = 1;
+            if (args.length >= 6) {
+                try {
+                    tier = Scroll.clampTier(Integer.parseInt(args[5]));
+                } catch (NumberFormatException notANumber) {
+                    live.messages().send(sender, "dnd.admin.not-a-number", "value", args[5]);
+                    return;
+                }
+            }
+            stack = live.itemForge().scroll(named.get(), tier);
+        } else {
+            stack = live.itemForge().make(item.get());
         }
-        org.bukkit.inventory.ItemStack stack = live.itemForge().make(item.get(), spell);
         Scheduling.entity(live.plugin(), target, () -> target.getInventory().addItem(stack).values()
                 .forEach(left -> target.getWorld().dropItemNaturally(target.getLocation(), left)));
         live.messages().send(sender, "dnd.admin.given", "player", target.getName(), "item", item.get().title());
@@ -216,15 +187,18 @@ public final class AdventurerCommand implements IDndCommand {
             return java.util.Arrays.stream(de.raindancer.modules.dnd.model.MagicItem.values())
                     .map(de.raindancer.modules.dnd.model.MagicItem::id).filter(id -> id.startsWith(started)).toList();
         }
-        if (args.length == 5 && args[1].equalsIgnoreCase("give")) {
-            return java.util.Arrays.stream(de.raindancer.modules.dnd.model.Spell.values())
-                    .map(de.raindancer.modules.dnd.model.Spell::id).filter(id -> id.startsWith(started)).toList();
+        if (args.length == 5 && args[1].equalsIgnoreCase("give") && args[3].equalsIgnoreCase("spell_scroll")) {
+            return java.util.Arrays.stream(Scroll.values()).map(Scroll::id).filter(id -> id.startsWith(started))
+                    .toList();
+        }
+        if (args.length == 6 && args[1].equalsIgnoreCase("give") && args[3].equalsIgnoreCase("spell_scroll")) {
+            return List.of("1", "2", "3", "4", "5");
         }
         return List.of();
     }
 
     @Override
     public String describe() {
-        return "the character sheet, resting, the casting stance, and staff tools for adventurers";
+        return "the skill tree, and staff tools for adventurers";
     }
 }

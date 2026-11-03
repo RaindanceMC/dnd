@@ -18,20 +18,16 @@ public final class DndCommands {
 
     public static List<ModuleCommand> declared() {
         return List.of(
-                ModuleCommand.of("adventurer", "Your class, your spells and your rests",
+                ModuleCommand.of("adventurer", "Your adventurer's skill tree",
                                 new AdventurerCommand(DndCommands::require))
                         .aliased("dnd")
                         .aliased("character")
-                        .taking("rest")
-                        .taking("stance")
-                        .taking("spells")
-                        .taking("class")
+                        .taking("tree")
                         .taking("admin level <player> <level>")
                         .taking("admin xp <player> <amount>")
-                        .taking("admin rest <player>")
+                        .taking("admin unlearn <player>")
                         .taking("admin reset <player>")
-                        .taking("admin give <player> <item> [spell]")
-                        .taking("admin surge <player> [number]"));
+                        .taking("admin give <player> <item> [scroll] [tier]"));
     }
 
     static void ready(DndServices live) {

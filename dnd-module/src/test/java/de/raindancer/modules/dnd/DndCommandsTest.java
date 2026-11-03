@@ -18,7 +18,7 @@ class DndCommandsTest {
         assertThat(declared).hasSize(1);
         assertThat(declared.getFirst().name()).isEqualTo("adventurer");
         assertThat(declared.getFirst().names()).contains("dnd", "character");
-        assertThat(declared.getFirst().options()).contains("rest", "stance", "admin reset <player>");
+        assertThat(declared.getFirst().options()).contains("tree", "admin unlearn <player>", "admin reset <player>");
         assertThat(declared.getFirst().handler()).isNotNull();
     }
 

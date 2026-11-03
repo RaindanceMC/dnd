@@ -2,12 +2,8 @@ package de.raindancer.modules.dnd.store;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import de.raindancer.modules.dnd.model.Feature;
-import de.raindancer.modules.dnd.model.HeroClass;
 import de.raindancer.modules.dnd.model.MagicItem;
-import de.raindancer.modules.dnd.model.Metamagic;
-import de.raindancer.modules.dnd.model.Spell;
-import de.raindancer.modules.dnd.model.Subclass;
+import de.raindancer.modules.dnd.model.Rarity;
 import org.bukkit.Material;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,38 +55,12 @@ class DndPackTest {
     @Test
     @DisplayName("every file the index names is in the jar, and the index is not empty")
     void everyFileShips() throws IOException {
-        assertThat(DndPack.files()).hasSizeGreaterThan(300).contains("pack.mcmeta");
+        assertThat(DndPack.files()).hasSizeGreaterThan(100).contains("pack.mcmeta", "assets/rainsadventurers/font/tree.json",
+                "assets/rainsadventurers/font/tree_scene.json");
         for (String file : DndPack.files()) {
             try (InputStream in = DndPack.class.getResourceAsStream(DndPack.ROOT + file)) {
                 assertThat(in).as(file).isNotNull();
             }
-        }
-    }
-
-    @Test
-    @DisplayName("every spell, feature, class, subclass and metamagic has an icon all the way down to its texture")
-    void everyIconResolves() throws IOException {
-        List<String> paths = new ArrayList<>();
-        for (Spell spell : Spell.values()) {
-            paths.add(DndPack.iconOf(spell));
-        }
-        for (Feature feature : Feature.values()) {
-            paths.add(DndPack.iconOf(feature));
-        }
-        for (HeroClass heroClass : HeroClass.values()) {
-            paths.add(DndPack.classIcon(heroClass));
-        }
-        for (Subclass subclass : Subclass.values()) {
-            paths.add(DndPack.subclassIcon(subclass));
-        }
-        for (Metamagic metamagic : Metamagic.values()) {
-            paths.add(DndPack.metamagicIcon(metamagic));
-        }
-        paths.add(DndPack.metamagicIcon(null));
-        paths.add(DndPack.EMPTY);
-        paths.add(DndPack.SHEET);
-        for (String path : paths) {
-            resolves(path);
         }
     }
 
@@ -101,13 +71,16 @@ class DndPackTest {
             if (item.isWeapon()) {
                 continue;
             }
-            resolves(DndPack.itemModel(item, Spell.FIREBALL, item.material()).orElseThrow());
+            resolves(DndPack.itemModel(item, Rarity.COMMON, item.material()).orElseThrow());
         }
-        for (Spell spell : Spell.values()) {
-            resolves(DndPack.itemModel(MagicItem.SPELL_SCROLL, spell, null).orElseThrow());
+        for (Rarity rarity : Rarity.values()) {
+            resolves(DndPack.itemModel(MagicItem.SPELL_SCROLL, rarity, null).orElseThrow());
         }
-        assertThat(DndPack.itemModel(MagicItem.SPELL_SCROLL, Spell.METEOR_SWARM, null))
+        assertThat(DndPack.itemModel(MagicItem.SPELL_SCROLL, Rarity.LEGENDARY, null))
                 .contains("magic/spell_scroll_legendary");
+        for (String branch : java.util.List.of("vitality", "might", "marksman", "shadow", "arcana")) {
+            assertThat(DndPack.treeBackdrop(branch)).as(branch).isNotNull();
+        }
         for (MagicItem weapon : List.of(MagicItem.WEAPON_PLUS_ONE, MagicItem.WEAPON_PLUS_TWO, MagicItem.WEAPON_PLUS_THREE)) {
             for (Material base : List.of(Material.IRON_SWORD, Material.DIAMOND_AXE, Material.NETHERITE_SWORD)) {
                 resolves(DndPack.itemModel(weapon, null, base).orElseThrow());

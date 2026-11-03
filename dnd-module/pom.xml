@@ -16,9 +16,9 @@
 
     <name>Rain's Flexible Modules — Adventurers</name>
     <description>
-        Tabletop-style classes on a survival server: pick a class, level from 1 to 20, spend spell slots,
-        sorcery points, rage and second winds, cast spells from a casting stance, and recover on short and
-        long rests. Rules adapted from the System Reference Document 5.1 (CC BY 4.0).
+        Adventurers on a survival server: levels from defeating monsters, a skill point every level for a skill
+        tree of five branches with feats like Dual Wielder, and magic items that monsters drop. Magic item names
+        from the System Reference Document 5.1 (CC BY 4.0).
     </description>
 
     <dependencies>

@@ -9,10 +9,8 @@ import de.raindancer.core.ui.effect.Effects;
 import de.raindancer.core.ui.messages.Messages;
 import de.raindancer.modules.dnd.DndSettings;
 import de.raindancer.modules.dnd.model.Hero;
-import de.raindancer.modules.dnd.model.HeroClass;
-import de.raindancer.modules.dnd.rules.LoadoutRule;
+import de.raindancer.modules.dnd.rules.PerkRule;
 import de.raindancer.modules.dnd.rules.ProgressionRule;
-import de.raindancer.modules.dnd.rules.SorceryRule;
 import de.raindancer.modules.dnd.store.HeroBook;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Server;
@@ -30,13 +28,8 @@ import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 /**
- * Every online player's hero, kept in memory and written back when it changed.
- *
- * <h2>Writes</h2>
- * Changes happen on the player's thread and only mark the hero dirty; a timer writes the dirty ones off the server's
- * threads, and leaving writes at once. Each write names the revision it was read at. When another server wrote in
- * between — a player who hopped servers faster than the old one could save — the write loses, the newer row is read
- * back, and the few seconds this server added are what is dropped: never the older state overwriting the newer.
+ * Every online player's adventurer, held in memory and written behind. A hero is read when its player joins and
+ * made the first time it is needed — the first monster defeated, the first look at the tree.
  */
 public final class HeroService implements IDndService {
 
@@ -49,10 +42,7 @@ public final class HeroService implements IDndService {
     private final LogChannel log;
     private final HeroBook book;
     private final ProgressionRule progression;
-    private final LoadoutRule loadouts;
-    private final SorceryRule sorcery;
-    private final de.raindancer.modules.dnd.rules.SubclassRule subclasses;
-    private final de.raindancer.modules.dnd.rules.AbilityRule abilities;
+    private final PerkRule perks;
     private final Messages messages;
     private final Effects effects;
     private final ActionBars actionBars;
@@ -68,17 +58,13 @@ public final class HeroService implements IDndService {
     private volatile Consumer<Player> changed = player -> { };
 
     public HeroService(Plugin plugin, Server server, LogChannel log, HeroBook book, ProgressionRule progression,
-                       LoadoutRule loadouts, SorceryRule sorcery, Messages messages, Effects effects,
-                       ActionBars actionBars, de.raindancer.modules.dnd.rules.SubclassRule subclasses) {
-        this.subclasses = subclasses;
-        this.abilities = new de.raindancer.modules.dnd.rules.AbilityRule(progression);
+                       PerkRule perks, Messages messages, Effects effects, ActionBars actionBars) {
         this.plugin = plugin;
         this.server = server;
         this.log = log;
         this.book = book;
         this.progression = progression;
-        this.loadouts = loadouts;
-        this.sorcery = sorcery;
+        this.perks = perks;
         this.messages = messages;
         this.effects = effects;
         this.actionBars = actionBars;
@@ -89,22 +75,21 @@ public final class HeroService implements IDndService {
         this.settings = updated == null ? DndSettings.DEFAULTS : updated;
     }
 
-    /** Told whenever a player's hero changes, on that player's thread: their body and their stance follow. */
+    /** Told whenever a player's hero changes, on that player's thread: their body follows. */
     public void onChange(Consumer<Player> listener) {
         this.changed = listener == null ? player -> { } : listener;
     }
 
-    /** The hero as every rule sees it — with the derived scores while ability scores are switched off. */
     public Optional<Hero> of(UUID player) {
         Entry entry = heroes.get(player);
-        return entry == null ? Optional.empty() : Optional.of(shown(entry.hero()));
+        return entry == null ? Optional.empty() : Optional.of(entry.hero());
     }
 
-    private Hero shown(Hero stored) {
-        return abilities.shown(stored, settings.abilityScores());
+    public PerkRule perks() {
+        return perks;
     }
 
-    /** Read from the database, so a class may be chosen; false while loading or when it could not be read. */
+    /** Read from the database, so a hero may be made; false while loading or when it could not be read. */
     public boolean known(UUID player) {
         return heroes.containsKey(player) || without.contains(player);
     }
@@ -126,8 +111,7 @@ public final class HeroService implements IDndService {
             HeroBook.Loaded loaded = book.load(id);
             switch (loaded.status()) {
                 case FOUND -> {
-                    Hero settled = subclasses.settled(loaded.hero());
-                    heroes.putIfAbsent(id, new Entry(settled, loaded.rev(), !settled.equals(loaded.hero())));
+                    heroes.putIfAbsent(id, new Entry(loaded.hero(), loaded.rev(), false));
                     unreadable.remove(id);
                 }
                 case NONE -> {
@@ -136,16 +120,14 @@ public final class HeroService implements IDndService {
                 }
                 case UNREADABLE -> {
                     unreadable.add(id);
-                    log.warn("The adventurer of {} could not be read; their class is held back until it can be.",
+                    log.warn("The adventurer of {} could not be read; their hero is held back until it can be.",
                             player.getName());
                 }
             }
             Scheduling.entity(plugin, player, () -> {
                 changed.accept(player);
-                if (loaded.status() == HeroBook.Loaded.Status.NONE && player.isOnline()) {
-                    messages.send(player, "dnd.welcome");
-                }
-                of(id).filter(subclasses::choosing).ifPresent(hero -> messages.send(player, "dnd.subclass.waiting"));
+                of(id).filter(hero -> perks.left(hero) > 0).ifPresent(hero -> messages.send(player,
+                        "dnd.tree.points-waiting", "points", String.valueOf(perks.left(hero))));
             });
         });
     }
@@ -172,8 +154,7 @@ public final class HeroService implements IDndService {
         UUID id = player.getUniqueId();
         Entry[] after = new Entry[1];
         heroes.computeIfPresent(id, (key, entry) -> {
-            Hero next = abilities.kept(entry.hero(), subclasses.settled(how.apply(shown(entry.hero()))),
-                    settings.abilityScores());
+            Hero next = how.apply(entry.hero());
             after[0] = next.equals(entry.hero()) ? entry : new Entry(next, entry.rev(), true);
             return after[0];
         });
@@ -181,26 +162,52 @@ public final class HeroService implements IDndService {
             return Optional.empty();
         }
         changed.accept(player);
-        return Optional.of(shown(after[0].hero()));
+        return Optional.of(after[0].hero());
     }
 
-    /** A new class, always from level 1: a level belongs to the class it was earned in. */
-    public Optional<Hero> choose(Player player, HeroClass heroClass) {
+    /**
+     * The player's hero, made at level 1 if they have none yet. Empty while it is still being read or could not be.
+     */
+    public Optional<Hero> ensure(Player player) {
         UUID id = player.getUniqueId();
-        if (unreadable.contains(id) || !known(id)) {
-            return Optional.empty();
+        Optional<Hero> known = of(id);
+        if (known.isPresent() || unreadable.contains(id) || !without.contains(id)) {
+            return known;
         }
-        Entry old = heroes.get(id);
-        Hero fresh = Hero.fresh(id, heroClass, loadouts.starting(heroClass));
-        fresh = subclasses.settled(fresh.withSorceryPoints(sorcery.most(fresh)));
-        heroes.put(id, new Entry(fresh, old == null ? 0 : old.rev(), true));
+        Hero fresh = Hero.fresh(id);
+        Entry before = heroes.putIfAbsent(id, new Entry(fresh, 0, true));
         without.remove(id);
-        changed.accept(player);
-        Scheduling.async(plugin, () -> write(id));
-        if (subclasses.choosing(fresh)) {
-            messages.send(player, "dnd.subclass.waiting");
+        if (before != null) {
+            return Optional.of(before.hero());
         }
-        return Optional.of(shown(fresh));
+        changed.accept(player);
+        messages.send(player, "dnd.welcome");
+        return Optional.of(fresh);
+    }
+
+    /** Takes the next rank of a node; the refusal when it may not be taken. */
+    public Optional<PerkRule.Refusal> learn(Player player, String node) {
+        Optional<Hero> hero = ensure(player);
+        if (hero.isEmpty()) {
+            return Optional.of(PerkRule.Refusal.UNKNOWN);
+        }
+        java.util.concurrent.atomic.AtomicReference<Optional<PerkRule.Refusal>> refused =
+                new java.util.concurrent.atomic.AtomicReference<>(Optional.empty());
+        change(player, now -> {
+            refused.set(perks.refusal(now, node));
+            return refused.get().isPresent() ? now : now.withRank(node, now.rank(node) + 1);
+        });
+        return refused.get();
+    }
+
+    /** Unlearns the whole tree, every point back; false when it may not be done now. */
+    public boolean unlearn(Player player, long now) {
+        boolean[] done = {false};
+        change(player, hero -> {
+            done[0] = perks.mayUnlearn(hero, now);
+            return done[0] ? hero.unlearnt(now) : hero;
+        });
+        return done[0];
     }
 
     /** Experience from a kill or a staff member, scaled by the setting. */
@@ -209,11 +216,11 @@ public final class HeroService implements IDndService {
         if (amount <= 0) {
             return;
         }
-        Optional<Hero> before = of(player.getUniqueId());
+        Optional<Hero> before = ensure(player);
         if (before.isEmpty()) {
             return;
         }
-        Optional<Hero> after = change(player, hero -> grown(hero, amount));
+        Optional<Hero> after = change(player, hero -> progression.grown(hero, amount));
         after.ifPresent(now -> {
             actionBars.show(player.getUniqueId(), "dnd-xp",
                     messages.get("dnd.xp-gained", "xp", String.valueOf(amount), "source", source),
@@ -226,58 +233,20 @@ public final class HeroService implements IDndService {
 
     /** Puts a hero at a level, for staff. */
     public Optional<Hero> setLevel(Player player, int level) {
-        Optional<Hero> before = of(player.getUniqueId());
-        Optional<Hero> after = change(player, hero -> {
-            Hero placed = progression.atLevel(hero, level);
-            Hero topped = loadouts.pruned(loadouts.toppedUp(placed, hero));
-            return topped.withSorceryPoints(Math.min(sorcery.most(topped),
-                    hero.sorceryPoints() + Math.max(0, sorcery.most(topped) - sorcery.most(hero))));
-        });
+        Optional<Hero> before = ensure(player);
+        Optional<Hero> after = change(player, hero -> progression.atLevel(hero, level));
         if (before.isPresent() && after.isPresent() && after.get().level() > before.get().level()) {
             levelledUp(player, before.get(), after.get());
         }
         return after;
     }
 
-    private Hero grown(Hero hero, long amount) {
-        Hero grown = progression.grown(hero, amount);
-        if (grown.level() == hero.level()) {
-            return grown;
-        }
-        int morePoints = sorcery.most(grown) - sorcery.most(hero);
-        return loadouts.toppedUp(grown, hero).withSorceryPoints(grown.sorceryPoints() + Math.max(0, morePoints));
-    }
-
-    /** A sorcerer's origin, chosen once. Empty when it may not be chosen. */
-    public Optional<Hero> chooseSubclass(Player player, de.raindancer.modules.dnd.model.Subclass subclass) {
-        Optional<Hero> hero = of(player.getUniqueId());
-        if (hero.isEmpty() || !subclasses.mayChoose(hero.get(), subclass)) {
-            return Optional.empty();
-        }
-        return change(player, now -> subclasses.mayChoose(now, subclass) ? now.withSubclass(subclass) : now);
-    }
-
     private void levelledUp(Player player, Hero before, Hero now) {
         effects.play(player.getUniqueId(), Cues.REWARD);
         player.showTitle(Title.title(messages.get("dnd.level-up-title", "level", String.valueOf(now.level())),
-                messages.get("dnd.level-up-subtitle", "class", now.heroClass().title())));
-        messages.send(player, "dnd.level-up", "level", String.valueOf(now.level()), "class",
-                now.heroClass().title());
-        if (now.subclass() != null && now.subclass() != before.subclass()) {
-            messages.send(player, "dnd.subclass.gained", "subclass", now.subclass().title());
-        }
-        if (subclasses.choosing(now) && !subclasses.choosing(before)) {
-            messages.send(player, "dnd.subclass.waiting");
-        }
-        if (settings.abilityScores() && now.improvements() > before.improvements()) {
-            messages.send(player, "dnd.improvement-earned", "points", String.valueOf(now.improvements()));
-        }
-        List<String> fresh = now.loadout().stream().filter(id -> !id.isEmpty() && !before.loadout().contains(id))
-                .toList();
-        for (String id : fresh) {
-            LoadoutRule.castable(id).ifPresent(castable -> messages.send(player, "dnd.learned",
-                    "name", castable.title()));
-        }
+                messages.get("dnd.level-up-subtitle", "points", String.valueOf(perks.left(now)))));
+        messages.send(player, "dnd.level-up", "level", String.valueOf(now.level()),
+                "points", String.valueOf(perks.left(now)));
     }
 
     /** Takes the hero out of memory and the database, for staff. */

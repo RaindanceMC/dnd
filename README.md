@@ -1,6 +1,6 @@
 # RaindanceMC/dnd
 
-- **`dnd-module`** — Rain's Flexible Modules — Adventurers: tabletop-style classes on a survival server. Six classes (fighter, barbarian, rogue, wizard, sorcerer, cleric), levels 1–20 from defeating monsters, ability scores and improvements, spell slots, sorcery points with Font of Magic and metamagic, rage, Second Wind, Action Surge, Sneak Attack, Cunning Action, Channel Divinity, concentration, d20 attack rolls and saving throws, short and long rests.
+- **`dnd-module`** — Rain's Flexible Modules — Adventurers: levels 1–100 from defeating monsters, a skill point every level for a skill tree of five branches (Vitality, Might, Marksman, Shadow, Arcana — 75 nodes, a choice and a capstone each, feats like Dual Wielder, Second Wind and Undying), and magic items that monsters drop. Until 0.10.0 it was tabletop classes and spells; heroes from then keep their level and experience.
 - **`dnd-standalone`** — Rain's Adventurers (`RainsAdventurers`): the dnd module and the standard wrapper, shaded together.
 
 Part of [RaindanceMC](https://github.com/RaindanceMC); built on [RainsCore](https://github.com/RaindanceMC/RainsCore) and the shared parent in [framework](https://github.com/RaindanceMC/framework).
@@ -9,45 +9,29 @@ Part of [RaindanceMC](https://github.com/RaindanceMC); built on [RainsCore](http
 
 | | |
 |---|---|
-| ![Choosing a class](docs/screenshots/1-classes.png) | ![The character sheet](docs/screenshots/2-sheet.png) |
-| ![The spellbook](docs/screenshots/3-spellbook.png) | ![Picking Fireball](docs/screenshots/4-spell-picker.png) |
-| ![The casting stance](docs/screenshots/5-stance.png) | ![A fireball](docs/screenshots/6-fireball.png) |
-| ![A sorcerer's origin](docs/screenshots/7-origins.png) | ![A wild surge](docs/screenshots/8-surge-poppies.png) |
-| ![After a few surges](docs/screenshots/9-surge-aftermath.png) | ![Magic items](docs/screenshots/10-items.png) |
+| ![The skill tree's five branches (art/tree/preview.py)](docs/screenshots/22-skill-tree-preview.png) | ![Magic items](docs/screenshots/10-items.png) |
+| ![Magic items, in Blockbench](docs/screenshots/11-items-blockbench.png) | ![Potions on a wall](docs/screenshots/14-wall-close.png) |
+| ![Gear on a wall](docs/screenshots/15-wall-gear.png) | ![Potions](docs/screenshots/13-wall-potions.png) |
 
-Its own looks (0.3.0) — every magic item modelled in Blockbench, a 32px icon for every spell, feature and class, the
-designed character sheet:
-
-| | |
-|---|---|
-| ![Magic items, in Blockbench](docs/screenshots/11-items-blockbench.png) | ![Every icon](docs/screenshots/12-icons.png) |
-| ![Potions on a wall](docs/screenshots/14-wall-close.png) | ![Gear on a wall](docs/screenshots/15-wall-gear.png) |
-| ![The character sheet](docs/screenshots/16-sheet.png) | ![Spell icons](docs/screenshots/17-spell-icons.png) |
-| ![Choosing a class, on parchment](docs/screenshots/19-parchment-classes.png) | ![The spellbook, on parchment](docs/screenshots/20-parchment-spellbook.png) |
-
-Taken with the real client by `AdventurersScreenshotsTest` and `AdventurersLooksScreenshotsTest` in
-[e2e](https://github.com/RaindanceMC/e2e). The art is made in `dnd-module/art/`: `items/` (Blockbench models, built
-through Blockbench's MCP plugin by `build.py`), `icons/` (`render.py`), `weapons/` (`runes.py`), `gui/` (`sheet.py`),
-then `pack.py` writes the index the plugin ships from.
+The art is made in `dnd-module/art/`: `items/` (Blockbench models, built through Blockbench's MCP plugin by
+`build.py`), `weapons/` (`runes.py`), `gui/` (`parchment.py`), `tree/` (the skill tree's frames, chain and branch
+paintings on Core's `art/menus/tree.py`; `preview.py` lays the pages out), then `pack.py` writes the index the plugin
+ships from.
 
 ## Playing
 
-- `/adventurer` (`/dnd`) — choose a class, then the character sheet: abilities, slots, features, spellbook.
-- **F** (swap hands) — the casting stance: hotbar slots 1–8 become your spells and features, slot 9 your sheet (a sorcerer's metamagic). Click to cast; sneak and click to cast from your highest slot. F again and your hotbar is back.
-- `/adventurer rest` — a short rest: stand still, unhurt, for 30 seconds. Sleeping through the night is a long rest.
-- A new class always starts at level 1.
-- **Subclasses**: Champion (fighter), Berserker (barbarian), Thief (rogue), Evocation (wizard), Life (cleric) come by themselves; a sorcerer chooses **Wild Magic** (an original d100 surge table, Tides of Chaos, Bend Luck, Controlled Chaos, Spell Bombardment) or **Draconic Bloodline** (scales, fire, dragon wings).
-- **Magic items** drop from monsters by rarity: healing potions, Heroism, Speed, spell scrolls, +1/+2/+3 weapons and bows, a Wand of Magic Missiles, Ring of Protection, Amulet of Health, Boots of Striding and Springing, a Bag of Holding (your ender chest, anywhere).
+- `/adventurer` (`/dnd`) — the skill tree, one branch a page. A skill point every level; click a node to learn its next rank, shift-click the middle button to unlearn everything (once a day by default).
+- **Levels** come from defeating monsters: 50 experience for a zombie up to 20,000 for the ender dragon; levels 1–20 on the old table, then 25,000 a level to 100.
+- **Branches**: Vitality (hearts, armour, healing, Second Wind or Stoneskin, Undying), Might (melee, attack speed, lifesteal, **Dual Wielder** — the off hand strikes too, for half — or Great Weapon Master, Warlord), Marksman (arrows, Long Shot, arrows saved, Volley or Sharpshooter, Deadeye), Shadow (speed, dodging, jumps, backstabs, Acrobat or Assassin, Phantom), Arcana (experience, loot, luck, mining, stronger scrolls, wands and potions, Sage or Treasure Hunter, Archmage).
+- **Magic items** drop from monsters by rarity: healing potions, Heroism, Speed, spell scrolls (Magic Missile, Fireball, Lightning, Healing, Misty Step, Shield; tier 1–5), +1/+2/+3 weapons and bows, a Wand of Magic Missiles, Ring of Protection, Amulet of Health, Boots of Striding and Springing, a Bag of Holding (your ender chest, anywhere). The Potion of Mach Fuck is brewed from a dragon head.
 
 Staff (`rainsadventurers.admin`):
 
 - `/adventurer admin xp <player> <amount>` — adventure experience, levels follow
-- `/adventurer admin level <player> <level>` · `rest <player>` · `reset <player>`
-- `/adventurer admin give <player> <item> [spell]` · `surge <player> [1-100]`
+- `/adventurer admin level <player> <level>` · `unlearn <player>` · `reset <player>`
+- `/adventurer admin give <player> <item> [scroll] [tier]`
 
-Everything an owner can tune (worlds, experience, health per level, spell damage, damage against players, waits, rest lengths, wild surge chance, loot rate) is under `/settings` → Adventurers.
-
-**Lighter play:** `/settings set ability-scores false` takes Strength, Intelligence and the rest out of the game for players — a class is its level, its spells and its features. Each class keeps fixed scores underneath, its main one rising by itself at levels 4, 8, 12, 16 and 19; the sheet loses its ability row and the dice stay quiet. Points already spent are kept for when it is switched back on.
+Everything an owner can tune (worlds, experience, loot rate, how much of the tree counts between players, how often it may be unlearnt, the Mach potion) is under `/settings` → Adventurers.
 
 ## Build
 
@@ -55,7 +39,7 @@ Everything an owner can tune (worlds, experience, health per level, spell damage
 mvn install
 ```
 
-Needs Java 25 and read access to `packages.tstieh.de` (server ids `packages-releases` / `packages-snapshots` in `~/.m2/settings.xml`). The end-to-end scenarios are `AdventurersScenarioTest` in [e2e](https://github.com/RaindanceMC/e2e).
+Needs Java 25 and read access to `packages.tstieh.de` (server ids `packages-releases` / `packages-snapshots` in `~/.m2/settings.xml`). The end-to-end scenarios are `AdventurersScenarioTest` in [e2e](https://github.com/RaindanceMC/e2e) — written for the classes before 0.11.0 and not yet rewritten for the skill tree.
 
 ## Versions
 
@@ -63,4 +47,4 @@ The module's version is `dnd-module.version` in the root `pom.xml`, the plugin's
 
 ## Licence notice
 
-This work includes material taken from the System Reference Document 5.1 ("SRD 5.1") by Wizards of the Coast LLC, available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode. Rule names, spell names and numbers are adapted to real-time play; this plugin is not affiliated with or endorsed by Wizards of the Coast.
+This work includes material taken from the System Reference Document 5.1 ("SRD 5.1") by Wizards of the Coast LLC, available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode. Magic item names and some spell names are kept from it; this plugin is not affiliated with or endorsed by Wizards of the Coast.

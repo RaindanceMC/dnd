@@ -4,12 +4,7 @@ import de.raindancer.core.RainsCore;
 import de.raindancer.core.content.pack.JarPack;
 import de.raindancer.core.ui.menu.Backdrop;
 import de.raindancer.core.platform.log.Log;
-import de.raindancer.modules.dnd.model.Feature;
-import de.raindancer.modules.dnd.model.HeroClass;
 import de.raindancer.modules.dnd.model.MagicItem;
-import de.raindancer.modules.dnd.model.Metamagic;
-import de.raindancer.modules.dnd.model.Spell;
-import de.raindancer.modules.dnd.model.Subclass;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -25,8 +20,8 @@ import java.util.Locale;
 import java.util.Optional;
 
 /**
- * The adventurers' looks — an icon for every spell, feature, class and subclass, and a model for every magic item —
- * offered to Core's resource packs. Made in {@code dnd-module/art}; {@code files.txt} is the index of what ships.
+ * The adventurers' looks — a model for every magic item, the skill tree's frames, lines and paintings — offered to
+ * Core's resource packs. Made in {@code dnd-module/art}; {@code files.txt} is the index of what ships.
  *
  * <p>Every item keeps its vanilla material, so a player without the pack still sees something sensible.
  */
@@ -34,9 +29,6 @@ public final class DndPack {
 
     public static final String NAMESPACE = "rainsadventurers";
     static final String ROOT = "/de/raindancer/modules/dnd/pack/";
-    public static final String EMPTY = "ui/empty";
-    public static final String SHEET = "ui/sheet";
-    public static final String D20 = "ui/d20";
     private static final String OWNER = "Adventurers";
     private static final String NAME = "looks";
     private static volatile List<String> files;
@@ -44,10 +36,6 @@ public final class DndPack {
             net.kyori.adventure.text.format.TextColor.color(0x4A3220);
     private static final net.kyori.adventure.key.Key PARCHMENT_FONT =
             net.kyori.adventure.key.Key.key(NAMESPACE, "parchment");
-    /** The character sheet's own page; its slots are where {@code art/gui/sheet.py} painted them. */
-    public static final Backdrop SHEET_BACKDROP =
-            new Backdrop(net.kyori.adventure.key.Key.key(NAMESPACE, "sheet"), "\uF808\uE000\uF8A9", INK,
-                    Backdrop.TITLE_FONT);
 
     private DndPack() {
     }
@@ -70,10 +58,6 @@ public final class DndPack {
         return known;
     }
 
-    /** The sheet without the ability scores' row, for a server that switched them off. */
-    public static final Backdrop SHEET_SIMPLE_BACKDROP =
-            new Backdrop(net.kyori.adventure.key.Key.key(NAMESPACE, "sheet"), "\uF808\uE001\uF8A9", INK,
-                    Backdrop.TITLE_FONT);
 
     /** Every other adventurers' menu: a parchment page, in the sheet's hand. */
     public static Backdrop parchment(int rows) {
@@ -81,24 +65,22 @@ public final class DndPack {
                 INK, Backdrop.TITLE_FONT);
     }
 
-    public static String iconOf(Spell spell) {
-        return "spell/" + spell.id();
-    }
+    /** The skill tree's frames and lines: brass rings and runed chain, painted in art/tree. */
+    public static final de.raindancer.core.ui.tree.TreeLook TREE_LOOK =
+            new de.raindancer.core.ui.tree.TreeLook(net.kyori.adventure.key.Key.key(NAMESPACE, "tree"));
+    /** The branches' paintings, in this order from U+E000 in the font rainsadventurers:tree_scene. */
+    static final List<String> SCENES = List.of("vitality", "might", "marksman", "shadow", "arcana");
+    private static final net.kyori.adventure.text.format.TextColor TREE_INK =
+            net.kyori.adventure.text.format.TextColor.color(0xF1E4C6);
 
-    public static String iconOf(Feature feature) {
-        return "feature/" + feature.id();
-    }
-
-    public static String classIcon(HeroClass heroClass) {
-        return "class/" + heroClass.id();
-    }
-
-    public static String subclassIcon(Subclass subclass) {
-        return "subclass/" + subclass.id();
-    }
-
-    public static String metamagicIcon(Metamagic metamagic) {
-        return "metamagic/" + (metamagic == null ? "none" : metamagic.name().toLowerCase(Locale.ROOT));
+    /** The painting behind a skill tree branch; {@code null} — the house's — for a branch without one. */
+    public static Backdrop treeBackdrop(String branch) {
+        int index = SCENES.indexOf(branch);
+        if (index < 0) {
+            return null;
+        }
+        return new Backdrop(net.kyori.adventure.key.Key.key(NAMESPACE, "tree_scene"),
+                "\uF808" + (char) (0xE000 + index) + "\uF8A9", TREE_INK);
     }
 
     /** Weapons whose rune overlays the pack has; a bow, a crossbow or a trident keeps its vanilla look. */
@@ -110,7 +92,8 @@ public final class DndPack {
      * A magic item's look: its own model, a scroll's seal in its rarity's colour, a weapon's runes over its vanilla
      * self — or empty, for a weapon the pack has no runes for.
      */
-    public static Optional<String> itemModel(MagicItem item, Spell spell, org.bukkit.Material base) {
+    public static Optional<String> itemModel(MagicItem item, de.raindancer.modules.dnd.model.Rarity rarity,
+                                             org.bukkit.Material base) {
         if (item.isWeapon()) {
             if (base == null || !RUNED.contains(base)) {
                 return Optional.empty();
@@ -119,9 +102,6 @@ public final class DndPack {
                     + item.amount().bonus());
         }
         if (item == MagicItem.SPELL_SCROLL) {
-            de.raindancer.modules.dnd.model.Rarity rarity = spell == null
-                    ? de.raindancer.modules.dnd.model.Rarity.COMMON
-                    : de.raindancer.modules.dnd.model.Rarity.ofSpellLevel(spell.level());
             return Optional.of("magic/spell_scroll_" + rarity.name().toLowerCase(Locale.ROOT));
         }
         return Optional.of("magic/" + item.id());
@@ -140,7 +120,7 @@ public final class DndPack {
     public static void contribute(Plugin plugin, RainsCore core) {
         try {
             JarPack.offer(plugin, core.resourcePacks(), DndPack.class, ROOT, files(), OWNER, NAME,
-                    "Icons for spells, features and classes, and models for the magic items");
+                    "Models for the magic items, and the skill tree's looks");
         } catch (IOException failure) {
             Log.of("dnd").warn("The adventurers' icons and item models could not be written ({}); everything works, "
                     + "but looks like the vanilla items underneath.", failure.getMessage());

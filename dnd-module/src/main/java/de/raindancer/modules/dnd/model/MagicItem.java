@@ -22,7 +22,7 @@ public enum MagicItem {
     POTION_OF_MACH_FUCK("Potion of Mach Fuck", Rarity.LEGENDARY, Material.POTION, Dice.NONE,
             "Brewed from a dragon's head. Drink it, glide, and you go wherever you look, far too fast."),
     SPELL_SCROLL("Spell Scroll", Rarity.COMMON, Material.PAPER, Dice.NONE,
-            "Read it to cast the spell written on it, if it is on your class's list. It crumbles afterwards."),
+            "Read it to set off the magic written on it. It crumbles afterwards."),
     WEAPON_PLUS_ONE("+1 Weapon", Rarity.UNCOMMON, Material.IRON_SWORD, Dice.flat(1),
             "One more damage on every blow or arrow."),
     WEAPON_PLUS_TWO("+2 Weapon", Rarity.RARE, Material.DIAMOND_SWORD, Dice.flat(2),
@@ -32,9 +32,9 @@ public enum MagicItem {
     WAND_OF_MAGIC_MISSILES("Wand of Magic Missiles", Rarity.UNCOMMON, Material.BREEZE_ROD, Dice.NONE,
             "Seven charges of Magic Missile, one back every few minutes. Sneak to spend three at once."),
     RING_OF_PROTECTION("Ring of Protection", Rarity.RARE, Material.GOLD_NUGGET, Dice.flat(1),
-            "Held in your off hand: more armour, and +1 to every saving throw."),
-    AMULET_OF_HEALTH("Amulet of Health", Rarity.RARE, Material.HEART_OF_THE_SEA, Dice.flat(19),
-            "Held in your off hand: your Constitution counts as 19."),
+            "Held in your off hand: two more armour, and a tenth less damage taken."),
+    AMULET_OF_HEALTH("Amulet of Health", Rarity.RARE, Material.HEART_OF_THE_SEA, Dice.flat(2),
+            "Held in your off hand: two more hearts."),
     BOOTS_OF_STRIDING("Boots of Striding and Springing", Rarity.UNCOMMON, Material.LEATHER_BOOTS, Dice.NONE,
             "Worn: you walk faster and jump three times as high."),
     BAG_OF_HOLDING("Bag of Holding", Rarity.UNCOMMON, Material.LEATHER, Dice.NONE,
@@ -66,7 +66,7 @@ public enum MagicItem {
         return title;
     }
 
-    /** A scroll's rarity is its spell's; see {@link Rarity#ofSpellLevel}. */
+    /** A scroll's rarity is its tier's; see {@link Scroll#rarity}. */
     public Rarity rarity() {
         return rarity;
     }
@@ -75,7 +75,7 @@ public enum MagicItem {
         return material;
     }
 
-    /** Healing for a potion, the bonus for a weapon, the score for the amulet. */
+    /** Healing for a potion, the bonus for a weapon, the hearts for the amulet. */
     public Dice amount() {
         return amount;
     }

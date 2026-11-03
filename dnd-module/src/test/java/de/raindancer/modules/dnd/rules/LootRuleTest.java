@@ -42,14 +42,15 @@ class LootRuleTest {
     }
 
     @Test
-    @DisplayName("an item of every rarity can be found, and a scroll's spell matches its rarity")
+    @DisplayName("an item of every rarity can be found, and a scroll's tier matches its rarity")
     void items() {
         SplittableRandom random = new SplittableRandom(4);
         for (Rarity rarity : Rarity.values()) {
             for (int go = 0; go < 50; go++) {
                 LootRule.Drop drop = rule.item(rarity, random);
                 if (drop.item() == MagicItem.SPELL_SCROLL) {
-                    assertThat(Rarity.ofSpellLevel(drop.spell().level())).isEqualTo(rarity);
+                    assertThat(drop.scroll()).isNotNull();
+                    assertThat(de.raindancer.modules.dnd.model.Scroll.rarity(drop.tier())).isEqualTo(rarity);
                 } else {
                     assertThat(drop.item().rarity()).isEqualTo(rarity);
                 }
@@ -68,5 +69,13 @@ class LootRuleTest {
         assertThat(MagicItem.POTION_OF_MACH_FUCK.lootable()).isFalse();
         assertThat(MagicItem.POTION_OF_SPEED.lootable()).isTrue();
         assertThat(MagicItem.POTION_OF_MACH_FUCK.isPotion()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Treasure Sense and its kin raise the drop chance by their percent, never past certain")
+    void luck() {
+        assertThat(rule.withLuck(0.1, 50)).isCloseTo(0.15, org.assertj.core.api.Assertions.within(1e-9));
+        assertThat(rule.withLuck(0.8, 100)).isEqualTo(1.0);
+        assertThat(rule.withLuck(0.1, -20)).isEqualTo(0.1);
     }
 }

@@ -13,7 +13,7 @@ public final class ScreenLineRule implements IDndRule {
     private static final String[] PLACE = {"<gold>", "<gray>", "<#cd7f32>"};
 
     /** One line of the top. */
-    public record Row(String name, String heroClass, int level, long xp) {
+    public record Row(String name, int level, long xp) {
     }
 
     public String bar(double progress) {
@@ -27,30 +27,26 @@ public final class ScreenLineRule implements IDndRule {
     }
 
     /**
-     * @param path        the class's second path, null before it is chosen
-     * @param nextXp      what the next level takes, 0 at the highest level
-     * @param progress    0 to 1 through the current level
-     * @param hitDiceLeft of {@code hitDice} (each a d{@code hitDie})
+     * @param nextXp   what the next level takes, 0 at the highest level
+     * @param progress 0 to 1 through the current level
      */
-    public String sheet(String heroClass, String path, int level, long xp, long nextXp, double progress,
-                        int hitDiceLeft, int hitDice, int hitDie) {
-        StringBuilder text = new StringBuilder(HEAD).append("\n<white>").append(MINI.escapeTags(heroClass))
-                .append("</white>");
-        if (path != null && !path.isBlank()) {
-            text.append(" <gray>· ").append(MINI.escapeTags(path));
-        }
+    public String sheet(int level, long xp, long nextXp, double progress, int pointsLeft) {
+        StringBuilder text = new StringBuilder(HEAD);
         boolean highest = nextXp <= 0;
         text.append("\n<gray>level <white>").append(level).append(highest ? " <gold>(highest)" : "")
                 .append("\n<gray>xp <white>").append(xp);
         if (!highest) {
             text.append("</white><gray>/").append(nextXp).append("\n").append(bar(progress));
         }
-        return text.append("\n<gray>hit dice <white>").append(hitDiceLeft).append("</white><gray>/").append(hitDice)
-                .append(" (d").append(hitDie).append(")").toString();
+        if (pointsLeft > 0) {
+            text.append("\n<green>").append(pointsLeft).append(" skill point").append(pointsLeft == 1 ? "" : "s")
+                    .append(" to spend <dark_gray>· <white>/adventurer");
+        }
+        return text.toString();
     }
 
     public String none() {
-        return HEAD + "\n<gray>No class chosen yet <dark_gray>· <white>/adventurer";
+        return HEAD + "\n<gray>No monster defeated yet <dark_gray>· <white>/adventurer";
     }
 
     public String top(List<Row> rows) {
@@ -61,8 +57,7 @@ public final class ScreenLineRule implements IDndRule {
         for (int i = 0; i < rows.size(); i++) {
             Row row = rows.get(i);
             text.append('\n').append(i < PLACE.length ? PLACE[i] : "<white>").append(i + 1).append(". ")
-                    .append(MINI.escapeTags(row.name())).append(" <dark_gray>· <gray>")
-                    .append(MINI.escapeTags(row.heroClass())).append(" lv ").append(row.level());
+                    .append(MINI.escapeTags(row.name())).append(" <dark_gray>· <gray>lv ").append(row.level());
         }
         return text.toString();
     }

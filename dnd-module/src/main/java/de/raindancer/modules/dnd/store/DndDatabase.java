@@ -25,7 +25,10 @@ public final class DndDatabase {
                 rev INTEGER NOT NULL
             )
             """,
-            "ALTER TABLE hero ADD COLUMN subclass TEXT NOT NULL DEFAULT ''");
+            "ALTER TABLE hero ADD COLUMN subclass TEXT NOT NULL DEFAULT ''",
+            // 0.11.0: the skill tree. The class, scores, slots and the rest stay as they were written, unread.
+            "ALTER TABLE hero ADD COLUMN nodes TEXT NOT NULL DEFAULT ''",
+            "ALTER TABLE hero ADD COLUMN respec_at INTEGER NOT NULL DEFAULT 0");
 
     private DndDatabase() {
     }

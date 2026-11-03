@@ -2,7 +2,6 @@ package de.raindancer.modules.dnd.listener;
 
 import de.raindancer.modules.dnd.DndServices;
 import de.raindancer.modules.dnd.model.MagicItem;
-import de.raindancer.modules.dnd.store.IconTags;
 import de.raindancer.modules.dnd.store.ItemTags;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -37,9 +36,6 @@ public final class ItemListener implements IDndListener {
         }
         Player player = event.getPlayer();
         ItemStack held = player.getInventory().getItemInMainHand();
-        if (IconTags.isIcon(held)) {
-            return;
-        }
         Optional<MagicItem> item = ItemTags.itemOf(held);
         if (item.isEmpty()) {
             return;
@@ -76,7 +72,7 @@ public final class ItemListener implements IDndListener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onShoot(EntityShootBowEvent event) {
-        int bonus = services.items().weaponBonus(event.getBow());
+        int bonus = de.raindancer.modules.dnd.service.CombatService.weaponBonus(event.getBow());
         if (bonus > 0 && event.getProjectile() instanceof Projectile arrow) {
             ItemTags.bonus(arrow, bonus);
         }

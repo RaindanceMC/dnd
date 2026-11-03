@@ -1,80 +1,84 @@
 package de.raindancer.modules.dnd.service;
 
-import de.raindancer.core.platform.util.Cooldowns;
 import de.raindancer.core.ui.actionbar.ActionBarPriority;
 import de.raindancer.core.ui.actionbar.ActionBars;
+import de.raindancer.core.ui.effect.Cues;
+import de.raindancer.core.ui.effect.Effects;
 import de.raindancer.core.ui.messages.Messages;
 import de.raindancer.modules.dnd.DndSettings;
-import de.raindancer.modules.dnd.model.Ability;
-import de.raindancer.modules.dnd.model.Condition;
-import de.raindancer.modules.dnd.model.Dice;
-import de.raindancer.modules.dnd.model.Feature;
 import de.raindancer.modules.dnd.model.Hero;
-import de.raindancer.modules.dnd.model.Spell;
-import de.raindancer.modules.dnd.rules.CheckRule;
-import de.raindancer.modules.dnd.rules.FeatureRule;
-import de.raindancer.modules.dnd.rules.MartialRule;
+import de.raindancer.modules.dnd.model.MagicItem;
+import de.raindancer.modules.dnd.model.MobProfile;
+import de.raindancer.modules.dnd.model.Perk;
+import de.raindancer.modules.dnd.rules.FightRule;
 import de.raindancer.modules.dnd.rules.MobRule;
+import de.raindancer.modules.dnd.rules.PerkRule;
+import de.raindancer.modules.dnd.store.ItemTags;
+import de.raindancer.modules.dnd.util.Living;
+import org.bukkit.Particle;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 
-import java.time.Duration;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
-import java.util.random.RandomGenerator;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.LongSupplier;
 
-/** What classes do to blows: given and taken. And the experience a kill is worth. */
+/**
+ * The skill tree in a fight: harder blows and arrows, softer hurts, dodging, lifesteal, the off hand of a Dual
+ * Wielder, Second Wind and Undying, healing out of a fight, and experience for a kill.
+ */
 public final class CombatService implements IDndService {
 
-    /** Sneak Attack is once a turn; a turn is this long. */
-    private static final Duration TURN = Duration.ofMillis(1_500);
-    private static final Duration DODGE = Duration.ofSeconds(6);
-    private static final int EXPLOSION_DC = 13;
+    static final long SECOND_WIND_MILLIS = 120_000;
+    static final long UNDYING_MILLIS = 600_000;
+    /** No blow given or taken for this long: out of a fight, and Mending works. */
+    static final long OUT_OF_FIGHT_MILLIS = 8_000;
+    /** Ticks between the main hand's blow and the off hand's. */
+    private static final long OFF_HAND_DELAY = 4;
 
+    private final Plugin plugin;
     private final Messages messages;
     private final ActionBars actionBars;
+    private final Effects effects;
     private final HeroService heroes;
-    private final ConditionService conditions;
-    private final ConcentrationService concentration;
-    private final MartialRule martial;
-    private final FeatureRule features;
-    private final CheckRule checks;
+    private final PerkRule perks;
+    private final FightRule fight;
     private final MobRule mobs;
-    private final RandomGenerator random;
-
-    private final Cooldowns<UUID> sneakAttacks = new Cooldowns<>();
-    private final Cooldowns<UUID> divineStrikes = new Cooldowns<>();
-    private final Cooldowns<UUID> retaliations = new Cooldowns<>();
-    private volatile java.util.function.ToIntFunction<org.bukkit.inventory.ItemStack> weaponBonus = item -> 0;
-    private final Cooldowns<UUID> dodges = new Cooldowns<>();
-
+    private final LongSupplier clock;
+    private final de.raindancer.core.platform.util.Cooldowns<UUID> secondWind;
+    private final de.raindancer.core.platform.util.Cooldowns<UUID> undying;
+    private final Map<UUID, Long> fighting = new ConcurrentHashMap<>();
+    /** Players whose off hand is striking right now: that blow does not strike again. */
+    private final Set<UUID> offHand = ConcurrentHashMap.newKeySet();
     private volatile DndSettings settings = DndSettings.DEFAULTS;
 
-    public CombatService(Messages messages, ActionBars actionBars, HeroService heroes, ConditionService conditions,
-                         ConcentrationService concentration, MartialRule martial, FeatureRule features,
-                         CheckRule checks, MobRule mobs, RandomGenerator random) {
+    public CombatService(Plugin plugin, Messages messages, ActionBars actionBars, Effects effects, HeroService heroes, PerkRule perks,
+                         FightRule fight, MobRule mobs, LongSupplier clock) {
+        this.plugin = plugin;
         this.messages = messages;
         this.actionBars = actionBars;
+        this.effects = effects;
         this.heroes = heroes;
-        this.conditions = conditions;
-        this.concentration = concentration;
-        this.martial = martial;
-        this.features = features;
-        this.checks = checks;
+        this.perks = perks;
+        this.fight = fight;
         this.mobs = mobs;
-        this.random = random;
-        sneakAttacks.every(TURN);
-        divineStrikes.every(TURN);
-        retaliations.every(Duration.ofSeconds(1));
-        dodges.every(DODGE);
-    }
-
-    /** What a magic weapon adds; the item service knows. */
-    public void weaponBonus(java.util.function.ToIntFunction<org.bukkit.inventory.ItemStack> lookup) {
-        this.weaponBonus = lookup == null ? item -> 0 : lookup;
+        this.clock = clock;
+        this.secondWind = new de.raindancer.core.platform.util.Cooldowns<>(clock);
+        this.secondWind.every(java.time.Duration.ofMillis(SECOND_WIND_MILLIS));
+        this.undying = new de.raindancer.core.platform.util.Cooldowns<>(clock);
+        this.undying.every(java.time.Duration.ofMillis(UNDYING_MILLIS));
     }
 
     @Override
@@ -82,143 +86,212 @@ public final class CombatService implements IDndService {
         this.settings = updated == null ? DndSettings.DEFAULTS : updated;
     }
 
-    private Optional<Hero> active(Player player) {
+    /** The tree's values for a player in an adventurers' world; nothing for anybody else. */
+    Map<Perk, Double> tree(Player player) {
         if (!settings.worksIn(player.getWorld().getName())) {
-            return Optional.empty();
+            return Map.of();
         }
-        return heroes.of(player.getUniqueId());
+        return heroes.of(player.getUniqueId()).map(perks::values).orElse(Map.of());
     }
 
-    /** A melee blow by a player: what it does with their class behind it. */
-    public double melee(Player attacker, LivingEntity target, double base) {
-        double armed = base + weaponBonus.applyAsInt(attacker.getInventory().getItemInMainHand());
-        Optional<Hero> found = active(attacker);
-        if (found.isEmpty()) {
-            return armed;
-        }
-        base = armed;
-        Hero hero = found.get();
-        UUID id = attacker.getUniqueId();
-        boolean unseen = attacker.hasPotionEffect(PotionEffectType.INVISIBILITY);
-        double damage = martial.melee(hero, base, conditions.has(id, Condition.RAGING),
-                conditions.has(id, Condition.RECKLESS));
-        if (Feature.SNEAK_ATTACK.has(hero) && sneakAttacks.isReady(id)) {
-            boolean busy = target instanceof Mob mob && mob.getTarget() != null && !attacker.equals(mob.getTarget());
-            if (martial.sneakAttackApplies(attacker.isSneaking(), unseen, busy, degreesFromBehind(attacker, target))) {
-                int extra = Dice.of(features.sneakAttackDice(hero.level()), 6).roll(random);
-                damage += extra;
-                sneakAttacks.start(id);
-                actionBars.show(id, "dnd-cast", messages.get("dnd.sneak-attack", "damage", String.valueOf(extra)),
-                        Duration.ofMillis(1500), ActionBarPriority.NORMAL);
-            }
-        }
-        if (random.nextDouble() < martial.critChance(hero)) {
-            damage *= 2;
-            actionBars.show(id, "dnd-cast", messages.get("dnd.critical"), Duration.ofMillis(1200),
-                    ActionBarPriority.NORMAL);
-        }
-        int divine = martial.divineStrikeDice(hero);
-        if (divine > 0 && divineStrikes.tryUse(id)) {
-            damage += Dice.of(divine, 8).roll(random);
-        }
-        if (conditions.clear(id, Condition.HIDDEN) || unseen) {
-            concentration.on(id).filter(focus -> focus.spell() == Spell.INVISIBILITY)
-                    .ifPresent(focus -> concentration.end(attacker, "dnd.cast.visible"));
-            if (!concentration.on(id).filter(focus -> focus.spell() == Spell.GREATER_INVISIBILITY).isPresent()) {
-                attacker.removePotionEffect(PotionEffectType.INVISIBILITY);
-            }
-        }
-        return damage;
-    }
-
-    /** 0 when the attacker stands straight behind the target, 180 straight in front of it. */
-    static double degreesFromBehind(LivingEntity attacker, LivingEntity target) {
-        Vector facing = target.getLocation().getDirection().setY(0);
-        Vector toAttacker = attacker.getLocation().toVector().subtract(target.getLocation().toVector()).setY(0);
-        if (facing.lengthSquared() < 1e-6 || toAttacker.lengthSquared() < 1e-6) {
-            return 180;
-        }
-        double cos = facing.normalize().dot(toAttacker.normalize());
-        return 180 - Math.toDegrees(Math.acos(Math.max(-1, Math.min(1, cos))));
-    }
-
-    /**
-     * A blow landing on a player: rage, Shield, Reckless Attack, Uncanny Dodge and Evasion — and Death Ward last.
-     *
-     * @param physical a blow or an arrow
-     * @param explosion a creeper, TNT, a fireball's blast
-     */
-    public double incoming(Player victim, double damage, boolean physical, boolean explosion) {
-        return incoming(victim, damage, physical, explosion, false);
-    }
-
-    /** @param fire flames, lava, a burning floor */
-    public double incoming(Player victim, double damage, boolean physical, boolean explosion, boolean fire) {
-        Optional<Hero> found = active(victim);
-        UUID id = victim.getUniqueId();
-        double left = damage;
-        if (found.isPresent()) {
-            Hero hero = found.get();
-            boolean dodge = physical && Feature.UNCANNY_DODGE.has(hero)
-                    && dodges.tryUse(id);
-            left = martial.incoming(damage, conditions.has(id, Condition.RAGING), physical,
-                    conditions.has(id, Condition.RECKLESS), conditions.has(id, Condition.SHIELDED), dodge);
-            if (dodge) {
-                messages.send(victim, "dnd.uncanny-dodge");
-            }
-            if (fire && Feature.ELEMENTAL_AFFINITY.has(hero)) {
-                left /= 2;
-            }
-            if (explosion && Feature.EVASION.has(hero)) {
-                boolean saved = checks.save(checks.d20(random, false), checks.saveBonus(hero, Ability.DEXTERITY),
-                        EXPLOSION_DC).succeeded();
-                left = saved ? 0 : left / 2;
-            }
-        }
-        double health = victim.getHealth() + victim.getAbsorptionAmount();
-        if (left >= health && conditions.clear(id, Condition.WARDED)) {
-            left = Math.max(0, health - 1);
-            messages.send(victim, "dnd.death-ward");
-        }
-        return left;
-    }
-
-    /** Retaliation: a raging berserker hit in melee hits straight back. */
-    public void retaliate(Player victim, LivingEntity attacker) {
-        Optional<Hero> found = active(victim);
-        if (found.isEmpty() || attacker.equals(victim) || !Feature.RETALIATION.has(found.get())
-                || !conditions.has(victim.getUniqueId(), Condition.RAGING)
-                || !retaliations.tryUse(victim.getUniqueId())) {
-            return;
-        }
-        double back = martial.retaliation(found.get());
-        org.bukkit.damage.DamageSource source = org.bukkit.damage.DamageSource.builder(
-                org.bukkit.damage.DamageType.MAGIC).withCausingEntity(victim).withDirectEntity(victim).build();
-        attacker.damage(back, source);
-    }
-
-    /** After a hit has landed: concentration is tested. */
-    public void landed(Player victim, double damage) {
-        heroes.of(victim.getUniqueId()).ifPresent(hero -> concentration.hit(victim, hero, damage));
-    }
-
-    /** A kill by a player: the experience it is worth. */
-    public void killed(Player killer, LivingEntity victim) {
-        if (active(killer).isEmpty() || victim instanceof Player) {
-            return;
-        }
-        int xp = mobs.of(victim.getType()).xp();
-        if (xp > 0) {
-            heroes.grantXp(killer, xp, victim.getType().name().toLowerCase(java.util.Locale.ROOT).replace('_', ' '),
-                    true);
-        }
+    private void fought(UUID player) {
+        fighting.put(player, clock.getAsLong());
     }
 
     public void forget(UUID player) {
-        sneakAttacks.forget(player);
-        divineStrikes.forget(player);
-        retaliations.forget(player);
-        dodges.forget(player);
-        conditions.forget(player);
+        secondWind.forget(player);
+        undying.forget(player);
+        fighting.remove(player);
+        offHand.remove(player);
+    }
+
+    // ------------------------------------------------------------------ blows given
+
+    /** A blow or an arrow the player landed: what it does now. */
+    public double dealt(Player striker, LivingEntity target, FightRule.Kind kind, boolean critical, double damage,
+                        double distance) {
+        fought(striker.getUniqueId());
+        Map<Perk, Double> tree = tree(striker);
+        ItemStack main = striker.getInventory().getItemInMainHand();
+        int bonus = kind == FightRule.Kind.RANGED ? 0 : weaponBonus(main);
+        double max = TargetService.maxHealth(striker);
+        var from = striker.getLocation().toVector().subtract(target.getLocation().toVector());
+        var facing = target.getLocation().getDirection();
+        MobProfile profile = target instanceof Player ? MobProfile.HARMLESS : mobs.of(target.getType());
+        FightRule.Hit hit = new FightRule.Hit(kind, critical, FightRule.behind(facing.getX(), facing.getZ(),
+                from.getX(), from.getZ()), profile.undead(), target instanceof Player,
+                striker.getInventory().getItemInOffHand().isEmpty(), striker.getHealth() < max / 2, distance, bonus);
+        return fight.dealt(tree, hit, damage, settings.pvpPercent());
+    }
+
+    /** A melee blow landed for {@code dealt}: lifesteal, and the off hand's strike for a Dual Wielder. */
+    public void landed(Player striker, LivingEntity target, double dealt) {
+        Map<Perk, Double> tree = tree(striker);
+        double healed = fight.healed(tree, dealt, target instanceof Player, settings.pvpPercent());
+        if (healed > 0) {
+            striker.setHealth(Math.min(TargetService.maxHealth(striker), striker.getHealth() + healed));
+        }
+        if (tree.getOrDefault(Perk.DUAL_WIELD, 0.0) <= 0 || offHand.contains(striker.getUniqueId())) {
+            return;
+        }
+        ItemStack off = striker.getInventory().getItemInOffHand();
+        double weapon = weaponDamage(off);
+        if (weapon <= 0) {
+            return;
+        }
+        double strike = fight.offHand(weapon + weaponBonus(off));
+        de.raindancer.core.platform.util.Scheduling.entityLater(plugin, striker, OFF_HAND_DELAY, () -> {
+            if (!striker.isOnline() || striker.isDead() || target.isDead() || !target.isValid()
+                    || target.getWorld() != striker.getWorld() || target.getLocation().distance(striker.getLocation()) > 6) {
+                return;
+            }
+            striker.swingOffHand();
+            // Held until the strike is dealt — on Folia that is on the target's own thread, later.
+            offHand.add(striker.getUniqueId());
+            Living.onTarget(plugin, target, () -> {
+                try {
+                    target.setNoDamageTicks(0);
+                    target.damage(strike, DamageSource.builder(DamageType.PLAYER_ATTACK)
+                            .withCausingEntity(striker).withDirectEntity(striker).build());
+                } finally {
+                    offHand.remove(striker.getUniqueId());
+                }
+            });
+        });
+    }
+
+    /** Whether the blow being dealt is a Dual Wielder's off hand. */
+    public boolean isOffHand(Player striker) {
+        return offHand.contains(striker.getUniqueId());
+    }
+
+    /** What a weapon does in the main hand: the player's own 1 and the item's damage, 0 for no weapon. */
+    static double weaponDamage(ItemStack item) {
+        if (item == null || item.isEmpty()) {
+            return 0;
+        }
+        double damage = 0;
+        for (AttributeModifier modifier : item.getType().getDefaultAttributeModifiers(EquipmentSlot.HAND)
+                .get(Attribute.ATTACK_DAMAGE)) {
+            if (modifier.getOperation() == AttributeModifier.Operation.ADD_NUMBER) {
+                damage += modifier.getAmount();
+            }
+        }
+        return damage <= 0 ? 0 : damage + 1;
+    }
+
+    public static int weaponBonus(ItemStack weapon) {
+        return ItemTags.itemOf(weapon).filter(MagicItem::isWeapon).map(item -> item.amount().bonus()).orElse(0);
+    }
+
+    // ------------------------------------------------------------------ blows taken
+
+    /** Whether the blow or arrow coming at the player misses them. */
+    public boolean dodges(Player victim, boolean byPlayer) {
+        double chance = fight.dodgeChance(tree(victim), byPlayer, settings.pvpPercent());
+        if (chance <= 0 || ThreadLocalRandom.current().nextDouble() >= chance) {
+            return false;
+        }
+        fought(victim.getUniqueId());
+        effects.play(victim.getUniqueId(), Cues.VANISH);
+        actionBars.show(victim.getUniqueId(), "dnd-dodge", messages.get("dnd.combat.dodged"),
+                java.time.Duration.ofSeconds(1), ActionBarPriority.LOW);
+        return true;
+    }
+
+    /** What a hurt does to the player, with the tree and a Ring of Protection. */
+    public double taken(Player victim, double damage, boolean byPlayer) {
+        fought(victim.getUniqueId());
+        boolean ring = ItemTags.itemOf(victim.getInventory().getItemInOffHand())
+                .filter(item -> item == MagicItem.RING_OF_PROTECTION).isPresent()
+                && settings.worksIn(victim.getWorld().getName());
+        return fight.taken(tree(victim), damage, byPlayer, settings.pvpPercent(), ring);
+    }
+
+    /**
+     * A hurt that would kill the player: Undying keeps them at one heart, once every ten minutes — unless a totem in
+     * their hands will save them anyway.
+     *
+     * @return whether they were kept alive
+     */
+    public boolean undying(Player victim) {
+        if (tree(victim).getOrDefault(Perk.UNDYING, 0.0) <= 0 || holdsTotem(victim)) {
+            return false;
+        }
+        if (!undying.tryUse(victim.getUniqueId())) {
+            return false;
+        }
+        victim.setHealth(Math.min(TargetService.maxHealth(victim), 2.0));
+        Living.give(victim, PotionEffectType.RESISTANCE, 4, 1);
+        victim.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, victim.getLocation().add(0, 1, 0), 40, 0.4, 0.6, 0.4,
+                0.3);
+        effects.play(victim.getUniqueId(), Cues.REWARD);
+        messages.send(victim, "dnd.combat.undying");
+        return true;
+    }
+
+    private static boolean holdsTotem(Player player) {
+        return player.getInventory().getItemInMainHand().getType() == org.bukkit.Material.TOTEM_OF_UNDYING
+                || player.getInventory().getItemInOffHand().getType() == org.bukkit.Material.TOTEM_OF_UNDYING;
+    }
+
+    /** After a hurt landed: Second Wind, once below a third of their health. */
+    public void hurt(Player victim) {
+        if (victim.isDead() || tree(victim).getOrDefault(Perk.SECOND_WIND, 0.0) <= 0) {
+            return;
+        }
+        double max = TargetService.maxHealth(victim);
+        if (victim.getHealth() >= max / 3) {
+            return;
+        }
+        if (!secondWind.tryUse(victim.getUniqueId())) {
+            return;
+        }
+        victim.setHealth(Math.min(max, victim.getHealth() + max / 3));
+        effects.play(victim.getUniqueId(), Cues.HEAL);
+        messages.send(victim, "dnd.combat.second-wind");
+    }
+
+    // ------------------------------------------------------------------ out of a fight, and kills
+
+    /** Every five seconds: Mending heals a player who has not fought for a while. */
+    public void mend(Player player) {
+        double perFive = tree(player).getOrDefault(Perk.REGEN, 0.0);
+        if (perFive <= 0 || player.isDead()) {
+            return;
+        }
+        Long last = fighting.get(player.getUniqueId());
+        if (last != null && clock.getAsLong() - last < OUT_OF_FIGHT_MILLIS) {
+            return;
+        }
+        double max = TargetService.maxHealth(player);
+        if (player.getHealth() < max) {
+            player.setHealth(Math.min(max, player.getHealth() + perFive));
+        }
+    }
+
+    /** A creature the player killed: its worth in experience, with Studious and its kin. */
+    public void killed(Player killer, LivingEntity victim) {
+        if (victim instanceof Player || !settings.worksIn(killer.getWorld().getName())) {
+            return;
+        }
+        int worth = mobs.of(victim.getType()).xp();
+        if (worth <= 0) {
+            return;
+        }
+        Optional<Hero> hero = heroes.ensure(killer);
+        double more = hero.map(found -> perks.value(found, Perk.XP)).orElse(0.0);
+        long amount = Math.round(worth * (100 + more) / 100.0);
+        heroes.grantXp(killer, amount, victim.getName(), true);
+    }
+
+    /** Experience from orbs, with Orb Catcher and its kin. */
+    public int orbs(Player player, int amount) {
+        double more = tree(player).getOrDefault(Perk.VANILLA_XP, 0.0);
+        return amount <= 0 || more <= 0 ? amount : (int) Math.min(Integer.MAX_VALUE, Math.round(amount * (100 + more) / 100));
+    }
+
+    public double chance(Player player, Perk perk) {
+        return tree(player).getOrDefault(perk, 0.0) / 100.0;
     }
 }

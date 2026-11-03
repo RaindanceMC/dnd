@@ -1,6 +1,5 @@
 package de.raindancer.modules.dnd.service;
 
-import de.raindancer.modules.dnd.model.HeroClass;
 import de.raindancer.modules.dnd.store.HeroBook;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,8 +23,8 @@ class AdventurerScreensTest {
     private AdventurerScreens screens() {
         return new AdventurerScreens(null, null, most -> {
             reads.incrementAndGet();
-            return List.of(new HeroBook.Standing(ada, HeroClass.SORCERER, 7, 23_500),
-                    new HeroBook.Standing(ghost, HeroClass.SORCERER, 2, 400));
+            return List.of(new HeroBook.Standing(ada, 7, 23_500),
+                    new HeroBook.Standing(ghost, 2, 400));
         }, player -> player.equals(ada) ? Optional.of("Ada") : Optional.empty(), now::get);
     }
 

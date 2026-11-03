@@ -25,17 +25,4 @@ public enum Rarity {
         return colour;
     }
 
-    /** A spell scroll is as rare as its spell is high. */
-    public static Rarity ofSpellLevel(int level) {
-        if (level <= 1) {
-            return COMMON;
-        }
-        if (level <= 3) {
-            return UNCOMMON;
-        }
-        if (level <= 5) {
-            return RARE;
-        }
-        return level <= 8 ? VERY_RARE : LEGENDARY;
-    }
 }

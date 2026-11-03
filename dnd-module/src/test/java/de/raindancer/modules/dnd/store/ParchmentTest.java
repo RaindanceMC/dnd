@@ -4,13 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.raindancer.core.ui.menu.Backdrop;
-import de.raindancer.modules.dnd.screen.ClassMenu;
 import de.raindancer.modules.dnd.screen.ConfirmScreen;
-import de.raindancer.modules.dnd.screen.FontOfMagicMenu;
-import de.raindancer.modules.dnd.screen.LoadoutMenu;
-import de.raindancer.modules.dnd.screen.SheetMenu;
-import de.raindancer.modules.dnd.screen.SpellPickerMenu;
-import de.raindancer.modules.dnd.screen.SubclassMenu;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -25,14 +19,13 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/** Every adventurers' menu is on parchment (the sheet on its own page), and every page it needs ships. */
+/** The adventurers' dialogs are on parchment (the tree on its branches' paintings), and every page it needs ships. */
 class ParchmentTest {
 
     @Test
     @DisplayName("Every menu chooses its backdrop")
     void everyMenuChooses() throws NoSuchMethodException {
-        for (Class<?> page : List.of(ClassMenu.class, ConfirmScreen.class, FontOfMagicMenu.class, LoadoutMenu.class,
-                SheetMenu.class, SpellPickerMenu.class, SubclassMenu.class)) {
+        for (Class<?> page : List.of(ConfirmScreen.class)) {
             assertThat(page.getDeclaredMethod("backdrop").getReturnType()).as(page.getSimpleName())
                     .isEqualTo(Backdrop.class);
         }
@@ -63,30 +56,7 @@ class ParchmentTest {
                 assertThat(image.getHeight()).isEqualTo(114 + 18 * rows).isEqualTo(provider.get("height").getAsInt());
             }
         }
-        assertThat(DndPack.SHEET_BACKDROP.font().value()).isEqualTo("sheet");
-        assertThat(DndPack.SHEET_BACKDROP.titleFont()).isEqualTo(Backdrop.TITLE_FONT);
         assertThat(DndPack.parchment(3).titleFont()).as("the storybook capitals are the adventurers' own")
                 .isEqualTo(Backdrop.TITLE_FONT);
-    }
-
-    @Test
-    @DisplayName("Without ability scores the sheet is painted without their row, in the same font")
-    void simpleSheet() throws Exception {
-        assertThat(DndPack.SHEET_SIMPLE_BACKDROP.font()).isEqualTo(DndPack.SHEET_BACKDROP.font());
-        assertThat(DndPack.SHEET_SIMPLE_BACKDROP.glyphs()).isNotEqualTo(DndPack.SHEET_BACKDROP.glyphs());
-        String glyph = String.valueOf(DndPack.SHEET_SIMPLE_BACKDROP.glyphs().charAt(1));
-        try (InputStream in = DndPack.class.getResourceAsStream(DndPack.ROOT + "assets/rainsadventurers/font/sheet.json")) {
-            JsonObject font = JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
-            boolean found = false;
-            for (JsonElement p : font.getAsJsonArray("providers")) {
-                JsonObject provider = p.getAsJsonObject();
-                if (provider.has("chars") && provider.getAsJsonArray("chars").get(0).getAsString().equals(glyph)) {
-                    String file = provider.get("file").getAsString().replace("rainsadventurers:", "assets/rainsadventurers/textures/");
-                    assertThat(DndPack.files()).contains(file);
-                    found = true;
-                }
-            }
-            assertThat(found).isTrue();
-        }
     }
 }

@@ -23,8 +23,8 @@ public final class PermissionNodes {
 
     public static List<Permission> declared() {
         return List.of(
-                new Permission(PLAY, "Choose a class, cast spells and rest", PermissionDefault.TRUE),
-                new Permission(ADMIN, "Set levels, grant experience and reset adventurers", PermissionDefault.OP));
+                new Permission(PLAY, "Be an adventurer: earn levels and spend skill points", PermissionDefault.TRUE),
+                new Permission(ADMIN, "Set levels, grant experience, unlearn trees and reset adventurers", PermissionDefault.OP));
     }
 
     /** @return how many were added */

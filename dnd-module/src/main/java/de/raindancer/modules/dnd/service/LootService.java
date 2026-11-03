@@ -50,20 +50,24 @@ public final class LootService implements IDndService {
         this.settings = updated == null ? DndSettings.DEFAULTS : updated;
     }
 
-    /** What this kill drops, if anything. The killer is told when something does. */
-    public Optional<ItemStack> roll(Player killer, LivingEntity victim) {
-        if (!settings.worksIn(victim.getWorld().getName()) || SurgeService.isSummoned(victim)) {
+    /**
+     * What this kill drops, if anything. The killer is told when something does.
+     *
+     * @param morePercent the killer's Treasure Sense and its kin
+     */
+    public Optional<ItemStack> roll(Player killer, LivingEntity victim, double morePercent) {
+        if (!settings.worksIn(victim.getWorld().getName())) {
             return Optional.empty();
         }
         int xp = mobs.of(victim.getType()).xp();
-        if (random.nextDouble() >= rule.dropChance(xp, settings.lootPercent())) {
+        if (random.nextDouble() >= rule.withLuck(rule.dropChance(xp, settings.lootPercent()), morePercent)) {
             return Optional.empty();
         }
         Rarity rarity = rule.rarity(xp, random.nextDouble());
         LootRule.Drop drop = rule.item(rarity, random);
-        ItemStack stack = forge.make(drop.item(), drop.spell(), weaponBase(drop.item()));
-        messages.send(killer, "dnd.loot", "item", drop.spell() == null ? drop.item().title()
-                : "Spell Scroll of " + drop.spell().title(), "rarity", rarity.title().toLowerCase(java.util.Locale.ROOT));
+        ItemStack stack = forge.make(drop.item(), drop.scroll(), drop.tier(), weaponBase(drop.item()));
+        messages.send(killer, "dnd.loot", "item", drop.scroll() == null ? drop.item().title()
+                : "Spell Scroll of " + drop.scroll().title(), "rarity", rarity.title().toLowerCase(java.util.Locale.ROOT));
         effects.play(killer.getUniqueId(), Cues.REWARD);
         return Optional.of(stack);
     }

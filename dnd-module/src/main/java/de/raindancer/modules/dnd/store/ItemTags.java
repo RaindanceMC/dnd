@@ -1,7 +1,7 @@
 package de.raindancer.modules.dnd.store;
 
 import de.raindancer.modules.dnd.model.MagicItem;
-import de.raindancer.modules.dnd.model.Spell;
+import de.raindancer.modules.dnd.model.Scroll;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -11,11 +11,14 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Optional;
 
-/** What makes an item a magic one, written on the item itself: which item, its spell, its charges. */
+/** What makes an item a magic one, written on the item itself: which item, a scroll's kind and tier, its charges. */
 public final class ItemTags {
 
     static final NamespacedKey ITEM = new NamespacedKey("rains_dnd", "item");
+    /** A scroll's kind; before 0.11.0, the spell on it. */
     static final NamespacedKey SPELL = new NamespacedKey("rains_dnd", "spell");
+    /** A scroll's tier, 1 to 5; missing on a scroll from before 0.11.0. */
+    static final NamespacedKey TIER = new NamespacedKey("rains_dnd", "tier");
     static final NamespacedKey CHARGES = new NamespacedKey("rains_dnd", "charges");
     static final NamespacedKey CHARGED_AT = new NamespacedKey("rains_dnd", "charged_at");
     /** On an arrow: the bonus of the bow that shot it. */
@@ -31,11 +34,26 @@ public final class ItemTags {
         return MagicItem.byId(stack.getItemMeta().getPersistentDataContainer().get(ITEM, PersistentDataType.STRING));
     }
 
-    public static Optional<Spell> spellOf(ItemStack stack) {
-        if (stack == null || stack.isEmpty() || !stack.hasItemMeta()) {
+    /** What a scroll sets off; an old scroll's spell is read as what it became. */
+    public static Optional<Scroll> scrollOf(ItemStack stack) {
+        String written = read(stack, SPELL, PersistentDataType.STRING, null);
+        if (written == null) {
             return Optional.empty();
         }
-        return Spell.byId(stack.getItemMeta().getPersistentDataContainer().get(SPELL, PersistentDataType.STRING));
+        return hasTier(stack) ? Scroll.byId(written).or(() -> Optional.of(Scroll.legacyKind(written)))
+                : Optional.of(Scroll.legacyKind(written));
+    }
+
+    /** A scroll's tier; an old scroll's is its spell's. */
+    public static int tierOf(ItemStack stack) {
+        if (hasTier(stack)) {
+            return Scroll.clampTier(read(stack, TIER, PersistentDataType.INTEGER, 1));
+        }
+        return Scroll.legacyTier(read(stack, SPELL, PersistentDataType.STRING, null));
+    }
+
+    private static boolean hasTier(ItemStack stack) {
+        return read(stack, TIER, PersistentDataType.INTEGER, null) != null;
     }
 
     public static int chargesOf(ItemStack stack) {
@@ -54,11 +72,12 @@ public final class ItemTags {
         return value == null ? otherwise : value;
     }
 
-    public static void stamp(ItemMeta meta, MagicItem item, Spell spell) {
+    public static void stamp(ItemMeta meta, MagicItem item, Scroll scroll, int tier) {
         PersistentDataContainer data = meta.getPersistentDataContainer();
         data.set(ITEM, PersistentDataType.STRING, item.id());
-        if (spell != null) {
-            data.set(SPELL, PersistentDataType.STRING, spell.id());
+        if (scroll != null) {
+            data.set(SPELL, PersistentDataType.STRING, scroll.id());
+            data.set(TIER, PersistentDataType.INTEGER, Scroll.clampTier(tier));
         }
     }
 

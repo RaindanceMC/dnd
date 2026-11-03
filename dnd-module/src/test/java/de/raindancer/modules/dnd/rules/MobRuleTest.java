@@ -21,20 +21,10 @@ class MobRuleTest {
     }
 
     @Test
-    @DisplayName("the undead and the humanoids are known")
+    @DisplayName("the undead are known")
     void kinds() {
         assertThat(rule.of(EntityType.ZOMBIE).undead()).isTrue();
         assertThat(rule.of(EntityType.SKELETON).undead()).isTrue();
         assertThat(rule.of(EntityType.CREEPER).undead()).isFalse();
-        assertThat(rule.of(EntityType.PILLAGER).humanoid()).isTrue();
-        assertThat(rule.of(EntityType.PLAYER).humanoid()).isTrue();
-        assertThat(rule.of(EntityType.SPIDER).humanoid()).isFalse();
-    }
-
-    @Test
-    @DisplayName("tougher monsters are harder to hit and better at saving")
-    void defences() {
-        assertThat(rule.of(EntityType.WITHER).armourClass()).isGreaterThan(rule.of(EntityType.ZOMBIE).armourClass());
-        assertThat(rule.of(EntityType.WITHER).saveBonus()).isGreaterThan(rule.of(EntityType.ZOMBIE).saveBonus());
     }
 }

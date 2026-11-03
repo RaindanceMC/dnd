@@ -1,0 +1,112 @@
+# The adventurer's skill tree, read by Core's SkillTree. Five branches, each filling five columns by three rows (at:
+# [column, row]); a node needs ONE of what it `requires` (a neighbour in its branch, joined by a line) and is shut while
+# one of what it `excludes` is taken. `effects` are per rank (Perk.java says what each means and caps them), `cost` is
+# skill points per rank, `level` the adventurer level the first rank needs and `level-step` how many more each further
+# rank needs. A skill point comes with every adventurer level.
+branches:
+  vitality:
+    title: Vitality
+    icon: golden_apple
+    blurb: More hearts, harder skin, a body that mends and will not die.
+  might:
+    title: Might
+    icon: iron_sword
+    blurb: Harder, faster blows; two blades at once, or one great one.
+  marksman:
+    title: Marksman
+    icon: bow
+    blurb: Arrows that hit harder, fly further and come back.
+  shadow:
+    title: Shadow
+    icon: leather_boots
+    blurb: Quick feet, blows that miss you, knives in the back.
+  arcana:
+    title: Arcana
+    icon: enchanted_book
+    blurb: Experience, treasure, and the magic items' full strength.
+
+nodes:
+  # ---------------------------------------------------------------- Vitality
+  toughness: {branch: vitality, at: [0, 1], title: Toughness, icon: apple, ranks: 3, level: 1, level-step: 2, effects: {hearts: 1}}
+  hearty_meals: {branch: vitality, at: [0, 0], title: Hearty Meals, icon: cooked_beef, ranks: 3, level: 1, level-step: 1, requires: [toughness], effects: {hunger_save: 10}}
+  thick_skin: {branch: vitality, at: [0, 2], title: Thick Skin, icon: leather_chestplate, ranks: 2, level: 2, level-step: 2, requires: [toughness], effects: {armour: 1}}
+  mending: {branch: vitality, at: [1, 0], title: Mending, icon: glistering_melon_slice, ranks: 3, level: 4, level-step: 2, requires: [toughness], effects: {regen: 1}}
+  stout: {branch: vitality, at: [1, 1], title: Stout, icon: shield, ranks: 2, level: 3, level-step: 2, requires: [toughness], effects: {knockback: 15}}
+  hardened: {branch: vitality, at: [1, 2], title: Hardened, icon: iron_chestplate, ranks: 3, level: 4, level-step: 2, requires: [toughness], effects: {damage_taken: 3}}
+  big_heart: {branch: vitality, at: [2, 1], title: Big Heart, icon: golden_apple, ranks: 3, level: 6, level-step: 2, requires: [mending, hardened], effects: {hearts: 1}}
+  second_wind: {branch: vitality, at: [2, 0], title: Second Wind, icon: totem_of_undying, choice: true, cost: 2, level: 8, requires: [mending], excludes: [stoneskin], effects: {second_wind: 1}}
+  stoneskin: {branch: vitality, at: [2, 2], title: Stoneskin, icon: stone, choice: true, cost: 2, level: 8, requires: [hardened], excludes: [second_wind], effects: {damage_taken: 10, armour: 2}}
+  fast_healer: {branch: vitality, at: [3, 0], title: Fast Healer, icon: glow_berries, ranks: 2, level: 12, level-step: 3, requires: [second_wind, big_heart], effects: {regen: 1}}
+  giant_blood: {branch: vitality, at: [3, 1], title: Giant's Blood, icon: enchanted_golden_apple, ranks: 3, level: 13, level-step: 3, requires: [big_heart], effects: {hearts: 1}}
+  iron_hide: {branch: vitality, at: [3, 2], title: Iron Hide, icon: netherite_chestplate, ranks: 2, level: 13, level-step: 3, requires: [stoneskin, big_heart], effects: {toughness: 2}}
+  bottomless: {branch: vitality, at: [4, 0], title: Bottomless Stomach, icon: cake, cost: 2, level: 21, requires: [fast_healer], effects: {hunger_save: 25}}
+  undying: {branch: vitality, at: [4, 1], title: Undying, icon: totem_of_undying, capstone: true, cost: 3, level: 30, requires: [fast_healer, giant_blood, iron_hide], effects: {undying: 1, hearts: 2}}
+  bulwark: {branch: vitality, at: [4, 2], title: Bulwark, icon: netherite_ingot, cost: 2, level: 23, requires: [iron_hide], effects: {damage_taken: 5, knockback: 30}}
+
+  # ---------------------------------------------------------------- Might
+  brawler: {branch: might, at: [0, 1], title: Brawler, icon: wooden_sword, ranks: 3, level: 1, level-step: 2, effects: {melee_damage: 4}}
+  quick_hands: {branch: might, at: [0, 0], title: Quick Hands, icon: feather, ranks: 2, level: 2, level-step: 2, requires: [brawler], effects: {attack_speed: 5}}
+  long_arms: {branch: might, at: [0, 2], title: Long Arms, icon: stick, level: 4, requires: [brawler], effects: {reach: 0.5}}
+  crusher: {branch: might, at: [1, 0], title: Crusher, icon: mace, ranks: 3, level: 4, level-step: 2, requires: [brawler], effects: {crit_damage: 10}}
+  sweeper: {branch: might, at: [1, 1], title: Sweeper, icon: iron_sword, ranks: 2, level: 3, level-step: 2, requires: [brawler], effects: {sweep_damage: 20}}
+  bloodthirst: {branch: might, at: [1, 2], title: Bloodthirst, icon: redstone, ranks: 3, level: 5, level-step: 2, requires: [brawler], effects: {lifesteal: 2}}
+  veteran: {branch: might, at: [2, 1], title: Veteran, icon: iron_axe, ranks: 3, level: 6, level-step: 2, requires: [crusher, bloodthirst], effects: {melee_damage: 4}}
+  dual_wielder: {branch: might, at: [2, 0], title: Dual Wielder, icon: golden_sword, choice: true, cost: 2, level: 9, requires: [crusher], excludes: [great_weapon], effects: {dual_wield: 1}}
+  great_weapon: {branch: might, at: [2, 2], title: Great Weapon Master, icon: netherite_axe, choice: true, cost: 2, level: 9, requires: [bloodthirst], excludes: [dual_wielder], effects: {two_handed: 25}}
+  flurry: {branch: might, at: [3, 0], title: Flurry, icon: blaze_rod, ranks: 2, level: 12, level-step: 3, requires: [dual_wielder, veteran], effects: {attack_speed: 8}}
+  berserker: {branch: might, at: [3, 1], title: Berserker, icon: fire_charge, ranks: 3, level: 13, level-step: 2, requires: [veteran], effects: {rage: 10}}
+  executioner: {branch: might, at: [3, 2], title: Executioner, icon: diamond_axe, ranks: 2, level: 13, level-step: 3, requires: [great_weapon, veteran], effects: {crit_damage: 15}}
+  slayer: {branch: might, at: [4, 0], title: Undead Slayer, icon: skeleton_skull, cost: 2, level: 21, requires: [flurry], effects: {undead_damage: 30}}
+  warlord: {branch: might, at: [4, 1], title: Warlord, icon: netherite_sword, capstone: true, cost: 3, level: 30, requires: [flurry, berserker, executioner], effects: {melee_damage: 15, lifesteal: 3}}
+  vampire: {branch: might, at: [4, 2], title: Vampire, icon: wither_rose, cost: 2, level: 23, requires: [executioner], effects: {lifesteal: 4}}
+
+  # ---------------------------------------------------------------- Marksman
+  steady_aim: {branch: marksman, at: [0, 1], title: Steady Aim, icon: arrow, ranks: 3, level: 1, level-step: 2, effects: {ranged_damage: 5}}
+  fletcher: {branch: marksman, at: [0, 0], title: Fletcher, icon: flint, ranks: 2, level: 2, level-step: 2, requires: [steady_aim], effects: {arrow_save: 15}}
+  hawk_eye: {branch: marksman, at: [0, 2], title: Hawk Eye, icon: spyglass, ranks: 2, level: 2, level-step: 2, requires: [steady_aim], effects: {long_shot: 10}}
+  quiver: {branch: marksman, at: [1, 0], title: Full Quiver, icon: bundle, ranks: 2, level: 4, level-step: 2, requires: [steady_aim], effects: {arrow_save: 10}}
+  hunter: {branch: marksman, at: [1, 1], title: Hunter, icon: crossbow, ranks: 3, level: 4, level-step: 2, requires: [steady_aim], effects: {ranged_damage: 5}}
+  tracker: {branch: marksman, at: [1, 2], title: Tracker, icon: compass, ranks: 2, level: 4, level-step: 2, requires: [steady_aim], effects: {long_shot: 10}}
+  piercing: {branch: marksman, at: [2, 1], title: Piercing Shot, icon: spectral_arrow, ranks: 2, level: 7, level-step: 3, requires: [quiver, tracker], effects: {ranged_damage: 8}}
+  volley: {branch: marksman, at: [2, 0], title: Volley, icon: tipped_arrow, choice: true, cost: 2, level: 9, requires: [quiver], excludes: [sharpshooter], effects: {volley: 20}}
+  sharpshooter: {branch: marksman, at: [2, 2], title: Sharpshooter, icon: target, choice: true, cost: 2, level: 9, requires: [tracker], excludes: [volley], effects: {long_shot: 40}}
+  rain_of_arrows: {branch: marksman, at: [3, 0], title: Rain of Arrows, icon: dispenser, ranks: 2, level: 13, level-step: 3, requires: [volley, piercing], effects: {volley: 10}}
+  marksmanship: {branch: marksman, at: [3, 1], title: Marksmanship, icon: bow, ranks: 3, level: 13, level-step: 2, requires: [piercing], effects: {ranged_damage: 5}}
+  sniper: {branch: marksman, at: [3, 2], title: Sniper, icon: ender_eye, ranks: 2, level: 13, level-step: 3, requires: [sharpshooter, piercing], effects: {long_shot: 15}}
+  endless_quiver: {branch: marksman, at: [4, 0], title: Endless Quiver, icon: chiseled_bookshelf, cost: 2, level: 22, requires: [rain_of_arrows], effects: {arrow_save: 25}}
+  deadeye: {branch: marksman, at: [4, 1], title: Deadeye, icon: crossbow, capstone: true, cost: 3, level: 30, requires: [rain_of_arrows, marksmanship, sniper], effects: {ranged_damage: 20, arrow_save: 15}}
+  monster_hunter: {branch: marksman, at: [4, 2], title: Monster Hunter, icon: zombie_head, cost: 2, level: 23, requires: [sniper], effects: {undead_damage: 25}}
+
+  # ---------------------------------------------------------------- Shadow
+  light_feet: {branch: shadow, at: [0, 1], title: Light Feet, icon: leather_boots, ranks: 3, level: 1, level-step: 2, effects: {speed: 3}}
+  cat_fall: {branch: shadow, at: [0, 0], title: Cat's Fall, icon: feather, ranks: 2, level: 2, level-step: 2, requires: [light_feet], effects: {safe_fall: 2}}
+  sidestep: {branch: shadow, at: [0, 2], title: Sidestep, icon: rabbit_foot, ranks: 3, level: 2, level-step: 2, requires: [light_feet], effects: {dodge: 2}}
+  springheel: {branch: shadow, at: [1, 0], title: Springheel, icon: slime_ball, ranks: 2, level: 4, level-step: 2, requires: [light_feet], effects: {jump: 10}}
+  climber: {branch: shadow, at: [1, 1], title: Climber, icon: ladder, level: 5, requires: [light_feet], effects: {step: 0.5}}
+  backstabber: {branch: shadow, at: [1, 2], title: Backstabber, icon: iron_sword, ranks: 3, level: 4, level-step: 2, requires: [light_feet], effects: {backstab: 10}}
+  evasion: {branch: shadow, at: [2, 1], title: Evasion, icon: phantom_membrane, ranks: 3, level: 7, level-step: 2, requires: [springheel, backstabber], effects: {dodge: 2}}
+  acrobat: {branch: shadow, at: [2, 0], title: Acrobat, icon: elytra, choice: true, cost: 2, level: 9, requires: [springheel], excludes: [assassin], effects: {jump: 20, safe_fall: 6}}
+  assassin: {branch: shadow, at: [2, 2], title: Assassin, icon: netherite_sword, choice: true, cost: 2, level: 9, requires: [backstabber], excludes: [acrobat], effects: {backstab: 40}}
+  windrunner: {branch: shadow, at: [3, 0], title: Windrunner, icon: sugar, ranks: 2, level: 12, level-step: 3, requires: [acrobat, evasion], effects: {speed: 4}}
+  blur: {branch: shadow, at: [3, 1], title: Blur, icon: ender_pearl, ranks: 3, level: 13, level-step: 2, requires: [evasion], effects: {dodge: 2}}
+  shadowstep: {branch: shadow, at: [3, 2], title: Shadowstep, icon: black_dye, ranks: 2, level: 13, level-step: 3, requires: [assassin, evasion], effects: {backstab: 15}}
+  wind_walker: {branch: shadow, at: [4, 0], title: Wind Walker, icon: breeze_rod, cost: 2, level: 22, requires: [windrunner], effects: {speed: 6, step: 0.5}}
+  phantom: {branch: shadow, at: [4, 1], title: Phantom, icon: echo_shard, capstone: true, cost: 3, level: 30, requires: [windrunner, blur, shadowstep], effects: {dodge: 6, speed: 5}}
+  nightblade: {branch: shadow, at: [4, 2], title: Nightblade, icon: wither_skeleton_skull, cost: 2, level: 23, requires: [shadowstep], effects: {backstab: 25}}
+
+  # ---------------------------------------------------------------- Arcana
+  studious: {branch: arcana, at: [0, 1], title: Studious, icon: book, ranks: 3, level: 1, level-step: 2, effects: {xp: 5}}
+  orb_catcher: {branch: arcana, at: [0, 0], title: Orb Catcher, icon: experience_bottle, ranks: 3, level: 2, level-step: 2, requires: [studious], effects: {vanilla_xp: 10}}
+  lucky: {branch: arcana, at: [0, 2], title: Lucky, icon: rabbit_foot, ranks: 2, level: 2, level-step: 2, requires: [studious], effects: {luck: 1}}
+  wandwright: {branch: arcana, at: [1, 0], title: Wandwright, icon: breeze_rod, ranks: 2, level: 4, level-step: 2, requires: [studious], effects: {wand_recharge: 25}}
+  scribe: {branch: arcana, at: [1, 1], title: Scribe, icon: paper, ranks: 2, level: 4, level-step: 2, requires: [studious], effects: {scroll_save: 10}}
+  alchemist: {branch: arcana, at: [1, 2], title: Alchemist, icon: brewing_stand, ranks: 3, level: 4, level-step: 2, requires: [studious], effects: {potion_power: 15}}
+  treasure_sense: {branch: arcana, at: [2, 1], title: Treasure Sense, icon: chest, ranks: 3, level: 6, level-step: 2, requires: [wandwright, alchemist], effects: {loot: 15}}
+  sage: {branch: arcana, at: [2, 0], title: Sage, icon: lectern, choice: true, cost: 2, level: 9, requires: [wandwright], excludes: [treasure_hunter], effects: {xp: 30}}
+  treasure_hunter: {branch: arcana, at: [2, 2], title: Treasure Hunter, icon: gold_block, choice: true, cost: 2, level: 9, requires: [alchemist], excludes: [sage], effects: {loot: 50}}
+  spellbreaker: {branch: arcana, at: [3, 0], title: Spellbreaker, icon: amethyst_shard, ranks: 2, level: 12, level-step: 3, requires: [sage, treasure_sense], effects: {scroll_power: 20}}
+  prospector: {branch: arcana, at: [3, 1], title: Prospector, icon: golden_pickaxe, ranks: 3, level: 13, level-step: 2, requires: [treasure_sense], effects: {mining_speed: 10}}
+  apothecary: {branch: arcana, at: [3, 2], title: Apothecary, icon: potion, ranks: 2, level: 13, level-step: 3, requires: [treasure_hunter, treasure_sense], effects: {potion_power: 20}}
+  loremaster: {branch: arcana, at: [4, 0], title: Loremaster, icon: knowledge_book, cost: 2, level: 21, requires: [spellbreaker], effects: {xp: 15, vanilla_xp: 20}}
+  archmage: {branch: arcana, at: [4, 1], title: Archmage, icon: nether_star, capstone: true, cost: 3, level: 30, requires: [spellbreaker, prospector, apothecary], effects: {scroll_save: 25, wand_recharge: 50, scroll_power: 30}}
+  fortune: {branch: arcana, at: [4, 2], title: Fortune's Child, icon: emerald, cost: 2, level: 23, requires: [apothecary], effects: {loot: 25, luck: 1}}

@@ -3,7 +3,7 @@ package de.raindancer.modules.dnd.service;
 import de.raindancer.modules.dnd.DndSettings;
 import de.raindancer.modules.dnd.model.MagicItem;
 import de.raindancer.modules.dnd.model.Rarity;
-import de.raindancer.modules.dnd.model.Spell;
+import de.raindancer.modules.dnd.model.Scroll;
 import de.raindancer.modules.dnd.store.ItemTags;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.TooltipDisplay;
@@ -38,25 +38,31 @@ public final class ItemForge implements IDndService {
         // Items read nothing configurable.
     }
 
-    public ItemStack make(MagicItem item, Spell spell) {
-        return make(item, spell, item.material());
+    public ItemStack make(MagicItem item) {
+        return make(item, null, 0, item.material());
     }
 
-    /** @param base for a weapon, what it is: a sword, an axe, a bow */
-    public ItemStack make(MagicItem item, Spell spell, Material base) {
+    public ItemStack scroll(Scroll scroll, int tier) {
+        return make(MagicItem.SPELL_SCROLL, scroll, tier, MagicItem.SPELL_SCROLL.material());
+    }
+
+    /**
+     * @param scroll for a Spell Scroll, what is written on it, and its {@code tier}, 1 to 5
+     * @param base   for a weapon, what it is: a sword, an axe, a bow
+     */
+    public ItemStack make(MagicItem item, Scroll scroll, int tier, Material base) {
         Material material = item.isWeapon() && base != null ? base : item.material();
         ItemStack stack = new ItemStack(material);
         ItemMeta meta = stack.getItemMeta();
-        Rarity rarity = item == MagicItem.SPELL_SCROLL && spell != null ? Rarity.ofSpellLevel(spell.level())
-                : item.rarity();
-        meta.displayName(line(rarity.colour() + title(item, spell, material)));
+        Rarity rarity = item == MagicItem.SPELL_SCROLL && scroll != null ? Scroll.rarity(tier) : item.rarity();
+        meta.displayName(line(rarity.colour() + title(item, scroll, material)));
         List<Component> lore = new ArrayList<>();
         lore.add(line("<dark_gray>" + rarity.title() + " magic item"));
-        if (spell != null) {
-            lore.add(line("<gray>" + spell.title() + ", " + (spell.isCantrip() ? "cantrip"
-                    : IconForge.ordinal(spell.level()) + " level")));
+        if (scroll != null) {
+            lore.add(line("<gray>" + scroll.summary()));
+            lore.add(line("<dark_gray>Tier " + Scroll.clampTier(tier) + " of " + Scroll.MOST_TIER));
         }
-        for (String text : IconForge.wrap(item.summary())) {
+        for (String text : wrap(item.summary())) {
             lore.add(line("<gray>" + text));
         }
         if (item == MagicItem.WAND_OF_MAGIC_MISSILES) {
@@ -77,9 +83,9 @@ public final class ItemForge implements IDndService {
         if (meta instanceof LeatherArmorMeta leather) {
             leather.setColor(Color.fromRGB(0x6B4F2A));
         }
-        ItemTags.stamp(meta, item, spell);
+        ItemTags.stamp(meta, item, scroll, tier);
         stack.setItemMeta(meta);
-        de.raindancer.modules.dnd.store.DndPack.itemModel(item, spell, material)
+        de.raindancer.modules.dnd.store.DndPack.itemModel(item, rarity, material)
                 .ifPresent(path -> de.raindancer.modules.dnd.store.DndPack.dress(stack, path));
         if (item.isPotion()) {
             stack.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay()
@@ -103,9 +109,9 @@ public final class ItemForge implements IDndService {
         wand.setItemMeta(meta);
     }
 
-    private static String title(MagicItem item, Spell spell, Material material) {
-        if (item == MagicItem.SPELL_SCROLL && spell != null) {
-            return "Spell Scroll of " + spell.title();
+    private static String title(MagicItem item, Scroll scroll, Material material) {
+        if (item == MagicItem.SPELL_SCROLL && scroll != null) {
+            return "Spell Scroll of " + scroll.title();
         }
         if (item.isWeapon()) {
             String base = material.name().toLowerCase(Locale.ROOT).replace('_', ' ');
@@ -117,6 +123,23 @@ public final class ItemForge implements IDndService {
             return "+" + item.amount().bonus() + named;
         }
         return item.title();
+    }
+
+    /** A sentence cut into lines of about thirty characters, for lore. */
+    static List<String> wrap(String text) {
+        List<String> lines = new ArrayList<>();
+        StringBuilder line = new StringBuilder();
+        for (String word : text.split(" ")) {
+            if (line.length() > 0 && line.length() + word.length() > 30) {
+                lines.add(line.toString());
+                line.setLength(0);
+            }
+            line.append(line.length() == 0 ? "" : " ").append(word);
+        }
+        if (line.length() > 0) {
+            lines.add(line.toString());
+        }
+        return lines;
     }
 
     private static Component line(String miniMessage) {

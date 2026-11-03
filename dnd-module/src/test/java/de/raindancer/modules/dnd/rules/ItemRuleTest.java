@@ -1,15 +1,10 @@
 package de.raindancer.modules.dnd.rules;
 
-import de.raindancer.modules.dnd.model.Hero;
-import de.raindancer.modules.dnd.model.HeroClass;
 import de.raindancer.modules.dnd.model.MagicItem;
-import de.raindancer.modules.dnd.model.Spell;
-import de.raindancer.modules.dnd.model.Subclass;
+import de.raindancer.modules.dnd.model.Rarity;
+import de.raindancer.modules.dnd.model.Scroll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,39 +13,36 @@ class ItemRuleTest {
     private final ItemRule rule = new ItemRule();
 
     @Test
-    @DisplayName("a scroll's save DC and attack bonus follow its spell level")
-    void scrollNumbers() {
-        assertThat(rule.scrollDc(0)).isEqualTo(13);
-        assertThat(rule.scrollAttack(2)).isEqualTo(5);
-        assertThat(rule.scrollDc(3)).isEqualTo(15);
-        assertThat(rule.scrollDc(5)).isEqualTo(17);
-        assertThat(rule.scrollDc(7)).isEqualTo(18);
-        assertThat(rule.scrollAttack(9)).isEqualTo(11);
+    @DisplayName("a scroll's strength grows with its tier and Spellbreaker's percent")
+    void power() {
+        assertThat(rule.power(1, 0)).isEqualTo(4.0);
+        assertThat(rule.power(5, 0)).isEqualTo(12.0);
+        assertThat(rule.power(9, 0)).as("tier 5 at most").isEqualTo(12.0);
+        assertThat(rule.power(1, 50)).isEqualTo(6.0);
     }
 
     @Test
-    @DisplayName("a scroll is read by its own classes, and by a thief from level 13")
-    void whoReads() {
-        Hero wizard = Hero.fresh(UUID.randomUUID(), HeroClass.WIZARD, List.of());
-        Hero fighter = Hero.fresh(UUID.randomUUID(), HeroClass.FIGHTER, List.of());
-        Hero thief = Hero.fresh(UUID.randomUUID(), HeroClass.ROGUE, List.of()).withLevel(13, 0, 0)
-                .withSubclass(Subclass.THIEF);
-        assertThat(rule.mayRead(wizard, Spell.FIREBALL)).isTrue();
-        assertThat(rule.mayRead(wizard, Spell.CURE_WOUNDS)).isFalse();
-        assertThat(rule.mayRead(fighter, Spell.FIREBALL)).isFalse();
-        assertThat(rule.mayRead(thief, Spell.CURE_WOUNDS)).isTrue();
-        assertThat(rule.mayRead(null, Spell.FIREBALL)).isFalse();
-    }
-
-    @Test
-    @DisplayName("a wand wins back a charge every few minutes and never holds more than seven")
+    @DisplayName("wand charges come back one per recharge, faster with Wandwright, the part-way time kept")
     void wand() {
-        long step = MagicItem.WAND_RECHARGE_MILLIS;
-        assertThat(rule.charges(3, 1_000, 1_000)).isEqualTo(3);
-        assertThat(rule.charges(3, 1_000, 1_000 + step)).isEqualTo(4);
-        assertThat(rule.charges(3, 1_000, 1_000 + step * 2 + 5)).isEqualTo(5);
-        assertThat(rule.charges(6, 0, 1_000 + step * 100)).isEqualTo(MagicItem.WAND_CHARGES);
-        assertThat(rule.chargedAt(3, 1_000, 1_000 + step + 10)).as("the part-way minutes are kept")
-                .isEqualTo(1_000 + step);
+        long every = rule.rechargeMillis(0);
+        assertThat(every).isEqualTo(MagicItem.WAND_RECHARGE_MILLIS);
+        assertThat(rule.rechargeMillis(100)).isEqualTo(MagicItem.WAND_RECHARGE_MILLIS / 2);
+        assertThat(rule.charges(2, 0, every * 3 + 5, every)).isEqualTo(5);
+        assertThat(rule.chargedAt(2, 0, every * 3 + 5, every)).isEqualTo(every * 3);
+        assertThat(rule.charges(6, 0, every * 10, every)).isEqualTo(MagicItem.WAND_CHARGES);
+    }
+
+    @Test
+    @DisplayName("old scrolls keep their strength: every spell becomes a scroll kind of a matching tier")
+    void legacyScrolls() {
+        assertThat(Scroll.legacyKind("fireball")).isEqualTo(Scroll.FIREBALL);
+        assertThat(Scroll.legacyTier("fireball")).isEqualTo(3);
+        assertThat(Scroll.legacyKind("cure_wounds")).isEqualTo(Scroll.HEALING);
+        assertThat(Scroll.legacyKind("power_word_kill")).isEqualTo(Scroll.LIGHTNING);
+        assertThat(Scroll.legacyTier("power_word_kill")).isEqualTo(5);
+        assertThat(Scroll.legacyKind("nonsense")).isEqualTo(Scroll.MAGIC_MISSILE);
+        assertThat(Scroll.rarity(1)).isEqualTo(Rarity.COMMON);
+        assertThat(Scroll.rarity(5)).isEqualTo(Rarity.LEGENDARY);
+        assertThat(Scroll.tierOf(Rarity.RARE)).isEqualTo(3);
     }
 }

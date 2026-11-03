@@ -2,7 +2,7 @@ package de.raindancer.modules.dnd.rules;
 
 import de.raindancer.modules.dnd.model.MagicItem;
 import de.raindancer.modules.dnd.model.Rarity;
-import de.raindancer.modules.dnd.model.Spell;
+import de.raindancer.modules.dnd.model.Scroll;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +11,8 @@ import java.util.random.RandomGenerator;
 /** Whether a kill drops a magic item, how rare, and which. */
 public final class LootRule implements IDndRule {
 
-    /** What dropped: an item, and for a scroll the spell on it. */
-    public record Drop(MagicItem item, Spell spell) {
+    /** What dropped: an item, and for a scroll what is written on it and its tier. */
+    public record Drop(MagicItem item, Scroll scroll, int tier) {
     }
 
     /** Experience at which a creature counts as a boss and always drops something. */
@@ -58,7 +58,7 @@ public final class LootRule implements IDndRule {
         return Rarity.COMMON;
     }
 
-    /** Something of that rarity. A scroll is one choice among the items, and carries a spell of that rarity. */
+    /** Something of that rarity. A scroll is one choice among the items, of the rarity's tier. */
     public Drop item(Rarity rarity, RandomGenerator random) {
         List<MagicItem> items = new ArrayList<>();
         for (MagicItem item : MagicItem.values()) {
@@ -66,18 +66,17 @@ public final class LootRule implements IDndRule {
                 items.add(item);
             }
         }
-        List<Spell> spells = new ArrayList<>();
-        for (Spell spell : Spell.values()) {
-            if (Rarity.ofSpellLevel(spell.level()) == rarity) {
-                spells.add(spell);
-            }
-        }
-        int choices = items.size() + (spells.isEmpty() ? 0 : 1);
-        int pick = random.nextInt(Math.max(1, choices));
+        int pick = random.nextInt(items.size() + 1);
         if (pick < items.size()) {
-            return new Drop(items.get(pick), null);
+            return new Drop(items.get(pick), null, 0);
         }
-        return new Drop(MagicItem.SPELL_SCROLL, spells.get(random.nextInt(spells.size())));
+        Scroll[] scrolls = Scroll.values();
+        return new Drop(MagicItem.SPELL_SCROLL, scrolls[random.nextInt(scrolls.length)], Scroll.tierOf(rarity));
+    }
+
+    /** The drop chance with Treasure Sense and its kin: so many percent more often, never past certain. */
+    public double withLuck(double chance, double morePercent) {
+        return Math.min(1.0, chance * (100 + Math.max(0, morePercent)) / 100.0);
     }
 
     @Override

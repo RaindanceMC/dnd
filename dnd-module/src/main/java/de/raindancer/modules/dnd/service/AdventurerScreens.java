@@ -55,10 +55,10 @@ public final class AdventurerScreens implements IDndService {
 
     public void register(Screens screens, Plugin owner) {
         screens.register(owner, ScreenKind.personal("adventurer-you", "Your adventurer",
-                "Everybody's own class, level, experience to the next level and hit dice.", Material.IRON_SWORD,
+                "Everybody's own level, experience to the next level and skill points to spend.", Material.IRON_SWORD,
                 this::you));
         screens.register(owner, ScreenKind.everyone("adventurer-top", "Top adventurers",
-                "The most experienced adventurers of the network, with class and level.", Material.GOLDEN_HELMET,
+                "The most experienced adventurers of the network, with their level.", Material.GOLDEN_HELMET,
                 () -> MINI.deserialize(topText())));
     }
 
@@ -69,10 +69,8 @@ public final class AdventurerScreens implements IDndService {
         }
         Hero held = hero.get();
         long next = held.level() >= Hero.MOST_LEVEL ? 0 : progression.xpFor(held.level() + 1);
-        return MINI.deserialize(rule.sheet(held.heroClass().title(),
-                held.subclass() == null ? null : held.subclass().title(), held.level(), held.xp(), next,
-                progression.progress(held.xp()), held.level() - held.hitDiceSpent(), held.level(),
-                held.heroClass().hitDie()));
+        return MINI.deserialize(rule.sheet(held.level(), held.xp(), next, progression.progress(held.xp()),
+                heroes.perks().left(held)));
     }
 
     String topText() {
@@ -83,7 +81,7 @@ public final class AdventurerScreens implements IDndService {
         }
         List<ScreenLineRule.Row> rows = top.apply(TOP_SHOWN).stream()
                 .map(standing -> new ScreenLineRule.Row(names.apply(standing.player()).orElse("somebody"),
-                        standing.heroClass().title(), standing.level(), standing.xp()))
+                        standing.level(), standing.xp()))
                 .toList();
         topText = rule.top(rows);
         topAt = now;

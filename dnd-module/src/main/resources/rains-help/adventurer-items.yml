@@ -9,7 +9,7 @@ order: 44
 module: dnd
 aliases: [magic-items, loot, potions, mach-fuck, scrolls, wand, rings, adventurer-loot, bag-of-holding]
 keywords: [healing, heroism, speed, mach, dragon, brewing, elytra, spell, scroll, wand, charges, ring, protection, amulet, health, boots, bag, holding, weapon, plus, rarity]
-related: [adventurer, adventurer-spells]
+related: [adventurer, adventurer-tree]
 sections:
   - question: Where do magic items come from?
     title: Loot
@@ -28,15 +28,15 @@ sections:
   - question: How do spell scrolls work?
     title: Scrolls
     text: |
-      Hold one and right-click. If the spell is on your class's list (a Thief reads any), it is cast, and the scroll crumbles; if it went wrong, you keep it. A scroll's rarity is its spell's level: common up to 1st, legendary at 9th.
+      Hold one and right-click; anybody can read one. <white>Magic Missile</white> and <white>Lightning</white> strike what you look at, <white>Fireball</white> bursts where you look and sets everything around on fire, <white>Healing</white> heals you and every player near you, <white>Misty Step</white> steps you to where you look, <white>Shield</white> gives golden hearts and harder skin for a while. A scroll has a tier, 1 to 5 — its rarity, common to legendary — and the higher, the stronger. It crumbles once read; with nothing to aim at, you keep it. The Arcana branch makes scrolls stronger and sometimes keeps them.
   - question: What is the Wand of Magic Missiles?
     title: Wand
     text: |
-      Seven charges of Magic Missile. Right-click to spend one; sneak and right-click to spend three for a stronger volley. It regains one charge every three minutes. Anybody can use it, whatever their class.
+      Seven charges of Magic Missile. Right-click to spend one; sneak and right-click to spend three for a stronger volley. It regains one charge every three minutes — faster with Wandwright and Archmage in the Arcana branch.
   - question: What do rings, amulets and boots do?
     title: Worn items
     text: |
-      <white>Ring of Protection</white>, held in your off hand: more armour and +1 on every saving throw. <white>Amulet of Health</white>, off hand: your Constitution counts as 19. <white>Boots of Striding and Springing</white>, worn: you walk faster and jump three times as high.
+      <white>Ring of Protection</white>, held in your off hand: two more armour and a tenth less damage taken. <white>Amulet of Health</white>, off hand: two more hearts. <white>Boots of Striding and Springing</white>, worn: you walk faster and jump three times as high.
   - question: What about the Bag of Holding?
     title: Bag of Holding
     text: |

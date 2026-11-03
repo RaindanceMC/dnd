@@ -1,6 +1,6 @@
 """
-Writes the pack's item definitions and flat icon models, and files.txt, the index DndPack ships from.
-Run after icons/render.py and items/build.py:
+Writes the pack's item definitions, the skill tree's looks (tree/skilltree_art.py), and files.txt, the index DndPack
+ships from. Run after items/build.py:
 
     python3 pack.py
 """
@@ -9,9 +9,9 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, "icons"))
+sys.path.insert(0, os.path.join(HERE, "tree"))
 sys.path.insert(0, os.path.join(HERE, "items"))
-from recipes import RECIPES  # noqa: E402
+import skilltree_art  # noqa: E402
 from models import POTIONS, SCROLL_SEALS  # noqa: E402
 
 NS = "rainsadventurers"
@@ -35,14 +35,11 @@ def item(path, model):
 
 def main():
     with open(os.path.join(ROOT, "pack.mcmeta"), "w") as out:
-        json.dump({"pack": {"description": "Rain's Adventurers — spells, classes and magic items",
+        json.dump({"pack": {"description": "Rain's Adventurers — magic items and the skill tree",
                             "min_format": 88, "max_format": 97}}, out, indent=1)
-    for path in RECIPES:
-        write("models/item/" + path + ".json",
-              {"parent": "minecraft:item/generated", "textures": {"layer0": NS + ":item/" + path}})
-        item(path, path)
     for name in MAGIC:
         item("magic/" + name, "magic/" + name)
+    skilltree_art.paint()
     files = []
     for folder, _, names in os.walk(ROOT):
         for name in names:
@@ -53,7 +50,7 @@ def main():
     with open(os.path.join(ROOT, "files.txt"), "w") as out:
         out.write("\n".join(files) + "\n")
     print(len(files), "files in the pack")
-    # The character sheet's background and its font live under textures/font and font/, written by gui/sheet.py.
+    # The parchment pages and their font live under textures/font and font/, written by gui/parchment.py.
 
 
 if __name__ == "__main__":

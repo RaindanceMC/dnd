@@ -22,25 +22,14 @@ public final class PresenceListener implements IDndListener {
         this.services = services;
     }
 
-    /** First thing: a hotbar left behind by a stance that never ended (a crash) is put back. */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        services.stance().restore(player);
-        services.heroes().joined(player);
+        services.heroes().joined(event.getPlayer());
     }
 
-    /**
-     * {@link EventPriority#LOWEST}: the real hotbar goes back before anything else on quit reads the inventory —
-     * an inventory snapshot, a network sync, the server's own save.
-     */
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        services.stance().leave(player, true);
-        services.concentration().forget(player);
-        services.features().foldWings(player);
-        UUID id = player.getUniqueId();
+        UUID id = event.getPlayer().getUniqueId();
         forget(id);
         services.heroes().left(id);
     }
@@ -48,14 +37,10 @@ public final class PresenceListener implements IDndListener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
-        if (!services.config().worksIn(player.getWorld().getName())) {
-            services.stance().leave(player, false);
-            services.concentration().end(player, null);
-            services.features().foldWings(player);
-        }
         services.body().refresh(player, services.heroes().of(player.getUniqueId()));
     }
 
+    /** Boots of Striding go on and off with the armour; the off hand's ring or amulet with a swap or a new slot. */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onArmour(PlayerArmorChangeEvent event) {
         Player player = event.getPlayer();
@@ -74,17 +59,19 @@ public final class PresenceListener implements IDndListener {
 
     @Override
     public void forget(UUID player) {
-        services.casting().forget(player);
         services.combat().forget(player);
-        services.resting().forget(player);
-        services.stance().forget(player);
-        services.features().forget(player);
-        services.surges().forget(player);
         services.core().actionBars().forget(player);
     }
 
     @Override
     public String describe() {
         return "joining, leaving, changing world, armour and respawning";
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onSwap(org.bukkit.event.player.PlayerSwapHandItemsEvent event) {
+        Player player = event.getPlayer();
+        Scheduling.entity(services.plugin(), player,
+                () -> services.body().refresh(player, services.heroes().of(player.getUniqueId())));
     }
 }

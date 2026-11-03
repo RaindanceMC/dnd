@@ -16,20 +16,11 @@ class DndSettingsTest {
     void defaults() {
         assertThat(defaults.worlds()).isEmpty();
         assertThat(defaults.xpPercent()).isEqualTo(100);
-        assertThat(defaults.healthPercent()).isEqualTo(25);
-        assertThat(defaults.spellDamagePercent()).isEqualTo(100);
-        assertThat(defaults.playerDamagePercent()).isEqualTo(50);
-        assertThat(defaults.showRolls()).isTrue();
-        assertThat(defaults.actionMillis()).isEqualTo(1200);
-        assertThat(defaults.bonusActionMillis()).isEqualTo(500);
-        assertThat(defaults.shortRestSeconds()).isEqualTo(30);
-        assertThat(defaults.longRestMinutes()).isEqualTo(15);
-        assertThat(defaults.stanceNeedsSneak()).isFalse();
-        assertThat(defaults.wildSurgePercent()).isEqualTo(5);
         assertThat(defaults.lootPercent()).isEqualTo(100);
+        assertThat(defaults.pvpPercent()).isEqualTo(50);
+        assertThat(defaults.unlearnHours()).isEqualTo(24);
         assertThat(defaults.machBlocksPerSecond()).isEqualTo(600);
         assertThat(defaults.machSeconds()).isEqualTo(20);
-        assertThat(defaults.abilityScores()).isTrue();
     }
 
     @Test
@@ -45,12 +36,9 @@ class DndSettingsTest {
     @Test
     @DisplayName("every with… changes its own component and nothing else")
     void withers() {
-        DndSettings changed = defaults.withXpPercent(200).withHealthPercent(50)
-                .withSpellDamagePercent(80).withPlayerDamagePercent(10).withShowRolls(false).withActionMillis(1)
-                .withBonusActionMillis(2).withShortRestSeconds(3).withLongRestMinutes(4).withStanceNeedsSneak(true).withWildSurgePercent(50)
-                .withLootPercent(7).withAbilityScores(false).withMachBlocksPerSecond(100).withMachSeconds(9);
-        assertThat(changed).isEqualTo(new DndSettings(List.of(), 200, 50, 80, 10, false, 1, 2, 3, 4, true, 50,
-                7, false, 100, 9));
-        assertThat(defaults.withXpPercent(5).healthPercent()).isEqualTo(defaults.healthPercent());
+        DndSettings changed = defaults.withXpPercent(200).withLootPercent(7).withPvpPercent(10).withUnlearnHours(3)
+                .withMachBlocksPerSecond(100).withMachSeconds(9);
+        assertThat(changed).isEqualTo(new DndSettings(List.of(), 200, 7, 10, 3, 100, 9));
+        assertThat(defaults.withXpPercent(5).lootPercent()).isEqualTo(defaults.lootPercent());
     }
 }

@@ -22,6 +22,6 @@ class WordingTest implements WordingContract {
 
     @Override
     public int fewestWordingLines() {
-        return 60;
+        return 40;
     }
 }
