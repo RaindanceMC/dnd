@@ -14,7 +14,7 @@ sections:
   - question: Where do magic items come from?
     title: Loot
     text: |
-      From monsters you defeat, now and then. {if:dnd:loot-percent > 0}Tougher monsters drop more often (a creeper about one in twenty-one with the book's rate, bosses always) and better things; the server's drop rate is <white>{setting:dnd:loot-percent|percent}</white> of normal.{else}Drops are switched off on this server; staff can still hand items out.{/if}
+      From monsters you defeat, now and then — never from a spawner's, never while you are away, and at most four an hour. {if:dnd:loot-percent > 0}Tougher monsters drop more often (a creeper about one in twenty-one with the book's rate, bosses always) and better things; the server's drop rate is <white>{setting:dnd:loot-percent|percent}</white> of normal.{else}Drops are switched off on this server; staff can still hand items out.{/if}
       Rarity runs Common, Uncommon, Rare, Very rare, Legendary, shown in the name's colour.
   - question: What do the potions do?
     title: Potions

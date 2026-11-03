@@ -34,6 +34,9 @@ public final class LootService implements IDndService {
     private final MobRule mobs;
     private final RandomGenerator random;
     private volatile DndSettings settings = DndSettings.DEFAULTS;
+    /** When each player last found something, for the hourly cap. */
+    private final java.util.Map<java.util.UUID, java.util.Deque<Long>> drops =
+            new java.util.concurrent.ConcurrentHashMap<>();
 
     public LootService(Messages messages, Effects effects, ItemForge forge, LootRule rule, MobRule mobs,
                        RandomGenerator random) {
@@ -56,13 +59,24 @@ public final class LootService implements IDndService {
      * @param morePercent the killer's Treasure Sense and its kin
      */
     public Optional<ItemStack> roll(Player killer, LivingEntity victim, double morePercent) {
-        if (!settings.worksIn(victim.getWorld().getName())) {
+        // A spawner's mobs, a player who is away, a fourth drop within the hour: the shape of a mob farm.
+        if (!settings.worksIn(victim.getWorld().getName())
+                || victim.getEntitySpawnReason() == org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.SPAWNER
+                || de.raindancer.core.social.presence.Away.isAway(killer.getUniqueId())) {
+            return Optional.empty();
+        }
+        long now = System.currentTimeMillis();
+        java.util.Deque<Long> recent = drops.computeIfAbsent(killer.getUniqueId(),
+                id -> new java.util.concurrent.ConcurrentLinkedDeque<>());
+        recent.removeIf(at -> now - at >= 3_600_000L);
+        if (!rule.mayDrop(recent, now)) {
             return Optional.empty();
         }
         int xp = mobs.of(victim.getType()).xp();
         if (random.nextDouble() >= rule.withLuck(rule.dropChance(xp, settings.lootPercent()), morePercent)) {
             return Optional.empty();
         }
+        recent.add(now);
         Rarity rarity = rule.rarity(xp, random.nextDouble());
         LootRule.Drop drop = rule.item(rarity, random);
         ItemStack stack = forge.make(drop.item(), drop.scroll(), drop.tier(), weaponBase(drop.item()));
@@ -70,6 +84,10 @@ public final class LootService implements IDndService {
                 : "Spell Scroll of " + drop.scroll().title(), "rarity", rarity.title().toLowerCase(java.util.Locale.ROOT));
         effects.play(killer.getUniqueId(), Cues.REWARD);
         return Optional.of(stack);
+    }
+
+    public void forget(java.util.UUID player) {
+        drops.remove(player);
     }
 
     private Material weaponBase(MagicItem item) {

@@ -15,6 +15,16 @@ public final class LootRule implements IDndRule {
     public record Drop(MagicItem item, Scroll scroll, int tier) {
     }
 
+    /** Magic items one player may find in an hour, so a mob farm does not rain them. */
+    public static final int DROPS_PER_HOUR = 4;
+    private static final long HOUR_MILLIS = 3_600_000L;
+
+    /** Whether a player whose last drops came at {@code drops} may find another at {@code now}. */
+    public boolean mayDrop(java.util.Collection<Long> drops, long now) {
+        long within = drops.stream().filter(at -> now - at < HOUR_MILLIS).count();
+        return within < DROPS_PER_HOUR;
+    }
+
     /** Experience at which a creature counts as a boss and always drops something. */
     public static final int BOSS_XP = 1_800;
 

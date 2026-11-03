@@ -135,8 +135,9 @@ public final class SkillTreeMenu extends TreeMenu implements IDndScreen {
         lore.add("");
         lore.add("<gray>Adventurer level <white>" + hero.level());
         lore.add("<green>Skill points to spend: <white>" + rule().left(hero) + "<gray> of " + rule().points(hero));
-        lore.add("<gray>A point every level; levels come");
-        lore.add("<gray>from defeating monsters.");
+        lore.add("<gray>A point every level; levels come from");
+        lore.add("<gray>playing — mining, farming, fishing,");
+        lore.add("<gray>trading, advancements, bosses.");
         lore.add("<gray>Spent in this branch: <white>" + tree().spentIn(hero.nodes(), branch.id()));
         if (!hero.nodes().isEmpty()) {
             lore.add("");
@@ -199,7 +200,8 @@ public final class SkillTreeMenu extends TreeMenu implements IDndScreen {
                 "one next to it first; a choice shuts its other side.",
                 "",
                 "A skill point every adventurer level; levels come",
-                "from defeating monsters.",
+                "from playing: mining, farming, fishing, trading,",
+                "enchanting, advancements, raids and bosses.",
                 "Shift-click the middle button to unlearn everything.");
     }
 

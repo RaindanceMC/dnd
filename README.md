@@ -1,6 +1,6 @@
 # RaindanceMC/dnd
 
-- **`dnd-module`** — Rain's Flexible Modules — Adventurers: levels 1–100 from defeating monsters, a skill point every level for a skill tree of five branches (Vitality, Might, Marksman, Shadow, Arcana — 75 nodes, a choice and a capstone each, feats like Dual Wielder, Second Wind and Undying), and magic items that monsters drop. Until 0.10.0 it was tabletop classes and spells; heroes from then keep their level and experience.
+- **`dnd-module`** — Rain's Flexible Modules — Adventurers: levels 1–100 from playing (minutes, natural ores, harvests, fish, breeding, trades, enchanting, advancements, raids, bosses — never ordinary monsters, so mob farms pay nothing), a skill point every level for a skill tree of five branches (Vitality, Might, Marksman, Shadow, Arcana — 75 nodes, a choice and a capstone each, feats like Dual Wielder, Second Wind and Undying), and magic items that monsters drop. Until 0.10.0 it was tabletop classes and spells; heroes from then keep their level and experience.
 - **`dnd-standalone`** — Rain's Adventurers (`RainsAdventurers`): the dnd module and the standard wrapper, shaded together.
 
 Part of [RaindanceMC](https://github.com/RaindanceMC); built on [RainsCore](https://github.com/RaindanceMC/RainsCore) and the shared parent in [framework](https://github.com/RaindanceMC/framework).
@@ -21,9 +21,9 @@ ships from.
 ## Playing
 
 - `/adventurer` (`/dnd`) — the skill tree, one branch a page. A skill point every level; click a node to learn its next rank, shift-click the middle button to unlearn everything (once a day by default).
-- **Levels** come from defeating monsters: 50 experience for a zombie up to 20,000 for the ender dragon; levels 1–20 on the old table, then 25,000 a level to 100.
+- **Levels** come from playing, through Core's `Activities`: 10 a minute not away, natural ores 5 × rarity, crops 2, fish 15, breeding and trades 10, enchanting 20 a level, advancements 150, raids 1,000, bosses 1,000–5,000. Ordinary monsters give nothing. Levels 1–20 on the old table, then 25,000 a level to 100.
 - **Branches**: Vitality (hearts, armour, healing, Second Wind or Stoneskin, Undying), Might (melee, attack speed, lifesteal, **Dual Wielder** — the off hand strikes too, for half — or Great Weapon Master, Warlord), Marksman (arrows, Long Shot, arrows saved, Volley or Sharpshooter, Deadeye), Shadow (speed, dodging, jumps, backstabs, Acrobat or Assassin, Phantom), Arcana (experience, loot, luck, mining, stronger scrolls, wands and potions, Sage or Treasure Hunter, Archmage).
-- **Magic items** drop from monsters by rarity: healing potions, Heroism, Speed, spell scrolls (Magic Missile, Fireball, Lightning, Healing, Misty Step, Shield; tier 1–5), +1/+2/+3 weapons and bows, a Wand of Magic Missiles, Ring of Protection, Amulet of Health, Boots of Striding and Springing, a Bag of Holding (your ender chest, anywhere). The Potion of Mach Fuck is brewed from a dragon head.
+- **Magic items** drop from monsters by rarity (never from spawners or while away, at most four an hour): healing potions, Heroism, Speed, spell scrolls (Magic Missile, Fireball, Lightning, Healing, Misty Step, Shield; tier 1–5), +1/+2/+3 weapons and bows, a Wand of Magic Missiles, Ring of Protection, Amulet of Health, Boots of Striding and Springing, a Bag of Holding (your ender chest, anywhere). The Potion of Mach Fuck is brewed from a dragon head.
 
 Staff (`rainsadventurers.admin`):
 

@@ -78,4 +78,15 @@ class LootRuleTest {
         assertThat(rule.withLuck(0.8, 100)).isEqualTo(1.0);
         assertThat(rule.withLuck(0.1, -20)).isEqualTo(0.1);
     }
+
+    @Test
+    @DisplayName("at most a few drops an hour per player: a mob farm does not rain magic items")
+    void hourlyCap() {
+        long hour = 3_600_000L;
+        java.util.List<Long> drops = java.util.List.of(0L, 10L, 20L, 30L);
+        assertThat(rule.mayDrop(drops, 40)).isFalse();
+        assertThat(rule.mayDrop(drops.subList(0, 3), 40)).isTrue();
+        assertThat(rule.mayDrop(drops, hour + 1)).as("the first left the hour").isTrue();
+        assertThat(LootRule.DROPS_PER_HOUR).isEqualTo(4);
+    }
 }

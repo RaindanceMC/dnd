@@ -25,13 +25,16 @@ public record DndSettings(
         List<String> worlds,
 
         @In("dnd") @Title("Experience earned") @Range(min = 0, max = 1000)
-        @Describe("Percent of a monster's worth a kill gives. 200 levels twice as fast; 0 stops levelling from kills.")
+        @Describe("Percent of what playing earns: minutes played, natural ores mined, grown crops harvested, fish, "
+                + "breeding, trades, enchanting, advancements, raids and bosses. 200 levels twice as fast; 0 stops "
+                + "levelling. Ordinary monsters never earn anything, so a mob farm does not pay.")
         @Key("xp-percent")
         int xpPercent,
 
         @In("dnd") @Title("Magic item drops") @Range(min = 0, max = 1000)
         @Describe("Percent of the normal chance that a monster drops a magic item. 0 switches drops off; "
-                + "bosses always drop one unless this is 0.")
+                + "bosses always drop one unless this is 0. Never from a spawner's mobs or for a player who is "
+                + "away, and at most four an hour per player.")
         @Key("loot-percent")
         int lootPercent,
 

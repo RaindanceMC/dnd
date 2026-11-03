@@ -1,9 +1,9 @@
 package de.raindancer.modules.dnd.model;
 
 /**
- * What a creature that is not a player is worth to an adventurer.
+ * How strong a creature that is not a player is, for its loot.
  *
- * @param xp     what killing it is worth
+ * @param xp     its strength at the table, which sets its drop chance and rarity
  * @param undead whether Undead Slayer and Monster Hunter bite on it
  */
 public record MobProfile(int xp, boolean undead) {

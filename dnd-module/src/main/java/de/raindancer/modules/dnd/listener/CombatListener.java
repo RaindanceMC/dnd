@@ -23,8 +23,8 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * The skill tree in a fight and around it: blows and arrows given and taken, dodging, the feats, kills, orbs, hunger
- * and arrows. Late (HIGH), so other plugins — and Core's say on who may hurt whom — come first.
+ * The skill tree in a fight and around it: blows and arrows given and taken, dodging, the feats, loot, orbs, hunger
+ * and arrows. Experience is not earned here: it comes from Core's Activities (see DndModule). Late (HIGH), so other plugins — and Core's say on who may hurt whom — come first.
  */
 public final class CombatListener implements IDndListener {
 
@@ -115,7 +115,7 @@ public final class CombatListener implements IDndListener {
         }
     }
 
-    // ------------------------------------------------------------------ kills and what they bring
+    // ------------------------------------------------------------------ loot, orbs, hunger, arrows
 
     /** A monster an adventurer killed may drop a magic item. */
     @EventHandler(priority = EventPriority.HIGH)
@@ -124,14 +124,6 @@ public final class CombatListener implements IDndListener {
         if (killer != null && !(event.getEntity() instanceof Player)) {
             double luck = services.combat().chance(killer, Perk.LOOT) * 100;
             services.loot().roll(killer, event.getEntity(), luck).ifPresent(event.getDrops()::add);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onDeath(EntityDeathEvent event) {
-        Player killer = event.getEntity().getKiller();
-        if (killer != null) {
-            services.combat().killed(killer, event.getEntity());
         }
     }
 
@@ -174,5 +166,6 @@ public final class CombatListener implements IDndListener {
     @Override
     public void forget(UUID player) {
         services.combat().forget(player);
+        services.loot().forget(player);
     }
 }

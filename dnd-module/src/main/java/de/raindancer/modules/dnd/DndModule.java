@@ -43,7 +43,8 @@ import java.util.SplittableRandom;
 import java.util.random.RandomGenerator;
 
 /**
- * Adventurers on a survival server: levels from defeating monsters, a skill point every level for a skill tree of
+ * Adventurers on a survival server: levels from playing — mining, farming, fishing, trading, enchanting, advancements,
+ * raids, bosses and the minutes themselves, never ordinary monsters — a skill point every level for a skill tree of
  * five branches — hearts, blows, arrows, quick feet and magic, with feats like Dual Wielder — and magic items that
  * monsters drop.
  *
@@ -52,8 +53,8 @@ import java.util.random.RandomGenerator;
  */
 public final class DndModule implements FlexModule {
 
-    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.11.0")
-            .describedAs("Levels from defeating monsters, a skill tree to spend them in, and magic items.")
+    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Adventurers", "0.12.0")
+            .describedAs("Levels from playing, a skill tree to spend them in, and magic items.")
             .by("Raindancer118");
 
     private static final long SECOND_TICKS = 20L;
@@ -129,6 +130,9 @@ public final class DndModule implements FlexModule {
         context.listener(new CombatListener(services));
         context.listener(new ItemListener(services));
         enableMach(context, settings, messages, itemForge);
+        // Experience for what players do — never for ordinary monsters, so a mob farm pays nothing.
+        Object listening = de.raindancer.core.world.activity.Activities.listen(context.plugin(), combat::did);
+        context.closeWith(() -> de.raindancer.core.world.activity.Activities.stop(listening));
 
         DndCommands.ready(services);
         DndPack.contribute(context.plugin(), context.core());

@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * What a creature is worth to an adventurer — the experience its nearest relative at the table would give — and
- * whether it is undead.
+ * How strong a creature is — the experience its nearest relative at the table would give, which sets how often and
+ * how rare a magic item it drops (it earns no adventurer experience) — and whether it is undead.
  */
 public final class MobRule implements IDndRule {
 

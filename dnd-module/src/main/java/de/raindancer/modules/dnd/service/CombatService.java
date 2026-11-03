@@ -37,7 +37,7 @@ import java.util.function.LongSupplier;
 
 /**
  * The skill tree in a fight: harder blows and arrows, softer hurts, dodging, lifesteal, the off hand of a Dual
- * Wielder, Second Wind and Undying, healing out of a fight, and experience for a kill.
+ * Wielder, Second Wind and Undying, healing out of a fight, and experience for what a player does.
  */
 public final class CombatService implements IDndService {
 
@@ -56,6 +56,7 @@ public final class CombatService implements IDndService {
     private final PerkRule perks;
     private final FightRule fight;
     private final MobRule mobs;
+    private final de.raindancer.modules.dnd.rules.WorthRule worths = new de.raindancer.modules.dnd.rules.WorthRule();
     private final LongSupplier clock;
     private final de.raindancer.core.platform.util.Cooldowns<UUID> secondWind;
     private final de.raindancer.core.platform.util.Cooldowns<UUID> undying;
@@ -270,19 +271,38 @@ public final class CombatService implements IDndService {
         }
     }
 
-    /** A creature the player killed: its worth in experience, with Studious and its kin. */
-    public void killed(Player killer, LivingEntity victim) {
-        if (victim instanceof Player || !settings.worksIn(killer.getWorld().getName())) {
+    /**
+     * Something the player did, from Core's {@code Activities}: its worth in adventurer experience, with Studious and
+     * its kin. Nothing for a player who is away or outside the adventurers' worlds.
+     */
+    public void did(Player player, de.raindancer.core.world.activity.Activity activity) {
+        if (player == null || !settings.worksIn(player.getWorld().getName())
+                || de.raindancer.core.social.presence.Away.isAway(player.getUniqueId())) {
             return;
         }
-        int worth = mobs.of(victim.getType()).xp();
+        long worth = worths.worth(activity);
         if (worth <= 0) {
             return;
         }
-        Optional<Hero> hero = heroes.ensure(killer);
+        Optional<Hero> hero = heroes.ensure(player);
         double more = hero.map(found -> perks.value(found, Perk.XP)).orElse(0.0);
-        long amount = Math.round(worth * (100 + more) / 100.0);
-        heroes.grantXp(killer, amount, victim.getName(), true);
+        heroes.grantXp(player, Math.round(worth * (100 + more) / 100.0), source(activity), true);
+    }
+
+    private static String source(de.raindancer.core.world.activity.Activity activity) {
+        return switch (activity.kind()) {
+            case PLAY -> "playing";
+            case MINE -> activity.what().replace('-', ' ') + " ore";
+            case HARVEST -> activity.what().replace('_', ' ');
+            case FISH -> "fishing";
+            case BREED -> "breeding";
+            case TRADE -> "trading";
+            case ENCHANT -> "enchanting";
+            case ADVANCEMENT -> "advancement";
+            case RAID -> "raid";
+            case BOSS -> activity.what().replace('_', ' ');
+            case MONSTER -> "monster";
+        };
     }
 
     /** Experience from orbs, with Orb Catcher and its kin. */
