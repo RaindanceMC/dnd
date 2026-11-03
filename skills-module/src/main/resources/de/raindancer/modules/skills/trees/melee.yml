@@ -1,0 +1,26 @@
+# The Melee skill's tree, read by Core's SkillTree (see SkillDef). One branch for now —
+# more come — ending in its mastery badge, open once every other node of the branch not shut by a choice is at its
+# last rank. Node ids are unique across every skill's tree: a hero's ranks are kept as <skill>:<node>.
+branches:
+  might:
+    title: Might
+    icon: iron_sword
+    blurb: Harder, faster blows; two blades at once, or one great one.
+
+nodes:
+  brawler: {branch: might, at: [0, 1], title: Brawler, icon: wooden_sword, ranks: 3, level: 1, level-step: 2, effects: {melee_damage: 4}}
+  quick_hands: {branch: might, at: [0, 0], title: Quick Hands, icon: feather, ranks: 2, level: 2, level-step: 2, requires: [brawler], effects: {attack_speed: 5}}
+  long_arms: {branch: might, at: [0, 2], title: Long Arms, icon: stick, level: 4, requires: [brawler], effects: {reach: 0.5}}
+  crusher: {branch: might, at: [1, 0], title: Crusher, icon: mace, ranks: 3, level: 4, level-step: 2, requires: [brawler], effects: {crit_damage: 10}}
+  sweeper: {branch: might, at: [1, 1], title: Sweeper, icon: iron_sword, ranks: 2, level: 3, level-step: 2, requires: [brawler], effects: {sweep_damage: 20}}
+  bloodthirst: {branch: might, at: [1, 2], title: Bloodthirst, icon: redstone, ranks: 3, level: 5, level-step: 2, requires: [brawler], effects: {lifesteal: 2}}
+  veteran: {branch: might, at: [2, 1], title: Veteran, icon: iron_axe, ranks: 3, level: 6, level-step: 2, requires: [crusher, bloodthirst], effects: {melee_damage: 4}}
+  dual_wielder: {branch: might, at: [2, 0], title: Dual Wielder, icon: golden_sword, choice: true, cost: 2, level: 9, requires: [crusher], excludes: [great_weapon], effects: {dual_wield: 1}}
+  great_weapon: {branch: might, at: [2, 2], title: Great Weapon Master, icon: netherite_axe, choice: true, cost: 2, level: 9, requires: [bloodthirst], excludes: [dual_wielder], effects: {two_handed: 25}}
+  flurry: {branch: might, at: [3, 0], title: Flurry, icon: blaze_rod, ranks: 2, level: 12, level-step: 3, requires: [dual_wielder, veteran], effects: {attack_speed: 8}}
+  berserker: {branch: might, at: [3, 1], title: Berserker, icon: fire_charge, ranks: 3, level: 13, level-step: 2, requires: [veteran], effects: {rage: 10}}
+  executioner: {branch: might, at: [3, 2], title: Executioner, icon: diamond_axe, ranks: 2, level: 13, level-step: 3, requires: [great_weapon, veteran], effects: {crit_damage: 15}}
+  slayer: {branch: might, at: [4, 0], title: Undead Slayer, icon: skeleton_skull, cost: 2, level: 21, requires: [flurry], effects: {undead_damage: 30}}
+  warlord: {branch: might, at: [4, 1], title: Warlord, icon: netherite_sword, capstone: true, cost: 3, level: 30, requires: [flurry, berserker, executioner], effects: {melee_damage: 15, lifesteal: 3}}
+  vampire: {branch: might, at: [4, 2], title: Vampire, icon: wither_rose, cost: 2, level: 23, requires: [executioner], effects: {lifesteal: 4}}
+  melee_mastery: {branch: might, at: [5, 1], title: "Weapon Mastery", icon: netherite_sword, mastery: true, cost: 0, requires: [warlord], effects: {melee_damage: 10, attack_speed: 5}}

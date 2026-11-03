@@ -1,0 +1,51 @@
+id: adventurer-items
+title: Magic Items
+summary: Potions, scrolls, wands, rings, boots, bags and plus-weapons — what they do and how to find them.
+intro: |
+  Loot! The kind that glows and has a rarity. Monsters drop it, staff hand it out, and it all works the same for everybody.
+icon: POTION
+category: Items & enchantments
+order: 44
+module: dnd
+aliases: [magic-items, loot, potions, mach-fuck, scrolls, wand, rings, adventurer-loot, bag-of-holding]
+keywords: [healing, heroism, speed, mach, dragon, brewing, elytra, spell, scroll, wand, charges, ring, protection, amulet, health, boots, bag, holding, weapon, plus, rarity]
+related: [skills, skills-trees]
+sections:
+  - question: Where do magic items come from?
+    title: Loot
+    text: |
+      From monsters you defeat, now and then — never from a spawner's, never while you are away, and at most four an hour. {if:dnd:loot-percent > 0}Tougher monsters drop more often (a creeper about one in twenty-one with the book's rate, bosses always) and better things; the server's drop rate is <white>{setting:dnd:loot-percent|percent}</white> of normal.{else}Drops are switched off on this server; staff can still hand items out.{/if}
+      Rarity runs Common, Uncommon, Rare, Very rare, Legendary, shown in the name's colour.
+  - question: What do the potions do?
+    title: Potions
+    text: |
+      Drink them like any potion. <white>Healing</white> heals 2d4+2, <white>Greater</white> 4d4+4, <white>Superior</white> 8d4+8 and <white>Supreme</white> 10d4+20. <white>Heroism</white>: ten temporary hit points and a minute of blessed strength. <white>Speed</white>: a minute of haste, faster legs and hands, harder skin.
+  - question: What is the Potion of Mach Fuck?
+    title: Potion of Mach Fuck
+    text: |
+      The one magic potion you <b>brew</b> instead of finding: put a <white>dragon head</white> into a brewing stand over any ordinary drinkable potion (a water bottle works too). Drink it with an elytra on: for {setting:dnd:mach.seconds|seconds} it keeps you flying — opening the elytra again whenever it folds, lifting you off the ground first — wherever you look at {setting:dnd:mach.blocks-per-second|number} blocks a second. Steer by looking.
+      Crashing into a wall or the ground does not hurt while it works and for five seconds after, so you can land. The land ahead cannot load that fast, so much of the trip is empty sky. It never drops from monsters.
+  - question: How do spell scrolls work?
+    title: Scrolls
+    text: |
+      Hold one and right-click; anybody can read one. <white>Magic Missile</white> and <white>Lightning</white> strike what you look at, <white>Fireball</white> bursts where you look and sets everything around on fire, <white>Healing</white> heals you and every player near you, <white>Misty Step</white> steps you to where you look, <white>Shield</white> gives golden hearts and harder skin for a while. A scroll has a tier, 1 to 5 — its rarity, common to legendary — and the higher, the stronger. It crumbles once read; with nothing to aim at, you keep it. The Arcana branch makes scrolls stronger and sometimes keeps them.
+  - question: What is the Wand of Magic Missiles?
+    title: Wand
+    text: |
+      Seven charges of Magic Missile. Right-click to spend one; sneak and right-click to spend three for a stronger volley. It regains one charge every three minutes — faster with Wandwright and Archmage in the Arcana branch.
+  - question: What do rings, amulets and boots do?
+    title: Worn items
+    text: |
+      <white>Ring of Protection</white>, held in your off hand: two more armour and a tenth less damage taken. <white>Amulet of Health</white>, off hand: two more hearts. <white>Boots of Striding and Springing</white>, worn: you walk faster and jump three times as high.
+  - question: What about the Bag of Holding?
+    title: Bag of Holding
+    text: |
+      Right-click it and your <white>ender chest</white> opens, wherever you are. It stores nothing of its own, so nothing can be lost or duplicated through the bag.
+  - question: What are plus weapons?
+    title: Plus weapons
+    text: |
+      A +1, +2 or +3 weapon adds that much damage to every blow, or every arrow if it is a bow. Swords and axes glow with pulsing runes for the rune pack.
+  - question: Can I trade or share these?
+    title: Trading
+    text: |
+      They are real items marked with their identity, so you can store, trade and sell them like any other. A scroll or potion is used up; the rest last until you lose them.

@@ -1,0 +1,58 @@
+# Rain's Adventurers — every line this module says.
+#
+# Offered as a floor: anything an owner already wrote in their own messages.yml wins. Every placeholder a line asks
+# for is supplied where it is sent.
+dnd:
+
+  usage: "<gray>/skills  ·  /skills <skill>  ·  every skill, or one skill's tree"
+  only-a-player: "<red>Only somebody standing in the world can be an adventurer."
+  not-allowed: "<red>Adventuring is not for you on this server, it seems."
+  welcome: "<gold>Adventure awaits.</gold> <gray>Every level brings a skill point for any skill's tree. <white>/skills</white> to spend them."
+  xp-gained: "<green>+<xp> XP</green> <dark_gray>(<source>)"
+  level-up-title: "<gold>Level <level>"
+  level-up-subtitle: "<yellow><points> skill point(s) to spend"
+  level-up: "<gold>Level <level>!</gold> <gray>You have <white><points></white> skill point(s) to spend. <white>/skills"
+  loot: "<gold>Loot!</gold> <gray>A <rarity> <white><item></white> falls from your foe."
+
+  item:
+    scroll-kept: "<light_purple>The scroll of <white><scroll></white> holds together.</light_purple> <gray>You can read it again."
+    nothing-there: "<red><scroll> needs something to aim at."
+    healed: "<green>The potion mends you:</green> <gray>+<white><health></white> health."
+    heroism: "<gold>You feel heroic.</gold> <gray>Ten extra hit points and a minute of strength."
+    speed: "<aqua>The world slows around you.</aqua> <gray>A minute of haste."
+    mach: "<dark_purple>MACH FUCK.</dark_purple> <gray>For <white><seconds></white> seconds your elytra keeps you flying wherever you look at <white><speed></white> blocks a second. Walls and the ground forgive you."
+    mach-left: "<dark_purple>Mach Fuck <white><seconds>s</white>"
+    mach-over: "<gray>The Potion of Mach Fuck wears off. Five seconds to land before the ground hurts again."
+    scroll-read: "<gray>The scroll of <white><scroll></white> crumbles to dust."
+    wand-empty: "<red>The wand fizzles: only <charges> charge(s) left. It recovers one every few minutes."
+
+  admin:
+    unlearnt: "<green><player>'s skill tree is unlearnt; every point is back."
+    unknown-scroll: "<red>A spell scroll needs what is written on it — magic_missile, fireball, lightning, healing, misty_step or shield; <value> is none of them."
+    not-allowed: "<red>Only staff can do that."
+    usage: "<gray>/skills admin level|xp <player> <number>  ·  unlearn|reset <player>  ·  give <player> <item> [scroll] [tier]"
+    not-online: "<red><player> is not online here."
+    one-at-a-time: "<red>One player at a time, please."
+    not-a-number: "<red><value> is not a number."
+    no-hero: "<red><player>'s adventurer is not read yet."
+    level-set: "<green><player> is level <level> now."
+    xp-given: "<green><player> got <xp> XP."
+    reset: "<green><player>'s adventurer is gone; they start again at level 1."
+    you-were-reset: "<yellow>Your adventurer was reset by staff. Type <white>/skills</white> to begin again."
+    unknown-item: "<red>No magic item is called <value>."
+    given: "<green><player> got a <item>."
+
+  still-reading: "<yellow>Your adventurer is still being read. Give it a second."
+
+  tree:
+    points-waiting: "<green>You have <white><points></white> skill point(s) to spend.</green> <gray><white>/skills"
+    learnt: "<gold><node></gold> <gray>rank <white><rank></white> learnt."
+    refused: "<red><node>: <reason>"
+    unlearnt: "<yellow><skill> is unlearnt.</yellow> <gray>Every point spent in it is back to spend."
+    mastered: "<gold>★ <node></gold> <gray>— you have mastered a branch of <white><skill></white>."
+    unlearnt-by-staff: "<yellow>Staff unlearnt your skill tree.</yellow> <gray>Every point is back to spend: <white>/skills"
+
+  combat:
+    dodged: "<gray>Dodged!"
+    second-wind: "<green>Second Wind!</green> <gray>You catch your breath and fight on."
+    undying: "<gold>Undying!</gold> <gray>A blow that should have killed you leaves you standing."

@@ -13,21 +13,21 @@
         <relativePath/>
     </parent>
 
-    <artifactId>dnd-build</artifactId>
+    <artifactId>skills-build</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
-    <name>RaindanceMC/dnd (build)</name>
+    <name>RaindanceMC/skills (build)</name>
 
     <!-- This repository's own versions: bump them here. CI publishes a new version on the next push to master. -->
     <properties>
-        <dnd-module.version>0.12.0</dnd-module.version>
-        <rainscore.version>2.30.0</rainscore.version>
+        <skills-module.version>0.13.0</skills-module.version>
+        <rainscore.version>2.36.0</rainscore.version>
         <modules-wrapper.version>1.11.0</modules-wrapper.version>
     </properties>
 
     <modules>
-        <module>dnd-module</module>
-        <module>dnd-standalone</module>
+        <module>skills-module</module>
+        <module>skills-standalone</module>
     </modules>
 
     <!-- Here as well as in the parent, because the parent itself has to be found somewhere. -->

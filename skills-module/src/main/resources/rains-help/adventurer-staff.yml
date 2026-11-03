@@ -1,0 +1,27 @@
+id: adventurer-staff
+title: Adventurers for Staff
+summary: Setting levels, granting experience, unlearning trees, resetting, handing out magic items.
+intro: |
+  Playing god with other people's characters. The commands all name a player who must be online, and they work on one at a time.
+icon: COMMAND_BLOCK
+category: Staff
+order: 45
+module: dnd
+permission: rainsskills.admin
+aliases: [adventurer-admin, dnd-admin, adminadventurer]
+keywords: [admin, level, xp, reset, give, unlearn, item, scroll]
+related: [skills, adventurer-items]
+sections:
+  - question: What can I do to a player's hero?
+    title: Admin commands
+    text: |
+      {cmd:/skills admin level <player> <level>} sets their level (1-100). {cmd:/skills admin xp <player> <amount>} grants experience. {cmd:/skills admin unlearn <player>} unlearns their whole skill tree, whatever the wait. {cmd:/skills admin reset <player>} deletes their hero — they start again at level 1; ask first, it cannot be undone.
+  - question: How do I give magic items?
+    title: Giving items
+    text: |
+      {cmd:/skills admin give <player> <item> [scroll] [tier]} gives an item by id (tab-completion lists them: potion_of_healing, weapon_plus_one, wand_of_magic_missiles, bag_of_holding and the rest). For a spell scroll, name what is written on it and its tier, 1 to 5: <white>spell_scroll fireball 3</white>.
+  - question: Where are the numbers?
+    title: Settings
+    permission: rainscore.settings
+    text: |
+      {cmd:/settings} has a page for adventurers: the worlds they work in, experience and magic item drops, how much of the tree counts between players, how often the tree may be unlearnt, and the Potion of Mach Fuck.

@@ -1,0 +1,26 @@
+# The Defense skill's tree, read by Core's SkillTree (see SkillDef). One branch for now —
+# more come — ending in its mastery badge, open once every other node of the branch not shut by a choice is at its
+# last rank. Node ids are unique across every skill's tree: a hero's ranks are kept as <skill>:<node>.
+branches:
+  vitality:
+    title: Vitality
+    icon: golden_apple
+    blurb: More hearts, harder skin, a body that mends and will not die.
+
+nodes:
+  toughness: {branch: vitality, at: [0, 1], title: Toughness, icon: apple, ranks: 3, level: 1, level-step: 2, effects: {hearts: 1}}
+  hearty_meals: {branch: vitality, at: [0, 0], title: Hearty Meals, icon: cooked_beef, ranks: 3, level: 1, level-step: 1, requires: [toughness], effects: {hunger_save: 10}}
+  thick_skin: {branch: vitality, at: [0, 2], title: Thick Skin, icon: leather_chestplate, ranks: 2, level: 2, level-step: 2, requires: [toughness], effects: {armour: 1}}
+  mending: {branch: vitality, at: [1, 0], title: Mending, icon: glistering_melon_slice, ranks: 3, level: 4, level-step: 2, requires: [toughness], effects: {regen: 1}}
+  stout: {branch: vitality, at: [1, 1], title: Stout, icon: shield, ranks: 2, level: 3, level-step: 2, requires: [toughness], effects: {knockback: 15}}
+  hardened: {branch: vitality, at: [1, 2], title: Hardened, icon: iron_chestplate, ranks: 3, level: 4, level-step: 2, requires: [toughness], effects: {damage_taken: 3}}
+  big_heart: {branch: vitality, at: [2, 1], title: Big Heart, icon: golden_apple, ranks: 3, level: 6, level-step: 2, requires: [mending, hardened], effects: {hearts: 1}}
+  second_wind: {branch: vitality, at: [2, 0], title: Second Wind, icon: totem_of_undying, choice: true, cost: 2, level: 8, requires: [mending], excludes: [stoneskin], effects: {second_wind: 1}}
+  stoneskin: {branch: vitality, at: [2, 2], title: Stoneskin, icon: stone, choice: true, cost: 2, level: 8, requires: [hardened], excludes: [second_wind], effects: {damage_taken: 10, armour: 2}}
+  fast_healer: {branch: vitality, at: [3, 0], title: Fast Healer, icon: glow_berries, ranks: 2, level: 12, level-step: 3, requires: [second_wind, big_heart], effects: {regen: 1}}
+  giant_blood: {branch: vitality, at: [3, 1], title: Giant's Blood, icon: enchanted_golden_apple, ranks: 3, level: 13, level-step: 3, requires: [big_heart], effects: {hearts: 1}}
+  iron_hide: {branch: vitality, at: [3, 2], title: Iron Hide, icon: netherite_chestplate, ranks: 2, level: 13, level-step: 3, requires: [stoneskin, big_heart], effects: {toughness: 2}}
+  bottomless: {branch: vitality, at: [4, 0], title: Bottomless Stomach, icon: cake, cost: 2, level: 21, requires: [fast_healer], effects: {hunger_save: 25}}
+  undying: {branch: vitality, at: [4, 1], title: Undying, icon: totem_of_undying, capstone: true, cost: 3, level: 30, requires: [fast_healer, giant_blood, iron_hide], effects: {undying: 1, hearts: 2}}
+  bulwark: {branch: vitality, at: [4, 2], title: Bulwark, icon: netherite_ingot, cost: 2, level: 23, requires: [iron_hide], effects: {damage_taken: 5, knockback: 30}}
+  defense_mastery: {branch: vitality, at: [5, 1], title: "Defender's Mastery", icon: netherite_chestplate, mastery: true, cost: 0, requires: [undying], effects: {hearts: 2, damage_taken: 5}}

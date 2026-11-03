@@ -1,0 +1,26 @@
+# The Agility skill's tree, read by Core's SkillTree (see SkillDef). One branch for now —
+# more come — ending in its mastery badge, open once every other node of the branch not shut by a choice is at its
+# last rank. Node ids are unique across every skill's tree: a hero's ranks are kept as <skill>:<node>.
+branches:
+  shadow:
+    title: Shadow
+    icon: leather_boots
+    blurb: Quick feet, blows that miss you, knives in the back.
+
+nodes:
+  light_feet: {branch: shadow, at: [0, 1], title: Light Feet, icon: leather_boots, ranks: 3, level: 1, level-step: 2, effects: {speed: 3}}
+  cat_fall: {branch: shadow, at: [0, 0], title: Cat's Fall, icon: feather, ranks: 2, level: 2, level-step: 2, requires: [light_feet], effects: {safe_fall: 2}}
+  sidestep: {branch: shadow, at: [0, 2], title: Sidestep, icon: rabbit_foot, ranks: 3, level: 2, level-step: 2, requires: [light_feet], effects: {dodge: 2}}
+  springheel: {branch: shadow, at: [1, 0], title: Springheel, icon: slime_ball, ranks: 2, level: 4, level-step: 2, requires: [light_feet], effects: {jump: 10}}
+  climber: {branch: shadow, at: [1, 1], title: Climber, icon: ladder, level: 5, requires: [light_feet], effects: {step: 0.5}}
+  backstabber: {branch: shadow, at: [1, 2], title: Backstabber, icon: iron_sword, ranks: 3, level: 4, level-step: 2, requires: [light_feet], effects: {backstab: 10}}
+  evasion: {branch: shadow, at: [2, 1], title: Evasion, icon: phantom_membrane, ranks: 3, level: 7, level-step: 2, requires: [springheel, backstabber], effects: {dodge: 2}}
+  acrobat: {branch: shadow, at: [2, 0], title: Acrobat, icon: elytra, choice: true, cost: 2, level: 9, requires: [springheel], excludes: [assassin], effects: {jump: 20, safe_fall: 6}}
+  assassin: {branch: shadow, at: [2, 2], title: Assassin, icon: netherite_sword, choice: true, cost: 2, level: 9, requires: [backstabber], excludes: [acrobat], effects: {backstab: 40}}
+  windrunner: {branch: shadow, at: [3, 0], title: Windrunner, icon: sugar, ranks: 2, level: 12, level-step: 3, requires: [acrobat, evasion], effects: {speed: 4}}
+  blur: {branch: shadow, at: [3, 1], title: Blur, icon: ender_pearl, ranks: 3, level: 13, level-step: 2, requires: [evasion], effects: {dodge: 2}}
+  shadowstep: {branch: shadow, at: [3, 2], title: Shadowstep, icon: black_dye, ranks: 2, level: 13, level-step: 3, requires: [assassin, evasion], effects: {backstab: 15}}
+  wind_walker: {branch: shadow, at: [4, 0], title: Wind Walker, icon: breeze_rod, cost: 2, level: 22, requires: [windrunner], effects: {speed: 6, step: 0.5}}
+  phantom: {branch: shadow, at: [4, 1], title: Phantom, icon: echo_shard, capstone: true, cost: 3, level: 30, requires: [windrunner, blur, shadowstep], effects: {dodge: 6, speed: 5}}
+  nightblade: {branch: shadow, at: [4, 2], title: Nightblade, icon: wither_skeleton_skull, cost: 2, level: 23, requires: [shadowstep], effects: {backstab: 25}}
+  agility_mastery: {branch: shadow, at: [5, 1], title: "Shadow Mastery", icon: echo_shard, mastery: true, cost: 0, requires: [phantom], effects: {dodge: 3, speed: 5}}

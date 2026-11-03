@@ -1,0 +1,38 @@
+id: skills-trees
+title: Skill trees and mastery
+summary: Every skill's tree — a canvas you scroll, branches with a choice and a capstone, each ending in a mastery badge.
+intro: |
+  Points are few and the trees are big. Choose what kind of adventurer you are.
+icon: NETHER_STAR
+category: Progress & rewards
+order: 41
+module: dnd
+aliases: [skill-trees, adventurer-tree, feats, dual-wielder, unlearn, respec, mastery-badge, badges]
+keywords: [branch, node, rank, choice, capstone, feat, dual wielder, second wind, undying, unlearn, points]
+commands: [skills]
+related: [skills, adventurer-items]
+sections:
+  - question: How does a tree work?
+    title: Trees and branches
+    text: |
+      {run:/skills}, then a skill: its tree is a canvas, often bigger than the window — the arrows at the bottom scroll it (◀ ▶ ▲ ▼; shift-click for a whole window), the middle button jumps to the next branch. Click a node to learn its next rank: it costs skill points (most one, choices two, capstones three) and many ranks need an adventurer level. A node needs one next to it learnt first; a line lights up once both its ends are learnt. Each branch has a <white>choice</white> — learning one side shuts the other — and a <white>capstone</white>.
+  - question: What is a mastery badge?
+    title: Mastery
+    text: |
+      Every branch ends in a <gold>★ mastery badge</gold>: two stars, free, and it opens once every other node of that branch is at its last rank (the side of a choice you did not take does not count). Taking it means you have mastered that branch — it brings a mastery feature of its own. Master every branch of a skill and its badge shows beside your name.
+  - question: What is in the fighting skills?
+    title: Defense, Melee, Archery, Agility, Magic
+    text: |
+      <white>Defense</white>: more hearts, armour and toughness, less damage taken, healing out of a fight, less hunger; Second Wind or Stoneskin; capstone <white>Undying</white>. <white>Melee</white>: melee damage, faster attacks, critical and sweeping blows, lifesteal, reach, rage below half health; <white>Dual Wielder</white> or Great Weapon Master; capstone Warlord. <white>Archery</white>: arrow damage, Long Shot from twenty blocks, arrows not used up; Volley or Sharpshooter; capstone Deadeye. <white>Agility</white>: speed, dodging, higher jumps, softer falls, blows from behind; Acrobat or Assassin; capstone Phantom. <white>Magic</white>: more experience, magic items found more often, luck, faster mining, stronger scrolls, wands and potions; Sage or Treasure Hunter; capstone Archmage.
+  - question: What do the feats do?
+    title: Feats
+    text: |
+      <white>Dual Wielder</white>: hold a weapon in your off hand and every melee blow is followed by a strike from it, for half its damage. <white>Second Wind</white>: dropping below a third of your health heals you a third, once every two minutes. <white>Undying</white>: a blow that would kill you leaves you one heart instead, once every ten minutes — a totem in your hand goes first.
+  - question: Does it count against players?
+    title: Between players
+    text: |
+      Hearts and armour always count. Of the damage, dodging and damage-taken bonuses, <white>{setting:dnd:pvp-percent|percent}</white> counts when players fight each other. Whether players can hurt each other at all is the server's PvP rule.
+  - question: Can I unlearn it?
+    title: Unlearning
+    text: |
+      Shift-click the middle button at the bottom of a skill's tree: every node of that skill goes and every point spent in it comes back to spend again. You can unlearn one skill every <white>{setting:dnd:unlearn-hours|number}</white> hour(s).

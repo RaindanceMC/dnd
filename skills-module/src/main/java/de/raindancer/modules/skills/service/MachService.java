@@ -1,0 +1,181 @@
+package de.raindancer.modules.skills.service;
+
+import de.raindancer.core.ui.actionbar.ActionBarPriority;
+import de.raindancer.core.ui.actionbar.ActionBars;
+import de.raindancer.core.ui.effect.Cues;
+import de.raindancer.core.ui.effect.Effects;
+import de.raindancer.core.ui.messages.Messages;
+import de.raindancer.modules.skills.AdventurerAdvancements;
+import de.raindancer.modules.skills.SkillsSettings;
+import de.raindancer.modules.skills.rules.MachRule;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.LongSupplier;
+
+/**
+ * The Potion of Mach Fuck in somebody: while it works they are kept gliding and flung along where they look every
+ * tick, and steer by looking. Crashes and falls are forgiven until a little after it wears off. Runs on the player's own
+ * thread, once a tick from {@link #tick}.
+ */
+public final class MachService implements ISkillsService {
+
+    /** A move further than this in a tick is a teleport, not flying; it does not count towards the distance. */
+    private static final double TELEPORT = 200;
+    private static final String BAR = "dnd-mach";
+    /** Upwards off the ground, a few blocks: room for the elytra to open. */
+    private static final double LIFT = 1.0;
+
+    private final Messages messages;
+    private final ActionBars actionBars;
+    private final Effects effects;
+    private final AdventurerAdvancements advancements;
+    private final MachRule rule;
+    private final LongSupplier clock;
+    private final Map<UUID, Flight> flights = new ConcurrentHashMap<>();
+    private volatile SkillsSettings settings = SkillsSettings.DEFAULTS;
+
+    private static final class Flight {
+        final long drankAt;
+        Location last;
+        double flown;
+        int ticks;
+        boolean over;
+        boolean glided;
+
+        Flight(long drankAt) {
+            this.drankAt = drankAt;
+        }
+    }
+
+    public MachService(Messages messages, ActionBars actionBars, Effects effects, AdventurerAdvancements advancements,
+                       MachRule rule, LongSupplier clock) {
+        this.messages = messages;
+        this.actionBars = actionBars;
+        this.effects = effects;
+        this.advancements = advancements;
+        this.rule = rule;
+        this.clock = clock;
+    }
+
+    @Override
+    public void settings(SkillsSettings updated) {
+        this.settings = updated == null ? SkillsSettings.DEFAULTS : updated;
+    }
+
+    public void drank(Player player) {
+        long now = clock.getAsLong();
+        Flight before = flights.put(player.getUniqueId(), new Flight(now));
+        if (before != null && rule.working(before.drankAt, now, settings.machSeconds())) {
+            advancements.doubleShot(player.getUniqueId());
+        }
+        messages.send(player, "dnd.item.mach", "seconds", String.valueOf(settings.machSeconds()),
+                "speed", String.valueOf(settings.machBlocksPerSecond()));
+        effects.play(player.getUniqueId(), Cues.ABILITY);
+        actionBars.countdown(player.getUniqueId(), BAR, java.time.Duration.ofSeconds(settings.machSeconds()),
+                ActionBarPriority.HIGH, left -> messages.get("dnd.item.mach-left",
+                        "seconds", String.valueOf((left + 999) / 1000)));
+    }
+
+    /** The players with the potion in them, or just coming down from it. */
+    public Set<UUID> active() {
+        return flights.keySet();
+    }
+
+    /** The players whose potion still works, not just forgives. */
+    public Set<UUID> working() {
+        long now = clock.getAsLong();
+        int seconds = settings.machSeconds();
+        Set<UUID> found = new java.util.HashSet<>();
+        flights.forEach((id, flight) -> {
+            if (rule.working(flight.drankAt, now, seconds)) {
+                found.add(id);
+            }
+        });
+        return found;
+    }
+
+    public void tick(Player player) {
+        Flight flight = flights.get(player.getUniqueId());
+        if (flight == null) {
+            return;
+        }
+        long now = clock.getAsLong();
+        int seconds = settings.machSeconds();
+        if (!player.isOnline() || player.isDead() || !rule.shielded(flight.drankAt, now, seconds)) {
+            flights.remove(player.getUniqueId());
+            return;
+        }
+        if (!rule.working(flight.drankAt, now, seconds)) {
+            if (!flight.over) {
+                flight.over = true;
+                messages.send(player, "dnd.item.mach-over");
+                if (!flight.glided) {
+                    advancements.wastedMach(player.getUniqueId());
+                }
+            }
+            return;
+        }
+        Location here = player.getLocation();
+        if (flight.last != null && flight.last.getWorld() == here.getWorld()) {
+            double moved = flight.last.distance(here);
+            if (moved < TELEPORT) {
+                flight.flown += moved;
+            }
+        }
+        flight.last = here;
+        if (!player.isGliding()) {
+            keepFlying(player);
+            return;
+        }
+        Vector look = here.getDirection();
+        double[] velocity = rule.velocity(new double[]{look.getX(), look.getY(), look.getZ()},
+                settings.machBlocksPerSecond());
+        player.setVelocity(new Vector(velocity[0], velocity[1], velocity[2]));
+        flight.glided = true;
+        if (flight.ticks++ % 10 == 0) {
+            if (here.getWorld().getEnvironment() == org.bukkit.World.Environment.NETHER) {
+                advancements.machInTheNether(player.getUniqueId());
+            }
+            player.getWorld().spawnParticle(Particle.EXPLOSION, here, 1);
+            advancements.machFlown(player.getUniqueId(), flight.flown);
+        }
+        player.getWorld().spawnParticle(Particle.CLOUD, here, 2, 0.2, 0.2, 0.2, 0.01);
+    }
+
+    /**
+     * As long as it works it keeps them flying: an elytra that folded opens again, and somebody standing is lifted off
+     * first. Not in a boat or a minecart, not under water, and not without an elytra on.
+     */
+    private static void keepFlying(Player player) {
+        ItemStack chest = player.getInventory().getChestplate();
+        if (chest == null || !chest.hasData(io.papermc.paper.datacomponent.DataComponentTypes.GLIDER)
+                || player.isInsideVehicle() || player.isInWater() || player.isFlying()) {
+            return;
+        }
+        if (player.isOnGround()) {
+            player.setVelocity(new Vector(0, LIFT, 0));
+        } else {
+            player.setGliding(true);
+        }
+    }
+
+    /** Whether a wall or the ground should not hurt now: the potion works, or wore off only just. */
+    public boolean shielded(Player player) {
+        Flight flight = flights.get(player.getUniqueId());
+        return flight != null && rule.shielded(flight.drankAt, clock.getAsLong(), settings.machSeconds());
+    }
+
+    public void forget(UUID player) {
+        if (flights.remove(player) != null) {
+            actionBars.clear(player, BAR);
+        }
+    }
+}

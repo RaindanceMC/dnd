@@ -78,7 +78,7 @@ jobs:
         with:
           name: plugins-${{ github.sha }}
           path: |
-            dnd-standalone/target/*.jar
+            skills-standalone/target/*.jar
             !**/original-*.jar
           retention-days: 14
 
@@ -97,7 +97,7 @@ jobs:
         run: |
           set -euo pipefail
           todo=""
-          for module in dnd-module dnd-standalone; do
+          for module in skills-module skills-standalone; do
             if [ "$module" = . ]; then flags="-N"; else flags="-pl $module"; fi
             artifact=$(mvn -B -q $flags help:evaluate -Dexpression=project.artifactId -DforceStdout)
             version=$(mvn -B -q $flags help:evaluate -Dexpression=project.version -DforceStdout)

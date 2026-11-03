@@ -1,0 +1,8 @@
+# Rain's Adventurers — the same lines said plainly, for a server whose Message tone is SERIOUS.
+# Only lines that differ are here; everything else is the same in both tones.
+dnd:
+  welcome: "<gray>Every adventurer level brings a skill point: <white>/skills</white>."
+  level-up-subtitle: "<gray><points> skill point(s)"
+  level-up: "<green>Level <level> reached. <white><points></white> skill point(s) to spend."
+  item:
+    mach: "<gray>Mach potion: while gliding, <white><seconds></white> seconds at <white><speed></white> blocks a second where you look. No crash or fall damage."

@@ -1,0 +1,26 @@
+# The Magic skill's tree, read by Core's SkillTree (see SkillDef). One branch for now —
+# more come — ending in its mastery badge, open once every other node of the branch not shut by a choice is at its
+# last rank. Node ids are unique across every skill's tree: a hero's ranks are kept as <skill>:<node>.
+branches:
+  arcana:
+    title: Arcana
+    icon: enchanted_book
+    blurb: Experience, treasure, and the magic items' full strength.
+
+nodes:
+  studious: {branch: arcana, at: [0, 1], title: Studious, icon: book, ranks: 3, level: 1, level-step: 2, effects: {xp: 5}}
+  orb_catcher: {branch: arcana, at: [0, 0], title: Orb Catcher, icon: experience_bottle, ranks: 3, level: 2, level-step: 2, requires: [studious], effects: {vanilla_xp: 10}}
+  lucky: {branch: arcana, at: [0, 2], title: Lucky, icon: rabbit_foot, ranks: 2, level: 2, level-step: 2, requires: [studious], effects: {luck: 1}}
+  wandwright: {branch: arcana, at: [1, 0], title: Wandwright, icon: breeze_rod, ranks: 2, level: 4, level-step: 2, requires: [studious], effects: {wand_recharge: 25}}
+  scribe: {branch: arcana, at: [1, 1], title: Scribe, icon: paper, ranks: 2, level: 4, level-step: 2, requires: [studious], effects: {scroll_save: 10}}
+  alchemist: {branch: arcana, at: [1, 2], title: Alchemist, icon: brewing_stand, ranks: 3, level: 4, level-step: 2, requires: [studious], effects: {potion_power: 15}}
+  treasure_sense: {branch: arcana, at: [2, 1], title: Treasure Sense, icon: chest, ranks: 3, level: 6, level-step: 2, requires: [wandwright, alchemist], effects: {loot: 15}}
+  sage: {branch: arcana, at: [2, 0], title: Sage, icon: lectern, choice: true, cost: 2, level: 9, requires: [wandwright], excludes: [treasure_hunter], effects: {xp: 30}}
+  treasure_hunter: {branch: arcana, at: [2, 2], title: Treasure Hunter, icon: gold_block, choice: true, cost: 2, level: 9, requires: [alchemist], excludes: [sage], effects: {loot: 50}}
+  spellbreaker: {branch: arcana, at: [3, 0], title: Spellbreaker, icon: amethyst_shard, ranks: 2, level: 12, level-step: 3, requires: [sage, treasure_sense], effects: {scroll_power: 20}}
+  prospector: {branch: arcana, at: [3, 1], title: Prospector, icon: golden_pickaxe, ranks: 3, level: 13, level-step: 2, requires: [treasure_sense], effects: {mining_speed: 10}}
+  apothecary: {branch: arcana, at: [3, 2], title: Apothecary, icon: potion, ranks: 2, level: 13, level-step: 3, requires: [treasure_hunter, treasure_sense], effects: {potion_power: 20}}
+  loremaster: {branch: arcana, at: [4, 0], title: Loremaster, icon: knowledge_book, cost: 2, level: 21, requires: [spellbreaker], effects: {xp: 15, vanilla_xp: 20}}
+  archmage: {branch: arcana, at: [4, 1], title: Archmage, icon: nether_star, capstone: true, cost: 3, level: 30, requires: [spellbreaker, prospector, apothecary], effects: {scroll_save: 25, wand_recharge: 50, scroll_power: 30}}
+  fortune: {branch: arcana, at: [4, 2], title: Fortune's Child, icon: emerald, cost: 2, level: 23, requires: [apothecary], effects: {loot: 25, luck: 1}}
+  magic_mastery: {branch: arcana, at: [5, 1], title: "Arcane Mastery", icon: nether_star, mastery: true, cost: 0, requires: [archmage], effects: {scroll_power: 20, potion_power: 20, loot: 10}}

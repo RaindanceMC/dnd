@@ -1,0 +1,26 @@
+# The Archery skill's tree, read by Core's SkillTree (see SkillDef). One branch for now —
+# more come — ending in its mastery badge, open once every other node of the branch not shut by a choice is at its
+# last rank. Node ids are unique across every skill's tree: a hero's ranks are kept as <skill>:<node>.
+branches:
+  marksman:
+    title: Marksman
+    icon: bow
+    blurb: Arrows that hit harder, fly further and come back.
+
+nodes:
+  steady_aim: {branch: marksman, at: [0, 1], title: Steady Aim, icon: arrow, ranks: 3, level: 1, level-step: 2, effects: {ranged_damage: 5}}
+  fletcher: {branch: marksman, at: [0, 0], title: Fletcher, icon: flint, ranks: 2, level: 2, level-step: 2, requires: [steady_aim], effects: {arrow_save: 15}}
+  hawk_eye: {branch: marksman, at: [0, 2], title: Hawk Eye, icon: spyglass, ranks: 2, level: 2, level-step: 2, requires: [steady_aim], effects: {long_shot: 10}}
+  quiver: {branch: marksman, at: [1, 0], title: Full Quiver, icon: bundle, ranks: 2, level: 4, level-step: 2, requires: [steady_aim], effects: {arrow_save: 10}}
+  hunter: {branch: marksman, at: [1, 1], title: Hunter, icon: crossbow, ranks: 3, level: 4, level-step: 2, requires: [steady_aim], effects: {ranged_damage: 5}}
+  tracker: {branch: marksman, at: [1, 2], title: Tracker, icon: compass, ranks: 2, level: 4, level-step: 2, requires: [steady_aim], effects: {long_shot: 10}}
+  piercing: {branch: marksman, at: [2, 1], title: Piercing Shot, icon: spectral_arrow, ranks: 2, level: 7, level-step: 3, requires: [quiver, tracker], effects: {ranged_damage: 8}}
+  volley: {branch: marksman, at: [2, 0], title: Volley, icon: tipped_arrow, choice: true, cost: 2, level: 9, requires: [quiver], excludes: [sharpshooter], effects: {volley: 20}}
+  sharpshooter: {branch: marksman, at: [2, 2], title: Sharpshooter, icon: target, choice: true, cost: 2, level: 9, requires: [tracker], excludes: [volley], effects: {long_shot: 40}}
+  rain_of_arrows: {branch: marksman, at: [3, 0], title: Rain of Arrows, icon: dispenser, ranks: 2, level: 13, level-step: 3, requires: [volley, piercing], effects: {volley: 10}}
+  marksmanship: {branch: marksman, at: [3, 1], title: Marksmanship, icon: bow, ranks: 3, level: 13, level-step: 2, requires: [piercing], effects: {ranged_damage: 5}}
+  sniper: {branch: marksman, at: [3, 2], title: Sniper, icon: ender_eye, ranks: 2, level: 13, level-step: 3, requires: [sharpshooter, piercing], effects: {long_shot: 15}}
+  endless_quiver: {branch: marksman, at: [4, 0], title: Endless Quiver, icon: chiseled_bookshelf, cost: 2, level: 22, requires: [rain_of_arrows], effects: {arrow_save: 25}}
+  deadeye: {branch: marksman, at: [4, 1], title: Deadeye, icon: crossbow, capstone: true, cost: 3, level: 30, requires: [rain_of_arrows, marksmanship, sniper], effects: {ranged_damage: 20, arrow_save: 15}}
+  monster_hunter: {branch: marksman, at: [4, 2], title: Monster Hunter, icon: zombie_head, cost: 2, level: 23, requires: [sniper], effects: {undead_damage: 25}}
+  archery_mastery: {branch: marksman, at: [5, 1], title: "Archer's Mastery", icon: spectral_arrow, mastery: true, cost: 0, requires: [deadeye], effects: {ranged_damage: 10, arrow_save: 10}}
