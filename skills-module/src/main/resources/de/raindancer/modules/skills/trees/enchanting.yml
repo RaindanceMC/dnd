@@ -1,0 +1,42 @@
+# The Enchanting skill's tree, read by Core's SkillTree (see SkillDef): the enchanting table in rows 0-2, the anvil in
+# rows 3-5, each ending in its mastery badge. Node ids are unique across every skill's tree.
+branches:
+  table:
+    title: Enchanting Table
+    icon: enchanting_table
+    blurb: Levels and lapis back, more bookshelf power, fresh offers.
+  anvil:
+    title: Anvil
+    icon: anvil
+    blurb: Cheaper anvil work, anvils that last, items that never grow dear.
+
+nodes:
+  initiate: {branch: table, at: [0, 1], title: Initiate, icon: enchanting_table, ranks: 3, level: 1, level-step: 2, effects: {level_refund: 3}}
+  lapis_saver: {branch: table, at: [0, 0], title: Lapis Saver, icon: lapis_lazuli, ranks: 3, level: 1, level-step: 2, requires: [initiate], effects: {lapis_save: 5}}
+  orb_gatherer: {branch: table, at: [0, 2], title: Orb Gatherer, icon: experience_bottle, ranks: 3, level: 2, level-step: 2, requires: [initiate], effects: {orb_xp: 5}}
+  azure_hands: {branch: table, at: [1, 0], title: Azure Hands, icon: lapis_block, ranks: 2, level: 4, level-step: 2, requires: [lapis_saver], effects: {lapis_save: 5}}
+  library: {branch: table, at: [1, 1], title: Library, icon: bookshelf, ranks: 3, level: 5, level-step: 2, requires: [initiate], effects: {bookshelf_power: 2}}
+  wisdom: {branch: table, at: [1, 2], title: Wisdom, icon: book, ranks: 2, level: 5, level-step: 2, requires: [orb_gatherer], effects: {orb_xp: 5}}
+  frugal_enchanter: {branch: table, at: [2, 0], title: Frugal Enchanter, icon: blue_dye, choice: true, cost: 2, level: 9, requires: [azure_hands], excludes: [scholar], effects: {lapis_save: 20}}
+  fresh_offers: {branch: table, at: [2, 1], title: Fresh Offers, icon: ender_eye, level: 12, requires: [library], effects: {fresh_offers: 1, bookshelf_power: 1}}
+  scholar: {branch: table, at: [2, 2], title: Scholar, icon: writable_book, choice: true, cost: 2, level: 9, requires: [wisdom], excludes: [frugal_enchanter], effects: {level_refund: 15}}
+  lapis_lord: {branch: table, at: [3, 0], title: Lapis Lord, icon: lapis_ore, ranks: 2, level: 14, level-step: 3, requires: [frugal_enchanter], effects: {lapis_save: 5}}
+  great_library: {branch: table, at: [3, 1], title: Great Library, icon: chiseled_bookshelf, ranks: 2, level: 14, level-step: 3, requires: [fresh_offers], effects: {bookshelf_power: 2}}
+  deep_study: {branch: table, at: [3, 2], title: Deep Study, icon: knowledge_book, ranks: 2, level: 15, level-step: 3, requires: [scholar], effects: {orb_xp: 5}}
+  grand_enchanter: {branch: table, at: [4, 1], title: Grand Enchanter, icon: enchanted_book, capstone: true, cost: 3, level: 30, requires: [lapis_lord, great_library, deep_study], effects: {bookshelf_power: 3, level_refund: 10}}
+  table_mastery: {branch: table, at: [5, 1], title: "Enchanter's Mastery", icon: nether_star, mastery: true, cost: 0, requires: [grand_enchanter], effects: {treasure_offers: 1, orb_xp: 10}}
+
+  tinkerer: {branch: anvil, at: [0, 4], title: Tinkerer, icon: anvil, ranks: 3, level: 1, level-step: 2, effects: {anvil_discount: 3}}
+  gentle_hammer: {branch: anvil, at: [0, 3], title: Gentle Hammer, icon: chipped_anvil, ranks: 3, level: 2, level-step: 2, requires: [tinkerer], effects: {anvil_save: 8}}
+  smith_sense: {branch: anvil, at: [0, 5], title: "Smith's Sense", icon: iron_ingot, ranks: 2, level: 2, level-step: 2, requires: [tinkerer], effects: {anvil_discount: 2}}
+  careful_strikes: {branch: anvil, at: [1, 3], title: Careful Strikes, icon: iron_block, ranks: 2, level: 5, level-step: 2, requires: [gentle_hammer], effects: {anvil_save: 8}}
+  journeyman_smith: {branch: anvil, at: [1, 4], title: Journeyman Smith, icon: grindstone, ranks: 3, level: 5, level-step: 2, requires: [tinkerer], effects: {anvil_discount: 3}}
+  quench: {branch: anvil, at: [1, 5], title: Quench, icon: water_bucket, ranks: 2, level: 6, level-step: 2, requires: [smith_sense], effects: {orb_xp: 3}}
+  light_hammer: {branch: anvil, at: [2, 3], title: Light Hammer, icon: mace, choice: true, cost: 2, level: 10, requires: [careful_strikes], excludes: [bargain_smith], effects: {anvil_save: 40}}
+  master_hand: {branch: anvil, at: [2, 4], title: Master Hand, icon: smithing_table, ranks: 3, level: 12, level-step: 3, requires: [journeyman_smith], effects: {anvil_discount: 2}}
+  bargain_smith: {branch: anvil, at: [2, 5], title: Bargain Smith, icon: gold_ingot, choice: true, cost: 2, level: 10, requires: [quench], excludes: [light_hammer], effects: {anvil_discount: 15}}
+  steady_anvil: {branch: anvil, at: [3, 3], title: Steady Anvil, icon: damaged_anvil, ranks: 2, level: 15, level-step: 3, requires: [light_hammer], effects: {anvil_save: 10}}
+  runesmith: {branch: anvil, at: [3, 4], title: Runesmith, icon: netherite_upgrade_smithing_template, ranks: 2, level: 15, level-step: 3, requires: [master_hand], effects: {anvil_discount: 3}}
+  haggling_smith: {branch: anvil, at: [3, 5], title: Haggling Smith, icon: emerald, level: 16, requires: [bargain_smith], effects: {anvil_discount: 3}}
+  grand_smith: {branch: anvil, at: [4, 4], title: Grand Smith, icon: netherite_ingot, capstone: true, cost: 3, level: 30, requires: [steady_anvil, runesmith, haggling_smith], effects: {anvil_discount: 5, anvil_save: 10}}
+  anvil_mastery: {branch: anvil, at: [5, 4], title: "Smith's Mastery", icon: netherite_block, mastery: true, cost: 0, requires: [grand_smith], effects: {no_prior_penalty: 1, anvil_discount: 5}}

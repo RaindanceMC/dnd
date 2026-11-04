@@ -182,6 +182,7 @@ public final class SkillsModule implements FlexModule {
         views.register(context.plugin(), (viewer, parent, skill) -> new SkillTreeMenu(services, viewer, parent, skill)
                 .open());
         context.closeWith(views::unregister);
+        de.raindancer.modules.skills.skill.CraftSkills.enable(context, services, database);
         // A fully mastered skill's glyph beside the name.
         de.raindancer.core.ui.identity.NameBadges.register("skills-mastery", "Mastered skills", player -> heroes
                 .of(player).map(hero -> SkillCatalog.all().stream().filter(skill -> perks.fullyMastered(hero, skill))

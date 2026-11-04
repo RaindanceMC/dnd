@@ -23,7 +23,24 @@ public final class SkillCatalog {
     public static final SkillDef MAGIC = new SkillDef("magic", "Magic", Material.ENCHANTED_BOOK, 14, "✧",
             "Scrolls, wands and potions at their full strength — and more to find.", FIGHTING);
 
-    private static final List<SkillDef> ALL = List.of(DEFENSE, MELEE, ARCHERY, AGILITY, MAGIC);
+    public static final SkillDef ARTISAN = new SkillDef("artisan", "Artisan", Material.CRAFTING_TABLE, 25, "⚒",
+            "Crafting and smelting: more from every craft, faster furnaces, ores that come out smelted.",
+            List.of(de.raindancer.modules.skills.skill.artisan.ArtisanEffect.values()));
+    public static final SkillDef BUILDING = new SkillDef("building", "Building", Material.BRICKS, 26, "⌂",
+            "Longer arms, blocks to spare — and blueprints, pasted from your own blocks.",
+            List.of(de.raindancer.modules.skills.skill.building.BuildingEffect.values()));
+    public static final SkillDef TRADING = new SkillDef("trading", "Trading", Material.EMERALD, 27, "⚖",
+            "Lower prices, extra emeralds, trades that come back sooner.",
+            List.of(de.raindancer.modules.skills.skill.trading.TradingEffect.values()));
+    public static final SkillDef ENCHANTING = new SkillDef("enchanting", "Enchanting", Material.ENCHANTING_TABLE, 28,
+            "✪", "Levels and lapis back, stronger offers, cheaper anvils.",
+            List.of(de.raindancer.modules.skills.skill.enchanting.EnchantingEffect.values()));
+    public static final SkillDef EXPLORATION = new SkillDef("exploration", "Exploration", Material.COMPASS, 32, "⚑",
+            "Faster travel, wider maps, a compass that finds ruins and more in their chests.",
+            List.of(de.raindancer.modules.skills.skill.exploration.ExplorationEffect.values()));
+
+    private static final List<SkillDef> ALL = List.of(DEFENSE, MELEE, ARCHERY, AGILITY, MAGIC, ARTISAN, BUILDING,
+            TRADING, ENCHANTING, EXPLORATION);
 
     /** Which skill holds each node id: for ranks kept before there were skills, by node id alone. */
     private static volatile Map<String, SkillDef> owners;

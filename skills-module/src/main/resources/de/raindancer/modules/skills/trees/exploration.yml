@@ -1,0 +1,42 @@
+# The Exploration skill's tree, read by Core's SkillTree (see SkillDef): the wayfarer in rows 0-2, the cartographer in
+# rows 3-5, each ending in its mastery badge. Node ids are unique across every skill's tree.
+branches:
+  wayfarer:
+    title: Wayfarer
+    icon: leather_boots
+    blurb: Faster on foot, in the water and in the saddle; new lands pay more.
+  cartographer:
+    title: Cartographer
+    icon: filled_map
+    blurb: Wider maps, a compass that finds ruins, more in their chests.
+
+nodes:
+  wanderer: {branch: wayfarer, at: [0, 1], title: Wanderer, icon: leather_boots, ranks: 3, level: 1, level-step: 2, effects: {sprint_speed: 3}}
+  light_step: {branch: wayfarer, at: [0, 0], title: Light Step, icon: feather, ranks: 3, level: 1, level-step: 2, requires: [wanderer], effects: {sprint_hunger: 8}}
+  strong_swimmer: {branch: wayfarer, at: [0, 2], title: Strong Swimmer, icon: kelp, ranks: 2, level: 2, level-step: 2, requires: [wanderer], effects: {swim_speed: 8}}
+  long_legs: {branch: wayfarer, at: [1, 0], title: Long Legs, icon: rabbit_foot, ranks: 2, level: 4, level-step: 2, requires: [light_step], effects: {sprint_hunger: 8}}
+  pathfinder: {branch: wayfarer, at: [1, 1], title: Pathfinder, icon: dirt_path, ranks: 2, level: 5, level-step: 2, requires: [wanderer], effects: {sprint_speed: 3}}
+  dolphin_kick: {branch: wayfarer, at: [1, 2], title: Dolphin Kick, icon: heart_of_the_sea, ranks: 2, level: 5, level-step: 2, requires: [strong_swimmer], effects: {swim_speed: 8}}
+  runner: {branch: wayfarer, at: [2, 0], title: Runner, icon: sugar, choice: true, cost: 2, level: 9, requires: [long_legs], excludes: [rider], effects: {sprint_speed: 8}}
+  seasoned_traveller: {branch: wayfarer, at: [2, 1], title: Seasoned Traveller, icon: compass, ranks: 3, level: 10, level-step: 3, requires: [pathfinder], effects: {explore_xp: 15}}
+  rider: {branch: wayfarer, at: [2, 2], title: Rider, icon: saddle, choice: true, cost: 2, level: 9, requires: [dolphin_kick], excludes: [runner], effects: {mount_speed: 15}}
+  marathon: {branch: wayfarer, at: [3, 0], title: Marathon, icon: golden_carrot, ranks: 2, level: 14, level-step: 3, requires: [runner], effects: {sprint_hunger: 10}}
+  horizon: {branch: wayfarer, at: [3, 1], title: Horizon, icon: spyglass, ranks: 2, level: 15, level-step: 3, requires: [seasoned_traveller], effects: {explore_xp: 20}}
+  cavalier: {branch: wayfarer, at: [3, 2], title: Cavalier, icon: diamond_horse_armor, ranks: 2, level: 14, level-step: 3, requires: [rider], effects: {mount_speed: 10}}
+  trailblazer: {branch: wayfarer, at: [4, 1], title: Trailblazer, icon: elytra, capstone: true, cost: 3, level: 30, requires: [marathon, horizon, cavalier], effects: {sprint_speed: 5, swim_speed: 10, mount_speed: 5}}
+  wayfarer_mastery: {branch: wayfarer, at: [5, 1], title: "Wayfarer's Mastery", icon: netherite_boots, mastery: true, cost: 0, requires: [trailblazer], effects: {road_runner: 1, sprint_hunger: 10}}
+
+  map_maker: {branch: cartographer, at: [0, 4], title: Map Maker, icon: map, level: 3, effects: {wide_maps: 1}}
+  keen_eye: {branch: cartographer, at: [0, 3], title: Keen Eye, icon: chest, ranks: 3, level: 3, level-step: 2, requires: [map_maker], effects: {structure_loot: 5}}
+  compass_rose: {branch: cartographer, at: [0, 5], title: Compass Rose, icon: compass, level: 5, requires: [map_maker], effects: {treasure_sense: 16}}
+  scavenger: {branch: cartographer, at: [1, 3], title: Scavenger, icon: brush, ranks: 2, level: 6, level-step: 2, requires: [keen_eye], effects: {structure_loot: 5}}
+  atlas: {branch: cartographer, at: [1, 4], title: Atlas, icon: cartography_table, level: 8, requires: [map_maker], effects: {wide_maps: 1}}
+  bloodhound: {branch: cartographer, at: [1, 5], title: Bloodhound, icon: bone, ranks: 2, level: 7, level-step: 2, requires: [compass_rose], effects: {treasure_sense: 12}}
+  relic_hunter: {branch: cartographer, at: [2, 3], title: Relic Hunter, icon: suspicious_sand, choice: true, cost: 2, level: 11, requires: [scavenger], excludes: [far_sight], effects: {structure_loot: 20}}
+  explorer: {branch: cartographer, at: [2, 4], title: Explorer, icon: filled_map, ranks: 2, level: 12, level-step: 3, requires: [atlas], effects: {explore_xp: 10}}
+  far_sight: {branch: cartographer, at: [2, 5], title: Far Sight, icon: ender_eye, choice: true, cost: 2, level: 11, requires: [bloodhound], excludes: [relic_hunter], effects: {treasure_sense: 40}}
+  looter: {branch: cartographer, at: [3, 3], title: Looter, icon: gold_ingot, ranks: 2, level: 15, level-step: 3, requires: [relic_hunter], effects: {structure_loot: 5}}
+  world_map: {branch: cartographer, at: [3, 4], title: World Map, icon: globe_banner_pattern, level: 16, requires: [explorer], effects: {wide_maps: 1}}
+  dowser: {branch: cartographer, at: [3, 5], title: Dowser, icon: recovery_compass, ranks: 2, level: 15, level-step: 3, requires: [far_sight], effects: {treasure_sense: 10}}
+  master_cartographer: {branch: cartographer, at: [4, 4], title: Master Cartographer, icon: lodestone, capstone: true, cost: 3, level: 30, requires: [looter, world_map, dowser], effects: {wide_maps: 1, treasure_sense: 20, structure_loot: 5}}
+  cartographer_mastery: {branch: cartographer, at: [5, 4], title: "Cartographer's Mastery", icon: clock, mastery: true, cost: 0, requires: [master_cartographer], effects: {compass_reading: 1, explore_xp: 15}}

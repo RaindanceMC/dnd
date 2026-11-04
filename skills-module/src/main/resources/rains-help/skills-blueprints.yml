@@ -1,0 +1,26 @@
+id: skills-blueprints
+title: Blueprints
+summary: Save what you built and put it up again elsewhere — from your own blocks. Building's Architect branch.
+intro: |
+  Learn <white>Draftsman</white> in Building's Architect branch, mark a box around something, save it, and paste it wherever you stand. Every block comes out of your inventory.
+icon: MAP
+category: Progress & rewards
+order: 43
+module: dnd
+aliases: [blueprint, blueprints, schematic, schematics, architect, copy-build, paste]
+keywords: [blueprint, mark, save, paste, rotate, undo, delete, demolition, ghost, box]
+commands: [skills]
+related: [skills-crafting, skills]
+sections:
+  - question: How do I save a blueprint?
+    title: Marking and saving
+    text: |
+      {run:/skills blueprint mark} hands you a golden marker: right-click two opposite corners of a box (left-click takes a corner back, shift-right-click puts the marker away). Stand within eight blocks of it and {run:/skills blueprint save hut} — a name of small letters, digits, - and _. A box may be <white>8</white> blocks a side with Draftsman, <white>16</white> with Larger Plans and <white>32</white> with Grand Design; more nodes let you keep more blueprints. {run:/skills blueprint list} shows yours, {run:/skills blueprint delete hut} throws one away.
+  - question: How do I paste one?
+    title: Pasting
+    text: |
+      {run:/skills blueprint paste hut}: it goes up the same way round you as it stood round you when you saved it. Every block is taken from your inventory — plain items, nothing renamed — and if anything is missing you are told what, and nothing is placed. Every block is asked about like a block you place by hand: one where you may not build, and nothing is placed. Blocks go only where there is air; whatever stands there stays — unless you took <white>Demolition</white>, which clears it and gives it to you (never a chest's contents). Crops come out unripe, cauldrons and composters empty, and a pasted block earns no experience.
+  - question: Can I turn it, or take it back?
+    title: Turning, ghosts and undo
+    text: |
+      With the Architect's Mastery, add <white>rotate 90</white>, <white>180</white> or <white>270</white>, and the first paste shows a ghost of it where it would go; the same command again within twenty seconds builds it. {run:/skills blueprint undo} takes your last paste down for ten minutes after — every block it cost comes back, and what Demolition cleared is put back if you can give it again.

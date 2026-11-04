@@ -1,0 +1,11 @@
+# Rain's Skills — Artisan, Building, Trading, Enchanting and Exploration said plainly, for a server whose Message tone
+# is SERIOUS. Only lines that differ are here; everything else is the same in both tones.
+dnd:
+  enchanting:
+    rerolled: "<gray>New enchanting offers. One level spent."
+  exploration:
+    sensing: "<gray>Searching for the nearest structure…"
+    sensed: "<gray>Compass set to a structure <white><blocks></white> blocks away."
+    sensed-nothing: "<gray>No structure within <white><chunks></white> chunks."
+  blueprint:
+    ghost: "<gray>Preview of <white><name></white> shown. Run the same command again within <white><seconds></white> seconds, from the same spot, to build it."

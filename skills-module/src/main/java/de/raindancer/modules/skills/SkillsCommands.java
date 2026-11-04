@@ -24,6 +24,7 @@ public final class SkillsCommands {
                         .aliased("dnd")
                         .aliased("character")
                         .taking("[skill]")
+                        .taking("blueprint mark|save <name>|list|paste <name> [rotate 90|180|270]|undo|delete <name>")
                         .taking("admin level <player> <level>")
                         .taking("admin xp <player> <amount>")
                         .taking("admin unlearn <player>")

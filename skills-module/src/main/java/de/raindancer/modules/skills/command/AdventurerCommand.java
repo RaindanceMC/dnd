@@ -23,7 +23,8 @@ import java.util.function.Supplier;
  */
 public final class AdventurerCommand implements ISkillsCommand {
 
-    private static final List<String> PLAYER_WORDS = java.util.stream.Stream.concat(java.util.stream.Stream.of("tree"),
+    private static final List<String> PLAYER_WORDS = java.util.stream.Stream.concat(java.util.stream.Stream.of("tree",
+            de.raindancer.modules.skills.skill.building.BlueprintCommand.WORD),
             de.raindancer.modules.skills.model.SkillCatalog.all().stream().map(de.raindancer.modules.skills.model.SkillDef::id)).toList();
     private static final List<String> ADMIN_WORDS = List.of("level", "xp", "unlearn", "reset", "give");
 
@@ -48,6 +49,10 @@ public final class AdventurerCommand implements ISkillsCommand {
         }
         if (!player.hasPermission(PermissionNodes.PLAY)) {
             live.messages().send(player, "dnd.not-allowed");
+            return;
+        }
+        if (first.equals(de.raindancer.modules.skills.skill.building.BlueprintCommand.WORD)) {
+            de.raindancer.modules.skills.skill.building.BlueprintCommand.execute(live.messages(), player, args);
             return;
         }
         if (first.isEmpty() || first.equals("tree")) {
@@ -179,6 +184,10 @@ public final class AdventurerCommand implements ISkillsCommand {
                 words.add("admin");
             }
             return words.stream().filter(word -> word.startsWith(started)).toList();
+        }
+        if (args[0].equalsIgnoreCase(de.raindancer.modules.skills.skill.building.BlueprintCommand.WORD)) {
+            return de.raindancer.modules.skills.skill.building.BlueprintCommand.suggest(
+                    source.getSender() instanceof Player player ? player : null, args);
         }
         if (!admin || !args[0].equalsIgnoreCase("admin")) {
             return List.of();
