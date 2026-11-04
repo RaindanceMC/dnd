@@ -9,7 +9,7 @@ import java.util.Locale;
 public enum MiningEffect implements Effect {
 
     MINE_SPEED("%s%% faster mining with a pickaxe", 80),
-    MINE_ORE_DOUBLE("%s%% chance coal drops twice over — less the rarer the ore", 15),
+    MINE_ORE_DOUBLE("%s%% chance coal drops twice over — less the rarer the ore", 50),
     MINE_ORE_XP("%s%% more experience from ores", 150),
     MINE_HASTE("Haste for %s second(s) after mining an ore", 12),
     MINE_WEAR("%s%% chance a pickaxe is not worn by a block", 60),

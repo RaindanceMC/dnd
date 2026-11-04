@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 class MiningRuleTest {
 
@@ -22,14 +23,15 @@ class MiningRuleTest {
     }
 
     @Test
-    @DisplayName("the rarer the ore, the smaller its chance to drop twice: the skill's chance over Core's rarity")
+    @DisplayName("the rarer the ore, the smaller its chance to drop twice — coal all of it, ancient debris two fifths")
     void rarerOresDoubleLess() {
-        assertThat(rule.byRarity(15, Material.COAL_ORE)).isEqualTo(15);
-        assertThat(rule.byRarity(15, Material.DEEPSLATE_IRON_ORE)).isEqualTo(7.5);
-        assertThat(rule.byRarity(15, Material.DIAMOND_ORE)).isEqualTo(15 / 8.0);
-        assertThat(rule.byRarity(15, Material.ANCIENT_DEBRIS)).isEqualTo(1);
-        assertThat(rule.byRarity(3, Material.EMERALD_ORE)).isLessThan(rule.byRarity(3, Material.GOLD_ORE));
-        assertThat(rule.byRarity(15, Material.STONE)).isZero();
+        assertThat(rule.byRarity(50, Material.COAL_ORE)).isEqualTo(50);
+        assertThat(rule.byRarity(50, Material.ANCIENT_DEBRIS)).isCloseTo(20, within(1e-9));
+        assertThat(rule.byRarity(50, Material.DEEPSLATE_IRON_ORE)).isBetween(38.0, 42.0);
+        assertThat(rule.byRarity(50, Material.DIAMOND_ORE)).isBetween(23.0, 26.0);
+        assertThat(rule.byRarity(50, Material.EMERALD_ORE)).isLessThan(rule.byRarity(50, Material.DIAMOND_ORE))
+                .isGreaterThan(20);
+        assertThat(rule.byRarity(50, Material.STONE)).isZero();
     }
 
     @Test

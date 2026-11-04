@@ -23,7 +23,7 @@ sections:
   - question: How often does an ore drop twice?
     title: Twice over
     text: |
-      The tree's chance is coal's, copper's, redstone's and quartz's; every other ore gets less, the rarer it is: iron half of it, gold a third, lapis half, diamond an eighth, emerald a tenth, ancient debris a fifteenth. With the whole Prospector branch that is 15% for coal and under 2% for diamonds — Motherlode's three times over is 3% for coal and about 0.4% for diamonds.
+      The tree's chance is coal's, copper's, redstone's and quartz's; every other ore gets less, the rarer it is. With the whole Prospector branch: coal 50%, iron and lapis about 40%, gold about 35%, diamond about 25%, emerald about 23%, ancient debris 20%. Motherlode's three times over is 3% for coal down to 1.2% for ancient debris.
   - question: How does Vein Miner work?
     title: Crouching with a pickaxe
     text: |

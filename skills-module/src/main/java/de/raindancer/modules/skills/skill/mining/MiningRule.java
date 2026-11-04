@@ -25,12 +25,18 @@ public final class MiningRule implements ISkillsRule {
         return group.isPresent() && group.equals(Ores.oreOf(other));
     }
 
+    /** The rarest ore Core knows — ancient debris — keeps this share of the tree's chance; coal keeps all of it. */
+    static final double RAREST_SHARE = 0.4;
+    private static final int RAREST_WEIGHT = 15;
+    private static final double RARITY_POWER = Math.log(RAREST_SHARE) / Math.log(RAREST_WEIGHT);
+
     /**
-     * A chance for an ore to drop twice or three times over, smaller the rarer the ore: divided by Core's rarity
-     * weight (coal 1, iron 2, diamond 8, ancient debris 15) — so diamonds stay diamonds.
+     * A chance for an ore to drop twice or three times over, smaller the rarer the ore: by Core's rarity weight
+     * (coal 1, iron 2, diamond 8, ancient debris 15) on a curve — all of it for coal, two fifths for ancient debris.
      */
     public double byRarity(double percent, Material ore) {
-        return Ores.oreOf(ore).map(group -> percent / Math.max(1, Ores.weight(group))).orElse(0.0);
+        return Ores.oreOf(ore).map(group -> percent * Math.pow(Math.max(1, Ores.weight(group)), RARITY_POWER))
+                .orElse(0.0);
     }
 
     public int hasteTicks(double seconds) {
