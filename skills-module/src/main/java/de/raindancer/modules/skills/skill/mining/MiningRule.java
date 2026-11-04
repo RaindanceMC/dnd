@@ -25,6 +25,14 @@ public final class MiningRule implements ISkillsRule {
         return group.isPresent() && group.equals(Ores.oreOf(other));
     }
 
+    /**
+     * A chance for an ore to drop twice or three times over, smaller the rarer the ore: divided by Core's rarity
+     * weight (coal 1, iron 2, diamond 8, ancient debris 15) — so diamonds stay diamonds.
+     */
+    public double byRarity(double percent, Material ore) {
+        return Ores.oreOf(ore).map(group -> percent / Math.max(1, Ores.weight(group))).orElse(0.0);
+    }
+
     public int hasteTicks(double seconds) {
         return (int) Math.max(0, Math.round(seconds * 20));
     }

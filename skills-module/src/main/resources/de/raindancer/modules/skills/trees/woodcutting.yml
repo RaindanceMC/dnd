@@ -19,13 +19,13 @@ branches:
 nodes:
   lumberjack: {branch: lumberjack, at: [0, 1], title: Lumberjack, icon: wooden_axe, ranks: 3, level: 1, level-step: 2, effects: {chop_speed: 5}}
   oiled_handle: {branch: lumberjack, at: [1, 0], title: Oiled Handle, icon: honeycomb, ranks: 2, level: 3, level-step: 2, requires: [lumberjack], effects: {chop_wear: 10}}
-  clean_cut: {branch: lumberjack, at: [1, 2], title: Clean Cut, icon: oak_log, ranks: 2, level: 3, level-step: 2, requires: [lumberjack], effects: {chop_log_double: 5}}
+  clean_cut: {branch: lumberjack, at: [1, 2], title: Clean Cut, icon: oak_log, ranks: 2, level: 3, level-step: 2, requires: [lumberjack], effects: {chop_log_double: 2}}
   woodsman: {branch: lumberjack, at: [2, 1], title: Woodsman, icon: iron_axe, ranks: 3, level: 6, level-step: 2, requires: [oiled_handle, clean_cut], effects: {chop_speed: 5}}
   heavy_swing: {branch: lumberjack, at: [3, 0], title: Heavy Swing, icon: golden_axe, choice: true, cost: 2, level: 12, requires: [woodsman], excludes: [splitter], effects: {chop_speed: 20}}
-  splitter: {branch: lumberjack, at: [3, 2], title: Splitter, icon: oak_planks, choice: true, cost: 2, level: 12, requires: [woodsman], excludes: [heavy_swing], effects: {chop_log_double: 20}}
-  seasoned: {branch: lumberjack, at: [4, 1], title: Seasoned, icon: diamond_axe, ranks: 2, level: 16, level-step: 4, requires: [heavy_swing, splitter], effects: {chop_log_double: 5, chop_wear: 10}}
-  old_growth: {branch: lumberjack, at: [5, 1], title: Old Growth, icon: netherite_axe, capstone: true, cost: 3, level: 28, requires: [seasoned], effects: {chop_speed: 20, chop_log_double: 15, chop_wear: 15}}
-  lumberjack_mastery: {branch: lumberjack, at: [6, 1], title: "Lumberjack's Mastery", icon: dark_oak_log, mastery: true, cost: 0, requires: [old_growth], effects: {chop_log_triple: 10}}
+  splitter: {branch: lumberjack, at: [3, 2], title: Splitter, icon: oak_planks, choice: true, cost: 2, level: 12, requires: [woodsman], excludes: [heavy_swing], effects: {chop_log_double: 8}}
+  seasoned: {branch: lumberjack, at: [4, 1], title: Seasoned, icon: diamond_axe, ranks: 2, level: 16, level-step: 4, requires: [heavy_swing, splitter], effects: {chop_log_double: 2, chop_wear: 10}}
+  old_growth: {branch: lumberjack, at: [5, 1], title: Old Growth, icon: netherite_axe, capstone: true, cost: 3, level: 28, requires: [seasoned], effects: {chop_speed: 20, chop_log_double: 4, chop_wear: 15}}
+  lumberjack_mastery: {branch: lumberjack, at: [6, 1], title: "Lumberjack's Mastery", icon: dark_oak_log, mastery: true, cost: 0, requires: [old_growth], effects: {chop_log_triple: 3}}
   forester: {branch: forester, at: [0, 4], title: Forester, icon: oak_sapling, ranks: 3, level: 1, level-step: 2, effects: {chop_sapling: 5}}
   orchard: {branch: forester, at: [1, 3], title: Orchard, icon: apple, ranks: 2, level: 3, level-step: 2, requires: [forester], effects: {chop_apple: 3}}
   twig_gatherer: {branch: forester, at: [1, 5], title: Twig Gatherer, icon: stick, ranks: 2, level: 3, level-step: 2, requires: [forester], effects: {chop_sticks: 10}}

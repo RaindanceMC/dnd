@@ -39,7 +39,7 @@ import static de.raindancer.modules.skills.skill.gathering.SkillValues.get;
 import static de.raindancer.modules.skills.skill.gathering.SkillValues.has;
 
 /**
- * The Mining tree at work: a faster pickaxe, ores the world made dropping twice or three times over and more
+ * The Mining tree at work: a faster pickaxe, ores the world made sometimes dropping twice or three times over — the rarer, the seldomer — and more
  * experience, haste after an ore, night vision deep down, a pickaxe that wears slower and Vein Miner.
  * Only ores the world made count — never one a player placed (Core's {@link PlacedBlocks}) — and never with silk
  * touch, so no ore is ever made out of nothing.
@@ -181,8 +181,9 @@ public final class MiningSkill implements ISkillsListener {
         if (tree.isEmpty() || !gather.multiplies(Hands.silk(player.getInventory().getItemInMainHand()))) {
             return;
         }
-        int times = gather.times(get(tree, MiningEffect.MINE_ORE_DOUBLE), get(tree, MiningEffect.MINE_MOTHERLODE),
-                roll(), roll());
+        Material ore = broken.getType();
+        int times = gather.times(rule.byRarity(get(tree, MiningEffect.MINE_ORE_DOUBLE), ore),
+                rule.byRarity(get(tree, MiningEffect.MINE_MOTHERLODE), ore), roll(), roll());
         if (times > 1) {
             for (Item item : event.getItems()) {
                 ItemStack stack = item.getItemStack();

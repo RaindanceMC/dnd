@@ -20,6 +20,10 @@ sections:
     title: Mastery
     text: |
       Prospector's Mastery: <white>Motherlode</white>, a chance an ore drops three times over. Delver's Mastery: <white>Haste II</white> after an ore instead of Haste I. Veinbreaker's Mastery: <white>Lodestone</white>, a vein's drops and experience come straight into your bag.
+  - question: How often does an ore drop twice?
+    title: Twice over
+    text: |
+      The tree's chance is coal's, copper's, redstone's and quartz's; every other ore gets less, the rarer it is: iron half of it, gold a third, lapis half, diamond an eighth, emerald a tenth, ancient debris a fifteenth. With the whole Prospector branch that is 15% for coal and under 2% for diamonds — Motherlode's three times over is 3% for coal and about 0.4% for diamonds.
   - question: How does Vein Miner work?
     title: Crouching with a pickaxe
     text: |

@@ -22,6 +22,17 @@ class MiningRuleTest {
     }
 
     @Test
+    @DisplayName("the rarer the ore, the smaller its chance to drop twice: the skill's chance over Core's rarity")
+    void rarerOresDoubleLess() {
+        assertThat(rule.byRarity(15, Material.COAL_ORE)).isEqualTo(15);
+        assertThat(rule.byRarity(15, Material.DEEPSLATE_IRON_ORE)).isEqualTo(7.5);
+        assertThat(rule.byRarity(15, Material.DIAMOND_ORE)).isEqualTo(15 / 8.0);
+        assertThat(rule.byRarity(15, Material.ANCIENT_DEBRIS)).isEqualTo(1);
+        assertThat(rule.byRarity(3, Material.EMERALD_ORE)).isLessThan(rule.byRarity(3, Material.GOLD_ORE));
+        assertThat(rule.byRarity(15, Material.STONE)).isZero();
+    }
+
+    @Test
     @DisplayName("haste: seconds to ticks, level II for the delver's mastery, nothing for nothing")
     void haste() {
         assertThat(rule.hasteTicks(6)).isEqualTo(120);

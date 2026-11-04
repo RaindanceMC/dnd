@@ -17,15 +17,15 @@ branches:
     blurb: "Crouch, and the whole vein comes with the first ore."
 
 nodes:
-  ore_finder: {branch: prospector, at: [0, 1], title: Ore Finder, icon: iron_ore, ranks: 3, level: 1, level-step: 2, effects: {mine_ore_double: 4}}
+  ore_finder: {branch: prospector, at: [0, 1], title: Ore Finder, icon: iron_ore, ranks: 3, level: 1, level-step: 2, effects: {mine_ore_double: 1}}
   assayer: {branch: prospector, at: [1, 0], title: Assayer, icon: gold_nugget, ranks: 2, level: 3, level-step: 2, requires: [ore_finder], effects: {mine_ore_xp: 15}}
   keen_assayer: {branch: prospector, at: [1, 2], title: Keen Assayer, icon: compass, ranks: 2, level: 3, level-step: 2, requires: [ore_finder], effects: {mine_ore_xp: 10}}
-  rich_seams: {branch: prospector, at: [2, 1], title: Rich Seams, icon: raw_iron, ranks: 3, level: 6, level-step: 2, requires: [assayer, keen_assayer], effects: {mine_ore_double: 4}}
-  lucky_strike: {branch: prospector, at: [3, 0], title: Lucky Strike, icon: emerald, choice: true, cost: 2, level: 12, requires: [rich_seams], excludes: [deep_reader], effects: {mine_ore_double: 15}}
+  rich_seams: {branch: prospector, at: [2, 1], title: Rich Seams, icon: raw_iron, ranks: 3, level: 6, level-step: 2, requires: [assayer, keen_assayer], effects: {mine_ore_double: 1}}
+  lucky_strike: {branch: prospector, at: [3, 0], title: Lucky Strike, icon: emerald, choice: true, cost: 2, level: 12, requires: [rich_seams], excludes: [deep_reader], effects: {mine_ore_double: 4}}
   deep_reader: {branch: prospector, at: [3, 2], title: Deep Reader, icon: recovery_compass, choice: true, cost: 2, level: 12, requires: [rich_seams], excludes: [lucky_strike], effects: {mine_ore_xp: 50}}
-  gem_eye: {branch: prospector, at: [4, 1], title: Gem Eye, icon: diamond, ranks: 2, level: 16, level-step: 4, requires: [lucky_strike, deep_reader], effects: {mine_ore_double: 5, mine_ore_xp: 10}}
-  gem_cutter: {branch: prospector, at: [5, 1], title: Gem Cutter, icon: amethyst_shard, capstone: true, cost: 3, level: 28, requires: [gem_eye], effects: {mine_ore_double: 10, mine_ore_xp: 30}}
-  prospector_mastery: {branch: prospector, at: [6, 1], title: "Prospector's Mastery", icon: diamond_ore, mastery: true, cost: 0, requires: [gem_cutter], effects: {mine_motherlode: 10}}
+  gem_eye: {branch: prospector, at: [4, 1], title: Gem Eye, icon: diamond, ranks: 2, level: 16, level-step: 4, requires: [lucky_strike, deep_reader], effects: {mine_ore_double: 1, mine_ore_xp: 10}}
+  gem_cutter: {branch: prospector, at: [5, 1], title: Gem Cutter, icon: amethyst_shard, capstone: true, cost: 3, level: 28, requires: [gem_eye], effects: {mine_ore_double: 3, mine_ore_xp: 30}}
+  prospector_mastery: {branch: prospector, at: [6, 1], title: "Prospector's Mastery", icon: diamond_ore, mastery: true, cost: 0, requires: [gem_cutter], effects: {mine_motherlode: 3}}
   tunneler: {branch: delver, at: [0, 4], title: Tunneler, icon: stone_pickaxe, ranks: 3, level: 1, level-step: 2, effects: {mine_speed: 5}}
   nimble_pick: {branch: delver, at: [1, 3], title: Nimble Pick, icon: sugar, ranks: 2, level: 3, level-step: 2, requires: [tunneler], effects: {mine_haste: 2}}
   tempered_pick: {branch: delver, at: [1, 5], title: Tempered Pick, icon: iron_ingot, ranks: 2, level: 3, level-step: 2, requires: [tunneler], effects: {mine_wear: 10}}
