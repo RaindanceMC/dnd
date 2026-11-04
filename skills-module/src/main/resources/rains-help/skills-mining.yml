@@ -1,29 +1,29 @@
 id: skills-mining
 title: Mining
-summary: The Mining skill — a faster pickaxe, ores twice over, Ore Sense, haste and night vision deep down, whole veins at once.
+summary: The Mining skill — a faster pickaxe, ores twice over, haste and night vision deep down, whole veins at once.
 intro: |
   Mining is a skill with a tree of its own: {run:/skills mining}. Points come from your adventurer level, as for every skill.
 icon: IRON_PICKAXE
 category: Progress & rewards
 order: 50
 module: dnd
-aliases: [mining-skill, veinminer, vein-miner, ore-sense, prospector, delver, veinbreaker]
-keywords: [mining, pickaxe, ore, vein, double drops, haste, night vision, ore sense, motherlode, lodestone]
+aliases: [mining-skill, veinminer, vein-miner, prospector, delver, veinbreaker]
+keywords: [mining, pickaxe, ore, vein, double drops, haste, night vision, motherlode, lodestone]
 commands: [skills]
 related: [skills, skills-trees, skills-excavation]
 sections:
   - question: What is in the Mining tree?
     title: Three branches
     text: |
-      <white>Prospector</white>: ores that drop twice over, more experience from ores, <white>Ore Sense</white>; choose Lucky Strike or Deep Reader; capstone Gem Cutter. <white>Delver</white>: a faster pickaxe that wears slower, Haste after an ore; choose Ore Rush or <white>Deep Sight</white> (night vision below height 0); capstone Deep Delver. <white>Veinbreaker</white>: <white>Vein Miner</white> and a pickaxe the vein wears less; choose Wide Vein or Careful Vein; capstone Heart of the Mountain.
+      <white>Prospector</white>: ores that drop twice over, more experience from ores; choose Lucky Strike or Deep Reader; capstone Gem Cutter. <white>Delver</white>: a faster pickaxe that wears slower, Haste after an ore; choose Ore Rush or <white>Deep Sight</white> (night vision below height 0); capstone Deep Delver. <white>Veinbreaker</white>: <white>Vein Miner</white> and a pickaxe the vein wears less; choose Wide Vein or Careful Vein; capstone Heart of the Mountain.
   - question: What do the mastery badges bring?
     title: Mastery
     text: |
       Prospector's Mastery: <white>Motherlode</white>, a chance an ore drops three times over. Delver's Mastery: <white>Haste II</white> after an ore instead of Haste I. Veinbreaker's Mastery: <white>Lodestone</white>, a vein's drops and experience come straight into your bag.
-  - question: How do Vein Miner and Ore Sense work?
+  - question: How does Vein Miner work?
     title: Crouching with a pickaxe
     text: |
-      <white>Vein Miner</white>: crouch while you break an ore and the rest of its vein — deepslate or not, up to as many more ores as your tree says, no further than eight blocks — comes with it, each block a real break that wears the pickaxe. It stops before the pickaxe would break. <white>Ore Sense</white>: crouch with a pickaxe in your hand; the nearest ore within reach sparks for you alone, once every five seconds.
+      <white>Vein Miner</white>: crouch while you break an ore and the rest of its vein — deepslate or not, up to as many more ores as your tree says, no further than eight blocks — comes with it, each block a real break that wears the pickaxe. It stops before the pickaxe would break.
   - question: Can I farm it with placed ore?
     title: Only the world's ore
     text: |

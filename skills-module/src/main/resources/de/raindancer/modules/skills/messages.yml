@@ -57,9 +57,6 @@ dnd:
     second-wind: "<green>Second Wind!</green> <gray>You catch your breath and fight on."
     undying: "<gold>Undying!</gold> <gray>A blow that should have killed you leaves you standing."
 
-  mining:
-    sensed: "<gray>Ore Sense: <white><ore></white> <white><distance></white> blocks away — look for the sparks."
-    sensed-nothing: "<gray>Ore Sense: no ore within <white><radius></white> blocks."
 
   excavation:
     treasure: "<gold>Treasure!</gold> <gray><white><amount>× <item></white> in the dirt."

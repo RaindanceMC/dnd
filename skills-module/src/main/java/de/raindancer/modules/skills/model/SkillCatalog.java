@@ -24,7 +24,7 @@ public final class SkillCatalog {
             "Scrolls, wands and potions at their full strength — and more to find.", FIGHTING);
 
     public static final SkillDef MINING = new SkillDef("mining", "Mining", Material.IRON_PICKAXE, 20, "⛏",
-            "A faster pickaxe, ores twice over, whole veins at once and a nose for ore.",
+            "A faster pickaxe, ores twice over, whole veins at once and eyes for the dark.",
             List.of(de.raindancer.modules.skills.skill.mining.MiningEffect.values()));
     public static final SkillDef EXCAVATION = new SkillDef("excavation", "Excavation", Material.IRON_SHOVEL, 21, "⚱",
             "A faster shovel, treasures in the dirt and luck under the brush.",

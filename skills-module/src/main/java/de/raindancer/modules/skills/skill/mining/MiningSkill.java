@@ -1,10 +1,6 @@
 package de.raindancer.modules.skills.skill.mining;
 
-import de.raindancer.core.platform.util.Cooldowns;
 import de.raindancer.core.platform.util.Scheduling;
-import de.raindancer.core.ui.actionbar.ActionBarPriority;
-import de.raindancer.core.ui.effect.Cues;
-import de.raindancer.core.world.activity.Ores;
 import de.raindancer.core.world.blocks.PlacedBlocks;
 import de.raindancer.modules.skills.SkillsServices;
 import de.raindancer.modules.skills.listener.ISkillsListener;
@@ -12,12 +8,10 @@ import de.raindancer.modules.skills.skill.gathering.ConnectedRule;
 import de.raindancer.modules.skills.skill.gathering.GatherRule;
 import de.raindancer.modules.skills.skill.gathering.Hands;
 import de.raindancer.modules.skills.skill.gathering.NaturalBreaks;
-import de.raindancer.modules.skills.skill.gathering.Sense;
 import de.raindancer.modules.skills.skill.gathering.SkillValues;
 import de.raindancer.modules.skills.skill.gathering.Spot;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -29,12 +23,10 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,14 +40,13 @@ import static de.raindancer.modules.skills.skill.gathering.SkillValues.has;
 
 /**
  * The Mining tree at work: a faster pickaxe, ores the world made dropping twice or three times over and more
- * experience, haste after an ore, night vision deep down, a pickaxe that wears slower, Ore Sense and Vein Miner.
+ * experience, haste after an ore, night vision deep down, a pickaxe that wears slower and Vein Miner.
  * Only ores the world made count — never one a player placed (Core's {@link PlacedBlocks}) — and never with silk
  * touch, so no ore is ever made out of nothing.
  */
 public final class MiningSkill implements ISkillsListener {
 
     static final NamespacedKey SPEED = Hands.key("mining_speed");
-    private static final Duration SENSE_EVERY = Duration.ofSeconds(5);
 
     private final SkillsServices services;
     private final SkillValues values;
@@ -63,7 +54,6 @@ public final class MiningSkill implements ISkillsListener {
     private final MiningRule rule = new MiningRule();
     private final GatherRule gather = new GatherRule();
     private final ConnectedRule connected = new ConnectedRule();
-    private final Cooldowns<UUID> sensing;
     /** Players whose vein is being mined right now: those breaks start no vein of their own. */
     private final Set<UUID> veining = ConcurrentHashMap.newKeySet();
 
@@ -71,8 +61,6 @@ public final class MiningSkill implements ISkillsListener {
         this.services = services;
         this.values = values;
         this.natural = natural;
-        this.sensing = new Cooldowns<>(System::currentTimeMillis);
-        this.sensing.every(SENSE_EVERY);
     }
 
     private static double roll() {
@@ -237,36 +225,6 @@ public final class MiningSkill implements ISkillsListener {
         }
     }
 
-    /** Ore Sense: crouching with a pickaxe shows the nearest ore the world made. */
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onCrouch(PlayerToggleSneakEvent event) {
-        Player player = event.getPlayer();
-        if (!event.isSneaking() || !pickaxe(player.getInventory().getItemInMainHand())) {
-            return;
-        }
-        int radius = rule.senseRadius(get(values.of(player), MiningEffect.MINE_SENSE));
-        if (radius <= 0 || !sensing.tryUse(player.getUniqueId())) {
-            return;
-        }
-        Block feet = player.getLocation().getBlock();
-        var found = Sense.nearest(feet, radius, block -> rule.ore(block.getType()) && !PlacedBlocks.isPlaced(block));
-        var messages = services.messages();
-        if (found.isEmpty()) {
-            services.core().actionBars().show(player.getUniqueId(), "dnd-mining",
-                    messages.get("dnd.mining.sensed-nothing", "radius", String.valueOf(radius)),
-                    Duration.ofSeconds(3), ActionBarPriority.LOW);
-            return;
-        }
-        Block ore = found.get();
-        Sense.show(services.plugin(), player, ore, Particle.WAX_OFF);
-        services.effects().play(player.getUniqueId(), Cues.NOTIFY);
-        services.core().actionBars().show(player.getUniqueId(), "dnd-mining", messages.get("dnd.mining.sensed",
-                        "ore", Ores.oreOf(ore.getType()).orElse("ore").replace('_', ' '),
-                        "distance", String.valueOf(Math.round(Math.sqrt(ore.getLocation().distanceSquared(
-                                feet.getLocation()))))),
-                Duration.ofSeconds(4), ActionBarPriority.LOW);
-    }
-
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         forget(event.getPlayer().getUniqueId());
@@ -275,6 +233,5 @@ public final class MiningSkill implements ISkillsListener {
     @Override
     public void forget(UUID player) {
         veining.remove(player);
-        sensing.forget(player);
     }
 }

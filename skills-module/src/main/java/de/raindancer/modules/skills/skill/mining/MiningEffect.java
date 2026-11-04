@@ -11,7 +11,6 @@ public enum MiningEffect implements Effect {
     MINE_SPEED("%s%% faster mining with a pickaxe", 80),
     MINE_ORE_DOUBLE("%s%% chance an ore drops twice over", 60),
     MINE_ORE_XP("%s%% more experience from ores", 150),
-    MINE_SENSE("Ore Sense: crouch with a pickaxe to sense the nearest ore within %s blocks", 12),
     MINE_HASTE("Haste for %s second(s) after mining an ore", 12),
     MINE_WEAR("%s%% chance a pickaxe is not worn by a block", 60),
     MINE_VEIN("Vein Miner: crouch to mine up to %s more ores of the vein at once", 32),

@@ -6,7 +6,7 @@ import org.bukkit.Material;
 
 import java.util.Optional;
 
-/** The Mining skill's sums: what a vein is, haste, night vision deep down, how far ore sense looks. */
+/** The Mining skill's sums: what a vein is, haste, night vision deep down. */
 public final class MiningRule implements ISkillsRule {
 
     /** Night vision lent deep down, in ticks; topped up before the game starts to flicker it (ten seconds). */
@@ -14,7 +14,6 @@ public final class MiningRule implements ISkillsRule {
     private static final int NIGHT_VISION_TOP_UP = 220;
     /** A vein is followed no further than this from the first ore. */
     public static final int VEIN_REACH = 8;
-    private static final int MOST_SENSE = 12;
 
     public boolean ore(Material block) {
         return Ores.oreOf(block).isPresent();
@@ -52,10 +51,6 @@ public final class MiningRule implements ISkillsRule {
         return ticksLeft < NIGHT_VISION_TOP_UP;
     }
 
-    public int senseRadius(double value) {
-        return (int) Math.max(0, Math.min(MOST_SENSE, Math.floor(value)));
-    }
-
     /** A vein goes on only while the pickaxe has more than a point or two left. */
     public boolean mayVeinOn(int maxDurability, int damage) {
         return maxDurability <= 0 || maxDurability - damage > 2;
@@ -63,6 +58,6 @@ public final class MiningRule implements ISkillsRule {
 
     @Override
     public String describe() {
-        return "what a vein is, haste after ore, night vision deep down and how far ore sense looks";
+        return "what a vein is, haste after ore, night vision deep down";
     }
 }

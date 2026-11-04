@@ -46,14 +46,6 @@ class MiningRuleTest {
     }
 
     @Test
-    @DisplayName("ore sense looks no further than twelve blocks, however many ranks")
-    void sense() {
-        assertThat(rule.senseRadius(8)).isEqualTo(8);
-        assertThat(rule.senseRadius(40)).isEqualTo(12);
-        assertThat(rule.senseRadius(0)).isZero();
-    }
-
-    @Test
     @DisplayName("a vein never takes the last of a pickaxe's durability")
     void veinStopsBeforeThePickBreaks() {
         assertThat(rule.mayVeinOn(1561, 1500)).isTrue();
