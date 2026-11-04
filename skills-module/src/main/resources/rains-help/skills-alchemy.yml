@@ -1,0 +1,22 @@
+id: skills-alchemy
+title: Alchemy
+summary: The Alchemy skill — potions that last longer and come out stronger, faster stands, a spare potion, ingredients saved.
+intro: |
+  The brewing stand is your workbench. {run:/skills alchemy} shows the tree.
+icon: BREWING_STAND
+category: Progress & rewards
+order: 51
+module: dnd
+aliases: [alchemy, alchemist, brewing, potions, bottomless-flask, catalyst]
+keywords: [alchemy, brewing, potion, splash, lingering, duration, stronger, ingredient, blaze powder, brewing stand]
+commands: [skills]
+related: [skills, skills-trees]
+sections:
+  - question: What does Potency give?
+    title: Potency
+    text: |
+      Potions you brew last longer and may come out a level stronger. It is written on the potion — it says so under its name — so it works for whoever drinks or throws it, splash and lingering ones too. The choice is Concentrate (stronger more often) or Distil (much longer), the capstone Grand Alchemist, the mastery badge <gold>Bottomless Flask</gold>: one potion in three you drink is still full afterwards.
+  - question: What does the Apparatus give?
+    title: Apparatus
+    text: |
+      A brewing stand you opened last brews faster, may fill an empty bottle slot with one more potion, and may not use up its ingredient. The choice is Overflow (spare potions more often) or Thrifty (ingredients saved more often), the capstone Master of the Stand, the mastery badge <gold>Catalyst</gold>: the stand burns no blaze powder.

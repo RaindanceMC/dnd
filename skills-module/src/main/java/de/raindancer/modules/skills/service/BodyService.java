@@ -104,7 +104,8 @@ public final class BodyService implements ISkillsService {
         clampHealth(player);
     }
 
-    private static void set(LivingEntity entity, Attribute attribute, NamespacedKey key, double amount,
+    /** Lends a transient modifier under {@code key}, or takes it off for 0; nothing is ever saved into the entity. */
+    public static void set(LivingEntity entity, Attribute attribute, NamespacedKey key, double amount,
                             AttributeModifier.Operation operation) {
         AttributeInstance instance = entity.getAttribute(attribute);
         if (instance == null) {
@@ -122,7 +123,7 @@ public final class BodyService implements ISkillsService {
         }
     }
 
-    private static void clampHealth(LivingEntity entity) {
+    public static void clampHealth(LivingEntity entity) {
         AttributeInstance max = entity.getAttribute(Attribute.MAX_HEALTH);
         if (max != null && entity.getHealth() > max.getValue()) {
             entity.setHealth(max.getValue());

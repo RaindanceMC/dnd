@@ -1,5 +1,10 @@
 package de.raindancer.modules.skills.model;
 
+import de.raindancer.modules.skills.skill.alchemy.AlchemyEffect;
+import de.raindancer.modules.skills.skill.cooking.CookingEffect;
+import de.raindancer.modules.skills.skill.farming.FarmingEffect;
+import de.raindancer.modules.skills.skill.foraging.ForagingEffect;
+import de.raindancer.modules.skills.skill.taming.TamingEffect;
 import org.bukkit.Material;
 
 import java.util.HashMap;
@@ -22,8 +27,24 @@ public final class SkillCatalog {
             "Quick feet, blows that miss you, knives in the back.", FIGHTING);
     public static final SkillDef MAGIC = new SkillDef("magic", "Magic", Material.ENCHANTED_BOOK, 14, "✧",
             "Scrolls, wands and potions at their full strength — and more to find.", FIGHTING);
+    public static final SkillDef FARMING = new SkillDef("farming", "Farming", Material.WHEAT, 18, "☘",
+            "Fuller harvests, crops that plant and grow themselves, twins in the pasture.",
+            List.of(FarmingEffect.values()));
+    public static final SkillDef FORAGING = new SkillDef("foraging", "Foraging", Material.SWEET_BERRIES, 19, "✿",
+            "Berries, flowers and mushrooms: more of them, rare finds, bone meal that goes further.",
+            List.of(ForagingEffect.values()));
+    public static final SkillDef ALCHEMY = new SkillDef("alchemy", "Alchemy", Material.BREWING_STAND, 24, "⚗",
+            "Potions that last longer and hit harder, a spare from the stand, ingredients saved.",
+            List.of(AlchemyEffect.values()));
+    public static final SkillDef COOKING = new SkillDef("cooking", "Cooking", Material.CAMPFIRE, 25, "♨",
+            "Meals that fill more and bless you, extra servings, a furnace that hurries.",
+            List.of(CookingEffect.values()));
+    public static final SkillDef TAMING = new SkillDef("taming", "Taming", Material.LEAD, 26, "♞",
+            "Wolves and cats that bite harder and live longer, horses that run, leap and never fall.",
+            List.of(TamingEffect.values()));
 
-    private static final List<SkillDef> ALL = List.of(DEFENSE, MELEE, ARCHERY, AGILITY, MAGIC);
+    private static final List<SkillDef> ALL = List.of(DEFENSE, MELEE, ARCHERY, AGILITY, MAGIC, FARMING, FORAGING,
+            ALCHEMY, COOKING, TAMING);
 
     /** Which skill holds each node id: for ranks kept before there were skills, by node id alone. */
     private static volatile Map<String, SkillDef> owners;

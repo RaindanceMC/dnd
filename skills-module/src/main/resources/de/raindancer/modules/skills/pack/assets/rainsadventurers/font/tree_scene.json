@@ -46,6 +46,96 @@
    ]
   },
   {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/fields.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue005"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/pasture.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue006"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/gatherer.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue007"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/herbalist.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue008"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/kitchen.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue009"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/table.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue00a"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/potency.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue00b"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/apparatus.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue00c"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/pack.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue00d"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/stable.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue00e"
+   ]
+  },
+  {
    "type": "space",
    "advances": {
     "\uf808": -8,

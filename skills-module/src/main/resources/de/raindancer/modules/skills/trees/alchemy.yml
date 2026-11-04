@@ -1,0 +1,38 @@
+# The Alchemy skill's tree, read by Core's SkillTree (see SkillDef): 2 branches stacked on the canvas, three rows
+# each, every one with a choice, a capstone and a free mastery badge. Node ids are unique across every skill.
+branches:
+  potency:
+    title: Potency
+    icon: dragon_breath
+    blurb: Potions that last longer and come out a level stronger, and a flask that refills.
+  apparatus:
+    title: Apparatus
+    icon: brewing_stand
+    blurb: Stands that brew faster, a spare potion, ingredients and blaze powder saved.
+
+nodes:
+  steady_hand: {branch: potency, at: [0, 1], title: "Steady Hand", icon: glass_bottle, ranks: 3, level: 1, level-step: 2, effects: {brew_duration: 5}}
+  strong_mix: {branch: potency, at: [1, 0], title: "Strong Mix", icon: glowstone_dust, ranks: 2, level: 3, level-step: 2, requires: [steady_hand], effects: {brew_potency: 5}}
+  slow_release: {branch: potency, at: [1, 1], title: "Slow Release", icon: redstone, ranks: 2, level: 3, level-step: 2, requires: [steady_hand], effects: {brew_duration: 5}}
+  long_steep: {branch: potency, at: [1, 2], title: "Long Steep", icon: clock, ranks: 2, level: 3, level-step: 2, requires: [steady_hand], effects: {brew_duration: 5}}
+  concentrate: {branch: potency, at: [2, 0], title: "Concentrate", icon: ghast_tear, choice: true, cost: 2, level: 8, requires: [strong_mix], excludes: [distil], effects: {brew_potency: 15}}
+  tincture: {branch: potency, at: [2, 1], title: "Tincture", icon: fermented_spider_eye, ranks: 2, level: 6, level-step: 2, requires: [slow_release], effects: {brew_duration: 5}}
+  distil: {branch: potency, at: [2, 2], title: "Distil", icon: dragon_breath, choice: true, cost: 2, level: 8, requires: [long_steep], excludes: [concentrate], effects: {brew_duration: 25}}
+  potent_brew: {branch: potency, at: [3, 0], title: "Potent Brew", icon: magma_cream, ranks: 2, level: 12, level-step: 3, requires: [concentrate, tincture], effects: {brew_potency: 5}}
+  elixir: {branch: potency, at: [3, 1], title: "Elixir", icon: glistering_melon_slice, level: 12, requires: [tincture], effects: {brew_duration: 5}}
+  lasting_draught: {branch: potency, at: [3, 2], title: "Lasting Draught", icon: redstone_block, ranks: 2, level: 12, level-step: 3, requires: [distil, tincture], effects: {brew_duration: 10}}
+  grand_alchemist: {branch: potency, at: [4, 1], title: "Grand Alchemist", icon: experience_bottle, capstone: true, cost: 3, level: 25, requires: [potent_brew, elixir, lasting_draught], effects: {brew_potency: 10, brew_duration: 10}}
+  bottomless_flask: {branch: potency, at: [5, 1], title: "Bottomless Flask", icon: potion, mastery: true, cost: 0, requires: [grand_alchemist], effects: {brew_bottomless: 1, brew_duration: 5}}
+
+  quick_stir: {branch: apparatus, at: [0, 4], title: "Quick Stir", icon: blaze_rod, ranks: 3, level: 1, level-step: 2, effects: {brew_speed: 10}}
+  spare_bottle: {branch: apparatus, at: [1, 3], title: "Spare Bottle", icon: glass, ranks: 2, level: 3, level-step: 2, requires: [quick_stir], effects: {brew_extra: 8}}
+  hot_burner: {branch: apparatus, at: [1, 4], title: "Hot Burner", icon: fire_charge, ranks: 2, level: 3, level-step: 2, requires: [quick_stir], effects: {brew_speed: 10}}
+  frugal: {branch: apparatus, at: [1, 5], title: "Frugal", icon: nether_wart, ranks: 2, level: 3, level-step: 2, requires: [quick_stir], effects: {brew_thrift: 5}}
+  overflow: {branch: apparatus, at: [2, 3], title: "Overflow", icon: splash_potion, choice: true, cost: 2, level: 8, requires: [spare_bottle], excludes: [thrifty], effects: {brew_extra: 20}}
+  fast_boil: {branch: apparatus, at: [2, 4], title: "Fast Boil", icon: lava_bucket, ranks: 2, level: 6, level-step: 2, requires: [hot_burner], effects: {brew_speed: 10}}
+  thrifty: {branch: apparatus, at: [2, 5], title: "Thrifty", icon: gold_nugget, choice: true, cost: 2, level: 8, requires: [frugal], excludes: [overflow], effects: {brew_thrift: 15}}
+  brimming: {branch: apparatus, at: [3, 3], title: "Brimming", icon: lingering_potion, ranks: 2, level: 12, level-step: 3, requires: [overflow, fast_boil], effects: {brew_extra: 8}}
+  clockwork_stand: {branch: apparatus, at: [3, 4], title: "Clockwork Stand", icon: repeater, level: 12, requires: [fast_boil], effects: {brew_speed: 15}}
+  penny_pincher: {branch: apparatus, at: [3, 5], title: "Penny Pincher", icon: iron_nugget, ranks: 2, level: 12, level-step: 3, requires: [thrifty, fast_boil], effects: {brew_thrift: 5}}
+  master_of_the_stand: {branch: apparatus, at: [4, 4], title: "Master of the Stand", icon: brewing_stand, capstone: true, cost: 3, level: 25, requires: [brimming, clockwork_stand, penny_pincher], effects: {brew_extra: 10, brew_thrift: 5, brew_speed: 10}}
+  catalyst: {branch: apparatus, at: [5, 4], title: "Catalyst", icon: nether_star, mastery: true, cost: 0, requires: [master_of_the_stand], effects: {brew_catalyst: 1, brew_speed: 5}}

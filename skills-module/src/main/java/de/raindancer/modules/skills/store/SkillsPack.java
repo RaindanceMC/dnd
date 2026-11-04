@@ -69,7 +69,8 @@ public final class SkillsPack {
     public static final de.raindancer.core.ui.tree.TreeLook TREE_LOOK =
             new de.raindancer.core.ui.tree.TreeLook(net.kyori.adventure.key.Key.key(NAMESPACE, "tree"));
     /** The branches' paintings, in this order from U+E000 in the font rainsadventurers:tree_scene. */
-    static final List<String> SCENES = List.of("vitality", "might", "marksman", "shadow", "arcana");
+    static final List<String> SCENES = List.of("vitality", "might", "marksman", "shadow", "arcana",
+            "fields", "pasture", "gatherer", "herbalist", "kitchen", "table", "potency", "apparatus", "pack", "stable");
     private static final net.kyori.adventure.text.format.TextColor TREE_INK =
             net.kyori.adventure.text.format.TextColor.color(0xF1E4C6);
 

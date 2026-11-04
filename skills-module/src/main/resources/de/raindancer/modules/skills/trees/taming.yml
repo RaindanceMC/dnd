@@ -1,0 +1,38 @@
+# The Taming skill's tree, read by Core's SkillTree (see SkillDef): 2 branches stacked on the canvas, three rows
+# each, every one with a choice, a capstone and a free mastery badge. Node ids are unique across every skill.
+branches:
+  pack:
+    title: Pack
+    icon: bone
+    blurb: Wolves and cats that bite harder, live longer, mend at your side and never leave you.
+  stable:
+    title: Stable
+    icon: saddle
+    blurb: Horses broken in quickly that run faster, leap higher, shrug off blows and falls.
+
+nodes:
+  animal_friend: {branch: pack, at: [0, 1], title: "Animal Friend", icon: bone, ranks: 3, level: 1, level-step: 2, effects: {tame_quick: 15}}
+  sharp_fangs: {branch: pack, at: [1, 0], title: "Sharp Fangs", icon: iron_sword, ranks: 2, level: 3, level-step: 2, requires: [animal_friend], effects: {tame_damage: 10}}
+  well_fed: {branch: pack, at: [1, 1], title: "Well Fed", icon: cooked_porkchop, ranks: 3, level: 3, level-step: 2, requires: [animal_friend], effects: {tame_hearts: 1}}
+  thick_fur: {branch: pack, at: [1, 2], title: "Thick Fur", icon: leather_chestplate, ranks: 2, level: 3, level-step: 2, requires: [animal_friend], effects: {tame_guard: 5}}
+  alpha: {branch: pack, at: [2, 0], title: "Alpha", icon: wolf_armor, choice: true, cost: 2, level: 8, requires: [sharp_fangs], excludes: [guardian], effects: {tame_damage: 30}}
+  licked_wounds: {branch: pack, at: [2, 1], title: "Licked Wounds", icon: cooked_salmon, ranks: 2, level: 6, level-step: 2, requires: [well_fed], effects: {tame_mend: 1}}
+  guardian: {branch: pack, at: [2, 2], title: "Guardian", icon: shield, choice: true, cost: 2, level: 8, requires: [thick_fur], excludes: [alpha], effects: {tame_guard: 20}}
+  pack_hunter: {branch: pack, at: [3, 0], title: "Pack Hunter", icon: rabbit_hide, ranks: 2, level: 12, level-step: 3, requires: [alpha, licked_wounds], effects: {tame_damage: 10}}
+  beast_whisperer: {branch: pack, at: [3, 1], title: "Beast Whisperer", icon: cod, ranks: 2, level: 12, level-step: 3, requires: [licked_wounds], effects: {tame_quick: 15}}
+  hardy_pets: {branch: pack, at: [3, 2], title: "Hardy Pets", icon: chainmail_chestplate, ranks: 2, level: 12, level-step: 3, requires: [guardian, licked_wounds], effects: {tame_hearts: 1}}
+  packleader: {branch: pack, at: [4, 1], title: "Packleader", icon: goat_horn, capstone: true, cost: 3, level: 25, requires: [pack_hunter, beast_whisperer, hardy_pets], effects: {tame_damage: 10, tame_hearts: 2, tame_mend: 1}}
+  loyal_to_the_end: {branch: pack, at: [5, 1], title: "Loyal to the End", icon: totem_of_undying, mastery: true, cost: 0, requires: [packleader], effects: {tame_loyal: 1, tame_mend: 1}}
+
+  horse_sense: {branch: stable, at: [0, 4], title: "Horse Sense", icon: saddle, ranks: 2, level: 1, level-step: 2, effects: {tame_horse_speed: 5}}
+  spring_step: {branch: stable, at: [1, 3], title: "Spring Step", icon: slime_ball, ranks: 2, level: 3, level-step: 2, requires: [horse_sense], effects: {tame_horse_jump: 10}}
+  gentle_hand: {branch: stable, at: [1, 4], title: "Gentle Hand", icon: apple, ranks: 2, level: 3, level-step: 2, requires: [horse_sense], effects: {tame_quick: 10}}
+  barding: {branch: stable, at: [1, 5], title: "Barding", icon: leather_horse_armor, ranks: 2, level: 3, level-step: 2, requires: [horse_sense], effects: {tame_horse_guard: 10}}
+  courser: {branch: stable, at: [2, 3], title: "Courser", icon: golden_horse_armor, choice: true, cost: 2, level: 8, requires: [spring_step], excludes: [warhorse], effects: {tame_horse_speed: 15}}
+  long_rides: {branch: stable, at: [2, 4], title: "Long Rides", icon: compass, ranks: 2, level: 6, level-step: 2, requires: [gentle_hand], effects: {tame_horse_speed: 5}}
+  warhorse: {branch: stable, at: [2, 5], title: "Warhorse", icon: iron_horse_armor, choice: true, cost: 2, level: 8, requires: [barding], excludes: [courser], effects: {tame_horse_guard: 25}}
+  high_leaps: {branch: stable, at: [3, 3], title: "High Leaps", icon: feather, ranks: 2, level: 12, level-step: 3, requires: [courser, long_rides], effects: {tame_horse_jump: 10}}
+  gallop: {branch: stable, at: [3, 4], title: "Gallop", icon: sugar, ranks: 2, level: 12, level-step: 3, requires: [long_rides], effects: {tame_horse_speed: 5}}
+  stalwart: {branch: stable, at: [3, 5], title: "Stalwart", icon: diamond_horse_armor, level: 12, requires: [warhorse, long_rides], effects: {tame_horse_guard: 10}}
+  horse_lord: {branch: stable, at: [4, 4], title: "Horse Lord", icon: golden_carrot, capstone: true, cost: 3, level: 25, requires: [high_leaps, gallop, stalwart], effects: {tame_horse_speed: 5, tame_horse_jump: 10, tame_horse_guard: 5}}
+  windrider: {branch: stable, at: [5, 4], title: "Windrider", icon: phantom_membrane, mastery: true, cost: 0, requires: [horse_lord], effects: {tame_windrider: 1, tame_horse_jump: 10}}

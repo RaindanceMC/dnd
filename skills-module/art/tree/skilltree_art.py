@@ -18,12 +18,13 @@ sys.path.insert(0, CORE_ART)
 from canvas import (Canvas, W, chest_well, inventory_well, hotbar_well, label_y, height, mix, wood, well,  # noqa: E402
                     vignette, shade)
 import tree as core_tree  # noqa: E402
+import nature_scenes  # noqa: E402
 
 PACK = os.path.join(HERE, "..", "..", "src", "main", "resources", "de", "raindancer", "modules", "skills", "pack")
 NS = "rainsadventurers"
 ASSETS = os.path.join(PACK, "assets", NS)
 ROWS = 6
-SCENES = ["vitality", "might", "marksman", "shadow", "arcana"]
+SCENES = ["vitality", "might", "marksman", "shadow", "arcana"] + nature_scenes.SCENES
 
 GOLD = (222, 176, 64)
 GOLD_DARK = (122, 82, 22)
@@ -294,7 +295,7 @@ def scene_arcana(seed=5):
     return c
 
 
-PAINTERS = [scene_vitality, scene_might, scene_marksman, scene_shadow, scene_arcana]
+PAINTERS = [scene_vitality, scene_might, scene_marksman, scene_shadow, scene_arcana] + nature_scenes.PAINTERS
 
 
 def write_scenes():

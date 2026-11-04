@@ -56,3 +56,12 @@ dnd:
     dodged: "<gray>Dodged!"
     second-wind: "<green>Second Wind!</green> <gray>You catch your breath and fight on."
     undying: "<gold>Undying!</gold> <gray>A blow that should have killed you leaves you standing."
+
+  nature:
+    rare-find: "<gold>A rare find:</gold> <white><item>"
+    feast: "<gold><player></gold> <gray>shares the meal with you."
+    brew-longer: "<!italic><dark_purple>Brewed with care: lasts <percent>% longer"
+    brew-stronger: "<!italic><dark_purple>Brewed with care: a level stronger"
+    bottomless: "<light_purple>The flask is still full."
+    tamed: "<green>It trusts you at once."
+    loyal: "<gold><pet></gold> <gray>clings on and runs to you."

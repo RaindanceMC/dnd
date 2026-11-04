@@ -1,0 +1,38 @@
+# The Farming skill's tree, read by Core's SkillTree (see SkillDef): 2 branches stacked on the canvas, three rows
+# each, every one with a choice, a capstone and a free mastery badge. Node ids are unique across every skill.
+branches:
+  fields:
+    title: Fields
+    icon: wheat
+    blurb: Fuller harvests, crops that grow faster around you and plant themselves again.
+  pasture:
+    title: Pasture
+    icon: lead
+    blurb: Twins, quicker lambs and calves, more from every animal and every sheep.
+
+nodes:
+  furrows: {branch: fields, at: [0, 1], title: "Furrows", icon: wheat_seeds, ranks: 3, level: 1, level-step: 2, effects: {farm_yield: 5}}
+  calloused_hands: {branch: fields, at: [1, 0], title: "Calloused Hands", icon: wooden_hoe, ranks: 3, level: 3, level-step: 2, requires: [furrows], effects: {farm_hoe: 10}}
+  sun_and_rain: {branch: fields, at: [1, 1], title: "Sun and Rain", icon: water_bucket, ranks: 3, level: 3, level-step: 2, requires: [furrows], effects: {farm_growth: 10}}
+  rich_soil: {branch: fields, at: [1, 2], title: "Rich Soil", icon: bone_meal, ranks: 2, level: 3, level-step: 2, requires: [furrows], effects: {farm_yield: 5}}
+  green_thumb: {branch: fields, at: [2, 0], title: "Green Thumb", icon: beetroot_seeds, choice: true, cost: 2, level: 8, requires: [calloused_hands], excludes: [bountiful], effects: {farm_replant: 1}}
+  tended_rows: {branch: fields, at: [2, 1], title: "Tended Rows", icon: composter, ranks: 2, level: 6, level-step: 2, requires: [sun_and_rain], effects: {farm_growth: 10}}
+  bountiful: {branch: fields, at: [2, 2], title: "Bountiful", icon: hay_block, choice: true, cost: 2, level: 8, requires: [rich_soil], excludes: [green_thumb], effects: {farm_yield: 15}}
+  steel_hoe: {branch: fields, at: [3, 0], title: "Steel Hoe", icon: iron_hoe, ranks: 2, level: 12, level-step: 3, requires: [green_thumb, tended_rows], effects: {farm_hoe: 15}}
+  lush_fields: {branch: fields, at: [3, 1], title: "Lush Fields", icon: moss_block, ranks: 2, level: 12, level-step: 3, requires: [tended_rows], effects: {farm_growth: 15}}
+  full_baskets: {branch: fields, at: [3, 2], title: "Full Baskets", icon: carrot, ranks: 2, level: 12, level-step: 3, requires: [bountiful, tended_rows], effects: {farm_yield: 10}}
+  harvest_moon: {branch: fields, at: [4, 1], title: "Harvest Moon", icon: golden_carrot, capstone: true, cost: 3, level: 25, requires: [steel_hoe, lush_fields, full_baskets], effects: {farm_yield: 20, farm_growth: 20}}
+  reaper: {branch: fields, at: [5, 1], title: "Reaper", icon: diamond_hoe, mastery: true, cost: 0, requires: [harvest_moon], effects: {farm_reaper: 1, farm_yield: 10}}
+
+  herdsman: {branch: pasture, at: [0, 4], title: "Herdsman", icon: wheat, ranks: 2, level: 1, level-step: 2, effects: {farm_twins: 5}}
+  shepherd: {branch: pasture, at: [1, 3], title: "Shepherd", icon: shears, ranks: 2, level: 3, level-step: 2, requires: [herdsman], effects: {farm_shear: 25}}
+  butcher: {branch: pasture, at: [1, 4], title: "Butcher", icon: beef, ranks: 3, level: 3, level-step: 2, requires: [herdsman], effects: {farm_animal_drops: 10}}
+  nursery: {branch: pasture, at: [1, 5], title: "Nursery", icon: egg, ranks: 3, level: 3, level-step: 2, requires: [herdsman], effects: {farm_grow_up: 15}}
+  twin_births: {branch: pasture, at: [2, 3], title: "Twin Births", icon: lead, choice: true, cost: 2, level: 8, requires: [shepherd], excludes: [prime_cuts], effects: {farm_twins: 15}}
+  fattened_stock: {branch: pasture, at: [2, 4], title: "Fattened Stock", icon: porkchop, ranks: 2, level: 6, level-step: 2, requires: [butcher], effects: {farm_animal_drops: 10}}
+  prime_cuts: {branch: pasture, at: [2, 5], title: "Prime Cuts", icon: cooked_beef, choice: true, cost: 2, level: 8, requires: [nursery], excludes: [twin_births], effects: {farm_animal_drops: 25}}
+  fine_fleece: {branch: pasture, at: [3, 3], title: "Fine Fleece", icon: white_wool, ranks: 2, level: 12, level-step: 3, requires: [twin_births, fattened_stock], effects: {farm_shear: 25}}
+  big_litters: {branch: pasture, at: [3, 4], title: "Big Litters", icon: rabbit_foot, ranks: 2, level: 12, level-step: 3, requires: [fattened_stock], effects: {farm_twins: 5}}
+  quick_weaning: {branch: pasture, at: [3, 5], title: "Quick Weaning", icon: milk_bucket, ranks: 2, level: 12, level-step: 3, requires: [prime_cuts, fattened_stock], effects: {farm_grow_up: 15}}
+  land_of_plenty: {branch: pasture, at: [4, 4], title: "Land of Plenty", icon: golden_apple, capstone: true, cost: 3, level: 25, requires: [fine_fleece, big_litters, quick_weaning], effects: {farm_twins: 10, farm_animal_drops: 15}}
+  herdmaster: {branch: pasture, at: [5, 4], title: "Herdmaster", icon: leather, mastery: true, cost: 0, requires: [land_of_plenty], effects: {farm_plenty: 1, farm_twins: 5}}
