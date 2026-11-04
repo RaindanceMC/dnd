@@ -23,7 +23,21 @@ public final class SkillCatalog {
     public static final SkillDef MAGIC = new SkillDef("magic", "Magic", Material.ENCHANTED_BOOK, 14, "✧",
             "Scrolls, wands and potions at their full strength — and more to find.", FIGHTING);
 
-    private static final List<SkillDef> ALL = List.of(DEFENSE, MELEE, ARCHERY, AGILITY, MAGIC);
+    public static final SkillDef MINING = new SkillDef("mining", "Mining", Material.IRON_PICKAXE, 20, "⛏",
+            "A faster pickaxe, ores twice over, whole veins at once and a nose for ore.",
+            List.of(de.raindancer.modules.skills.skill.mining.MiningEffect.values()));
+    public static final SkillDef EXCAVATION = new SkillDef("excavation", "Excavation", Material.IRON_SHOVEL, 21, "⚱",
+            "A faster shovel, treasures in the dirt and luck under the brush.",
+            List.of(de.raindancer.modules.skills.skill.excavation.ExcavationEffect.values()));
+    public static final SkillDef WOODCUTTING = new SkillDef("woodcutting", "Woodcutting", Material.IRON_AXE, 22, "🪓",
+            "A faster axe, whole trees felled, saplings and apples from the leaves.",
+            List.of(de.raindancer.modules.skills.skill.woodcutting.WoodcuttingEffect.values()));
+    public static final SkillDef SMITHING = new SkillDef("smithing", "Smithing", Material.ANVIL, 23, "⚒",
+            "Cheaper anvil work, never too expensive; salvage, sturdier gear, templates kept.",
+            List.of(de.raindancer.modules.skills.skill.smithing.SmithingEffect.values()));
+
+    private static final List<SkillDef> ALL = List.of(DEFENSE, MELEE, ARCHERY, AGILITY, MAGIC, MINING, EXCAVATION,
+            WOODCUTTING, SMITHING);
 
     /** Which skill holds each node id: for ranks kept before there were skills, by node id alone. */
     private static volatile Map<String, SkillDef> owners;

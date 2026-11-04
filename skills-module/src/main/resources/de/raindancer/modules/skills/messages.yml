@@ -56,3 +56,24 @@ dnd:
     dodged: "<gray>Dodged!"
     second-wind: "<green>Second Wind!</green> <gray>You catch your breath and fight on."
     undying: "<gold>Undying!</gold> <gray>A blow that should have killed you leaves you standing."
+
+  mining:
+    sensed: "<gray>Ore Sense: <white><ore></white> <white><distance></white> blocks away — look for the sparks."
+    sensed-nothing: "<gray>Ore Sense: no ore within <white><radius></white> blocks."
+
+  excavation:
+    treasure: "<gold>Treasure!</gold> <gray><white><amount>× <item></white> in the dirt."
+    suspicious: "<gray>Keen Eye: <white><count></white> suspicious block(s) within <white><radius></white> — look for the sparks."
+    nothing-suspicious: "<gray>Keen Eye: nothing suspicious within <white><radius></white> blocks."
+
+  smithing:
+    salvage-question: "<gold>Salvage this <item>?"
+    salvage-gives: "<green>You get back <white><amount>× <item></white>."
+    salvage-book: "<light_purple>Its <white><enchantment></white> is kept as a book."
+    salvage-enchantments-lost: "<red>Its enchantments are lost."
+    salvaged: "<gold>Salvaged.</gold> <gray>The <white><item></white> is back in pieces."
+    salvage-worn: "<red>That is too worn to give anything back."
+    salvage-refused: "<red>That is no ordinary item — it cannot be salvaged."
+    salvage-moved: "<red>The item is no longer in your hand; nothing was salvaged."
+    template-kept: "<gold>The template survives the work.</gold> <gray>It is back in your bag."
+    scrap-back: "<dark_red>Forgemaster:</dark_red> <gray>a netherite scrap comes back from the work."

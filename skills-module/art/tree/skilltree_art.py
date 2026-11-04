@@ -23,7 +23,9 @@ PACK = os.path.join(HERE, "..", "..", "src", "main", "resources", "de", "raindan
 NS = "rainsadventurers"
 ASSETS = os.path.join(PACK, "assets", NS)
 ROWS = 6
-SCENES = ["vitality", "might", "marksman", "shadow", "arcana"]
+SCENES = ["vitality", "might", "marksman", "shadow", "arcana",
+          "prospector", "delver", "veinbreaker", "digger", "treasure_hunter", "archaeologist",
+          "lumberjack", "forester", "feller", "anvil_work", "salvager", "forgemaster"]
 
 GOLD = (222, 176, 64)
 GOLD_DARK = (122, 82, 22)
@@ -294,10 +296,318 @@ def scene_arcana(seed=5):
     return c
 
 
-PAINTERS = [scene_vitality, scene_might, scene_marksman, scene_shadow, scene_arcana]
+# ------------------------------------------------------------------------------------------------ the gathering skills
+
+def rock(c, rng, top, bottom, light, dark, block=9):
+    """A wall of stone in blocks, each a shade of its own."""
+    for y in range(T0, T1):
+        for x in range(W):
+            bx, by = x // block, (y - T0) // block
+            f = 0.86 + ((bx * 7 + by * 13) % 5) * 0.035
+            v = (y - T0) / (T1 - T0)
+            c.put(x, y, shade(mix(mix(top, bottom, v), light, 0.0), f + noise(rng, x, y, 0.03)))
+            if (y - T0) % block == 0 or x % block == 0:
+                c.tint(x, y, dark, 0.35)
+
+
+def speckles(c, rng, colour, count, x0=0, x1=W, size=2):
+    for _ in range(count):
+        x, y = rng.randint(x0, x1 - size - 1), rng.randint(T0 + 2, T1 - size - 2)
+        for dy in range(size):
+            for dx in range(size):
+                c.put(x + dx, y + dy, shade(colour, rng.uniform(0.85, 1.1)))
+
+
+def trunk(c, x0, width, bark, top=T0, bottom=T1):
+    for y in range(top, bottom):
+        for x in range(max(0, x0), min(W, x0 + width)):
+            ring = 0.78 + 0.22 * math.sin((x - x0) / max(1, width) * math.pi)
+            c.put(x, y, shade(bark, ring * (0.92 if (y // 3 + x) % 5 == 0 else 1.0)))
+
+
+def finish(c, rng, edge, top, bottom, plank, plank_dark, plank_light, well_inner):
+    vignette(c, 0, T0, W, T1, edge, strength=0.5, reach=18)
+    title_band(c, top, bottom, shade(top, 0.5))
+    chrome_and_inventory(c, rng, plank, plank_dark, plank_light, well_inner)
+    return c
+
+
+def scene_prospector(seed=6):
+    """A cave wall flecked with ore, a lantern's warm light."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    rock(c, rng, (118, 118, 122), (82, 82, 88), (130, 130, 136), (40, 40, 46))
+    speckles(c, rng, (216, 175, 147), 26)
+    speckles(c, rng, (250, 214, 60), 14)
+    speckles(c, rng, (96, 230, 220), 9)
+    speckles(c, rng, (40, 40, 40), 18)
+    glow(c, 132, T0 + 22, (255, 196, 110), 70, 0.45)
+    return finish(c, rng, (12, 10, 8), (58, 58, 64), (82, 82, 90), (96, 80, 60), (48, 38, 28), (140, 118, 90),
+                  (30, 28, 26))
+
+
+def scene_delver(seed=7):
+    """Deep down: a deepslate tunnel held up by beams, a torch far along it."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    rock(c, rng, (74, 74, 80), (36, 36, 44), (90, 90, 96), (20, 20, 26), block=7)
+    for bx in (20, 92, 164):
+        for y in range(T0, T1):
+            for x in range(bx, bx + 5):
+                c.put(x, y, shade((112, 80, 46), 0.85 + 0.15 * ((x - bx) / 4)))
+        for x in range(bx - 14, bx + 19):
+            for y in range(T0 + 4, T0 + 8):
+                c.put(max(0, min(W - 1, x)), y, (98, 70, 40))
+    for x in range(W):
+        c.put(x, T1 - 6, (120, 120, 126))
+        c.put(x, T1 - 9, (120, 120, 126))
+        if x % 6 == 0:
+            for y in range(T1 - 9, T1 - 5):
+                c.put(x, y, (90, 64, 36))
+    glow(c, 110, T0 + 40, (255, 170, 80), 40, 0.5)
+    return finish(c, rng, (4, 4, 8), (30, 30, 36), (46, 46, 54), (78, 70, 64), (38, 32, 28), (118, 106, 96),
+                  (24, 22, 22))
+
+
+def scene_veinbreaker(seed=8):
+    """A red vein winding through dark stone, glowing where it is broken open."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    rock(c, rng, (96, 94, 98), (60, 58, 64), (110, 108, 112), (30, 28, 32))
+    for x in range(W):
+        cy = T0 + 44 + math.sin(x * 0.045) * 20 + math.sin(x * 0.13) * 5
+        width = 5 + 3 * math.sin(x * 0.07 + 1)
+        for y in range(int(cy - width), int(cy + width)):
+            if T0 <= y < T1 and rng.random() < 0.8:
+                c.put(x, y, shade((200, 30, 30), rng.uniform(0.75, 1.15)))
+    glow(c, 60, T0 + 40, (255, 70, 60), 40, 0.4)
+    glow(c, 150, T0 + 52, (255, 120, 60), 36, 0.35)
+    return finish(c, rng, (14, 6, 6), (60, 22, 22), (86, 32, 30), (92, 76, 62), (46, 36, 28), (134, 114, 92),
+                  (30, 24, 22))
+
+
+def scene_digger(seed=9):
+    """The ground cut open: grass on top, dirt, a band of gravel, clay at the bottom."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    bands = [(T0, T0 + 8, (98, 156, 64)), (T0 + 8, T0 + 46, (134, 96, 66)), (T0 + 46, T0 + 62, (132, 126, 124)),
+             (T0 + 62, T1, (160, 166, 178))]
+    for top, bottom, colour in bands:
+        for y in range(top, bottom):
+            for x in range(W):
+                wave = math.sin(x * 0.08 + top) * 2
+                c.put(x, y, shade(colour, rng.uniform(0.86, 1.08) if y > top + wave else 0.9))
+    speckles(c, rng, (90, 88, 86), 40, size=2)
+    for x in range(60, 120):
+        depth = int(30 - abs(x - 90) * 0.9)
+        for y in range(T0, T0 + max(0, depth)):
+            c.put(x, y, shade((80, 58, 40), 0.7))
+    glow(c, 40, T0 + 6, (255, 240, 190), 80, 0.3)
+    return finish(c, rng, (16, 10, 6), (64, 46, 30), (90, 66, 44), (104, 80, 54), (52, 38, 24), (150, 120, 84),
+                  (34, 26, 20))
+
+
+def scene_treasure_hunter(seed=10):
+    """A sandy dig: a chest half buried, gold glinting in the sand."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        v = (y - T0) / (T1 - T0)
+        for x in range(W):
+            dune = math.sin(x * 0.05) * 6
+            c.put(x, y, mix((236, 206, 150), (196, 160, 104), min(1, max(0, v + dune / 90 + rng.uniform(-0.03, 0.03)))))
+    cx, cy = 96, T0 + 50
+    for y in range(cy - 10, cy + 8):
+        for x in range(cx - 16, cx + 16):
+            lid = y < cy - 2
+            c.put(x, y, shade((136, 92, 48), 0.8 if lid else 1.0))
+            if abs(x - cx) <= 1 and cy - 4 < y < cy + 2:
+                c.put(x, y, (250, 214, 60))
+    for x in range(cx - 18, cx + 18):
+        for y in range(cy + 4, cy + 9):
+            c.put(x, y, shade((220, 188, 128), rng.uniform(0.9, 1.05)))
+    speckles(c, rng, (255, 222, 80), 22, size=1)
+    glow(c, cx, cy - 6, (255, 230, 140), 40, 0.4)
+    return finish(c, rng, (30, 20, 6), (96, 70, 30), (130, 96, 44), (120, 92, 56), (60, 44, 24), (170, 134, 86),
+                  (40, 30, 20))
+
+
+def scene_archaeologist(seed=11):
+    """Ruins at dusk: sandstone pillars, a patterned pot, the sky going violet."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        v = (y - T0) / (T1 - T0)
+        for x in range(W):
+            c.put(x, y, mix((214, 140, 120), (96, 60, 110), v * 0.9))
+    ground = T0 + 62
+    for y in range(ground, T1):
+        for x in range(W):
+            c.put(x, y, shade((210, 182, 128), rng.uniform(0.86, 1.04)))
+    for px in (22, 140):
+        for y in range(T0 + 12, ground):
+            for x in range(px, px + 16):
+                c.put(x, y, shade((218, 196, 140), 0.82 + 0.18 * ((x - px) / 15) + (0.06 if (y // 6) % 2 else 0)))
+    cx, cy = 96, ground - 10
+    for y in range(cy - 14, cy + 10):
+        for x in range(cx - 12, cx + 12):
+            r = abs(x - cx) / (12 * (0.6 + 0.4 * math.sin((y - cy + 14) / 24 * math.pi)))
+            if r <= 1:
+                c.put(x, y, shade((176, 92, 60), 0.85 + 0.15 * (1 - r)))
+                if (y - cy) % 6 == 0:
+                    c.put(x, y, (92, 46, 30))
+    return finish(c, rng, (20, 10, 24), (70, 40, 56), (96, 56, 76), (112, 90, 70), (56, 42, 32), (160, 132, 104),
+                  (36, 28, 26))
+
+
+def scene_lumberjack(seed=12):
+    """A clearing of stumps, a pile of logs, warm daylight."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        v = (y - T0) / (T1 - T0)
+        for x in range(W):
+            c.put(x, y, mix((170, 210, 150), (70, 120, 50), min(1, v * 1.3)))
+    for tx in (4, 30, 156, 178):
+        trunk(c, tx, 9, (96, 70, 44))
+    for row in range(3):
+        for i in range(4 - row):
+            lx, ly = 62 + i * 18 + row * 9, T1 - 14 - row * 14
+            for y in range(ly - 7, ly + 7):
+                for x in range(lx - 8, lx + 8):
+                    d = math.hypot(x - lx, y - ly)
+                    if d <= 7:
+                        ring = int(d) % 3 == 0
+                        c.put(x, y, (150, 110, 64) if d > 6 else ((176, 136, 84) if ring else (204, 166, 108)))
+    glow(c, 100, T0 + 4, (255, 240, 190), 90, 0.35)
+    return finish(c, rng, (10, 18, 6), (40, 60, 30), (58, 86, 42), (110, 82, 52), (56, 40, 24), (156, 122, 82),
+                  (36, 28, 20))
+
+
+def scene_forester(seed=13):
+    """An orchard: round green crowns with red apples, saplings in a row."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        v = (y - T0) / (T1 - T0)
+        for x in range(W):
+            c.put(x, y, mix((190, 224, 236), (120, 170, 90), min(1, v * 1.6)))
+    for cx in (28, 96, 164):
+        trunk(c, cx - 3, 6, (110, 80, 50), top=T0 + 40, bottom=T1 - 8)
+        for y in range(T0 + 6, T0 + 50):
+            for x in range(cx - 26, cx + 26):
+                if 0 <= x < W and math.hypot(x - cx, (y - T0 - 28) * 1.2) < 24 + rng.uniform(-1.5, 1.5):
+                    c.put(x, y, shade((70, 140, 50), rng.uniform(0.75, 1.1)))
+        for _ in range(9):
+            ax, ay = cx + rng.randint(-18, 18), T0 + rng.randint(14, 44)
+            c.put(ax, ay, (210, 30, 30))
+            c.put(ax + 1, ay, (180, 20, 20))
+    for sx in range(12, W, 22):
+        for y in range(T1 - 10, T1 - 2):
+            c.put(sx, y, (60, 120, 40))
+        c.put(sx - 1, T1 - 9, (80, 150, 50))
+        c.put(sx + 1, T1 - 8, (80, 150, 50))
+    return finish(c, rng, (8, 20, 8), (34, 66, 28), (50, 92, 40), (108, 84, 54), (54, 40, 24), (154, 124, 84),
+                  (34, 28, 20))
+
+
+def scene_feller(seed=14):
+    """A dark spruce wood, one great trunk coming down across it."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        v = (y - T0) / (T1 - T0)
+        for x in range(W):
+            c.put(x, y, mix((70, 96, 80), (20, 34, 26), v))
+    for tx in (6, 34, 120, 150, 176):
+        for y in range(T0, T1):
+            half = 2 + (y - T0) // 10
+            for x in range(tx - half, tx + half):
+                if 0 <= x < W and rng.random() < 0.9:
+                    c.put(x, y, shade((30, 60, 40), rng.uniform(0.7, 1.05)))
+        trunk(c, tx - 2, 4, (70, 48, 32))
+    for i in range(140):
+        x, y = 40 + i, T1 - 12 - int(i * 0.42)
+        for d in range(-4, 5):
+            if 0 <= x < W and T0 <= y + d < T1:
+                c.put(x, y + d, shade((92, 64, 40), 0.75 + 0.25 * (1 - abs(d) / 4)))
+    return finish(c, rng, (4, 10, 6), (22, 40, 28), (34, 58, 40), (90, 70, 50), (44, 32, 22), (134, 108, 78),
+                  (28, 22, 18))
+
+
+def scene_anvil_work(seed=15):
+    """A smithy: dark stone, an anvil, the forge's orange glow."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    rock(c, rng, (66, 58, 56), (38, 32, 30), (76, 68, 64), (24, 20, 18), block=10)
+    ax, ay = 96, T0 + 56
+    for y in range(ay - 14, ay - 6):
+        for x in range(ax - 26, ax + 22):
+            c.put(x, y, shade((70, 72, 78), 0.8 + 0.2 * ((y - ay + 14) / 8)))
+    for y in range(ay - 6, ay + 10):
+        w = 8 if y < ay + 4 else 16
+        for x in range(ax - w, ax + w):
+            c.put(x, y, shade((58, 60, 66), 0.9))
+    glow(c, 160, T0 + 30, (255, 130, 40), 70, 0.55)
+    glow(c, ax, ay - 16, (255, 200, 120), 24, 0.35)
+    speckles(c, rng, (255, 190, 80), 12, x0=120, size=1)
+    return finish(c, rng, (10, 4, 2), (60, 28, 14), (88, 42, 20), (96, 72, 54), (48, 34, 24), (138, 108, 84),
+                  (30, 22, 18))
+
+
+def scene_salvager(seed=16):
+    """A heap of old gear — iron, gold and gems — by a grindstone's wheel."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        v = (y - T0) / (T1 - T0)
+        for x in range(W):
+            c.put(x, y, mix((110, 100, 92), (60, 54, 50), v))
+    for _ in range(90):
+        x, y = rng.randint(10, W - 60), rng.randint(T0 + 30, T1 - 4)
+        colour = rng.choice([(190, 190, 196), (160, 160, 168), (236, 200, 70), (110, 220, 210), (120, 110, 104)])
+        length = rng.randint(4, 10)
+        for i in range(length):
+            if 0 <= x + i < W and T0 <= y - i // 2 < T1:
+                c.put(x + i, y - i // 2, shade(colour, rng.uniform(0.8, 1.1)))
+    gx, gy = W - 34, T0 + 46
+    for y in range(T0, T1):
+        for x in range(W - 60, W):
+            d = math.hypot(x - gx, y - gy)
+            if d < 20:
+                c.put(x, y, shade((150, 146, 140), 0.8 + 0.2 * math.sin(d)))
+            elif d < 22:
+                c.put(x, y, (80, 60, 40))
+    return finish(c, rng, (12, 10, 8), (56, 52, 50), (80, 74, 70), (100, 80, 60), (50, 38, 28), (144, 118, 92),
+                  (32, 26, 22))
+
+
+def scene_forgemaster(seed=17):
+    """Blackstone and lava: the nether's forge, netherite's dark sheen."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    rock(c, rng, (46, 40, 46), (24, 20, 26), (56, 50, 56), (12, 10, 14), block=8)
+    for x in range(W):
+        top = T1 - 16 + int(math.sin(x * 0.1) * 2)
+        for y in range(top, T1):
+            c.put(x, y, mix((255, 150, 30), (210, 60, 10), rng.uniform(0, 1)))
+    for y in range(T0 + 24, T0 + 46):
+        for x in range(70, 122):
+            c.put(x, y, shade((68, 58, 62), 0.75 + 0.25 * ((x - 70) / 52)))
+    glow(c, 96, T1 - 10, (255, 110, 30), 90, 0.5)
+    speckles(c, rng, (255, 170, 60), 16, size=1)
+    return finish(c, rng, (6, 2, 2), (40, 20, 22), (60, 30, 30), (80, 64, 60), (40, 30, 28), (120, 100, 96),
+                  (26, 20, 20))
+
+
+PAINTERS = [scene_vitality, scene_might, scene_marksman, scene_shadow, scene_arcana,
+            scene_prospector, scene_delver, scene_veinbreaker, scene_digger, scene_treasure_hunter,
+            scene_archaeologist, scene_lumberjack, scene_forester, scene_feller, scene_anvil_work, scene_salvager,
+            scene_forgemaster]
 
 
 def write_scenes():
+    assert len(SCENES) == len(PAINTERS), "a painting for every scene"
     out = os.path.join(ASSETS, "textures", "font", "tree_scene")
     os.makedirs(out, exist_ok=True)
     providers = []

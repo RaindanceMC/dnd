@@ -1,0 +1,26 @@
+id: skills-excavation
+title: Excavation
+summary: The Excavation skill — a faster shovel, treasures in the dirt, flint and clay, finds twice over under the brush, three by three.
+intro: |
+  Excavation is a skill with a tree of its own: {run:/skills excavation}. Dirt, sand, gravel, clay, mud and snow count.
+icon: IRON_SHOVEL
+category: Progress & rewards
+order: 51
+module: dnd
+aliases: [excavation-skill, digging, archaeology, treasure, earthmover, keen-eye]
+keywords: [excavation, shovel, dirt, sand, gravel, clay, flint, treasure, brush, suspicious sand, archaeology]
+commands: [skills]
+related: [skills, skills-trees, skills-mining]
+sections:
+  - question: What is in the Excavation tree?
+    title: Three branches
+    text: |
+      <white>Digger</white>: a faster shovel that wears slower, flint from gravel; choose Fast Spade or Flint Knapper; capstone Earthshaker. <white>Treasure Hunter</white>: a chance to dig up a treasure — nuggets, bones, string, coal and the like — and more clay; choose Potter or Fortune Seeker; capstone Buried Riches. <white>Archaeologist</white>: a find from suspicious sand or gravel that comes up twice, brushes that wear slower; choose Twice Lucky or Gentle Brush; capstone Grand Excavation.
+  - question: What do the mastery badges bring?
+    title: Mastery
+    text: |
+      Digger's Mastery: <white>Earthmover</white> — crouch while digging with a shovel and the eight blocks of soft ground around it go too, across the way you look. Treasure Hunter's Mastery: <white>rare treasures</white> — diamonds, emeralds, golden apples, name tags, music discs. Archaeologist's Mastery: <white>Keen Eye</white> — crouch with a brush and the suspicious sand and gravel within eight blocks spark for you.
+  - question: Can I farm it with placed sand?
+    title: Only the world's ground
+    text: |
+      No. Treasures, flint and clay only come from ground the world made — never from a block somebody placed, never from sand or gravel that fell and landed — and never with silk touch.

@@ -1,0 +1,26 @@
+id: skills-woodcutting
+title: Woodcutting
+summary: The Woodcutting skill — a faster axe, logs twice over, saplings, apples and sticks from leaves, Timber, Replanter.
+intro: |
+  Woodcutting is a skill with a tree of its own: {run:/skills woodcutting}. Logs and stems a tree grew count.
+icon: IRON_AXE
+category: Progress & rewards
+order: 52
+module: dnd
+aliases: [woodcutting-skill, lumberjack, timber, treefeller, tree-feller, replant, forester]
+keywords: [woodcutting, axe, log, tree, timber, sapling, apple, sticks, leaves, replant, canopy]
+commands: [skills]
+related: [skills, skills-trees]
+sections:
+  - question: What is in the Woodcutting tree?
+    title: Three branches
+    text: |
+      <white>Lumberjack</white>: a faster axe that wears slower, logs twice over; choose Heavy Swing or Splitter; capstone Old Growth. <white>Forester</white>: leaves that drop more saplings, apples (oak and dark oak) and sticks; choose Orchard Keeper or Seed Saver; capstone Ancient Grove. <white>Feller</white>: <white>Timber</white> and an axe the tree wears less; choose Big Timber or Gentle Fall; capstone Forest Giant.
+  - question: What do the mastery badges bring?
+    title: Mastery
+    text: |
+      Lumberjack's Mastery: <white>Heartwood</white>, a chance a log drops three times over. Forester's Mastery: <white>Replanter</white> — chop a tree's lowest log and a sapling of its kind from your bag is planted in its place. Feller's Mastery: <white>Clear Canopy</white> — a tree felled with Timber brings its leaves down too, with their saplings and apples.
+  - question: How does Timber work?
+    title: Crouching with an axe
+    text: |
+      Crouch while you chop a log and the rest of that tree — the same wood, up and sideways, never below the cut — comes down with it, up to as many more logs as your tree says, each a real break that wears the axe. It stops before the axe would break. Only logs a tree grew count, never logs somebody placed, so a house is never felled.
