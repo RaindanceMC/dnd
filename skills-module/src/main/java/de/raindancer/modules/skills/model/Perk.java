@@ -8,7 +8,8 @@ import java.util.Optional;
  *
  * <p>An effect with an {@link #attribute()} is the game's own: it is lent to the player as an attribute modifier
  * (value × {@link #scale()}, added, or multiplied when {@link #multiplies()}). The others are worked in this module's
- * listeners: damage dealt and taken, dodging, arrows, experience, loot, magic items, the feats.
+ * listeners: damage dealt and taken, dodging, arrows, experience, loot, magic items, the feats — among them every
+ * branch's mastery feature.
  */
 public enum Perk implements Effect {
 
@@ -24,6 +25,9 @@ public enum Perk implements Effect {
     STEP("Step up %s block(s) higher", 1, "step_height", 1.0, false),
     LUCK("+%s luck", 4, "luck", 1.0, false),
     MINING_SPEED("%s%% faster mining", 60, "block_break_speed", 0.01, true),
+    SWIM("%s%% faster in water", 100, "water_movement_efficiency", 0.01, false),
+    BREATH("%s%% longer breath under water", 300, "oxygen_bonus", 0.01, false),
+    SNEAK_SPEED("%s%% faster while sneaking", 100, "sneaking_speed", 0.01, true),
 
     HUNGER_SAVE("%s%% chance hunger does not go down", 75),
     REGEN("Heal %s half-heart(s) every five seconds out of a fight", 6),
@@ -49,9 +53,49 @@ public enum Perk implements Effect {
     SCROLL_POWER("Scrolls and wands are %s%% stronger", 0),
     POTION_POWER("Magic potions heal %s%% more", 0),
 
+    THORNS("A foe's blow hurts it back for %s%% of what it did", 50),
+    RIPOSTE("%s%% more damage on your next blow after your shield stopped one", 0),
+    FIRE_WARD("%s%% less damage from fire and lava", 80),
+    BLAST_WARD("%s%% less damage from explosions", 80),
+    ARROW_WARD("%s%% less damage from arrows and other missiles", 60),
+    MAGIC_WARD("%s%% less damage from magic, poison and wither", 60),
+    SWORD_DAMAGE("%s%% more damage with a sword", 0),
+    AXE_DAMAGE("%s%% more damage with an axe", 0),
+    BLEED("%s%% chance a blow makes the foe bleed two hearts away", 50),
+    STUN("%s%% chance a critical blow stuns the foe for two seconds", 50),
+    MOMENTUM("%s%% more melee damage for every kill in a row, up to five", 10),
+    HEADSHOT("%s%% more arrow damage on a hit to the head", 0),
+    CLOSE_SHOT("%s%% more arrow damage from 6 blocks away or nearer", 0),
+    VELOCITY("Arrows fly %s%% faster — and so hit harder", 50),
+    IGNITE("%s%% chance an arrow sets its target alight", 100),
+    PIN("%s%% chance an arrow pins its target in place for two seconds", 60),
+    FALL_DAMAGE("%s%% less damage from falling", 80),
+    VENOM("%s%% chance a blow poisons the foe", 50),
+    SNEAK_ATTACK("%s%% more melee damage while sneaking", 0),
+    POTION_DURATION("Potions you drink last %s%% longer", 100),
+    EFFECT_SHED("Harmful effects on you wear off %s%% sooner", 60),
+    MANA_SHIELD("%s%% of a hurt is paid with experience points instead, two a half-heart", 50),
+    HEX("%s%% chance a blow or an arrow weakens the foe", 50),
+
     DUAL_WIELD("Dual Wielder: a weapon in your off hand strikes too, for half its damage", 1),
     SECOND_WIND("Second Wind: below a third of your health, heal a third — once every two minutes", 1),
-    UNDYING("Undying: a blow that would kill you leaves you one heart — once every ten minutes", 1);
+    UNDYING("Undying: a blow that would kill you leaves you one heart — once every ten minutes", 1),
+
+    PURE_BLOOD("Pure Blood: poison and wither do you no harm", 1),
+    AEGIS("Aegis: your shield never wears out, and a blow it stops throws the striker back", 1),
+    FIREPROOF("Fireproof: you never catch fire — flames and lava hurt only while you stand in them", 1),
+    EXECUTE("Executioner: a blow that leaves a monster below a fifth of its health finishes it — not a boss", 1),
+    SUNDER("Sunder: your blows hit 1% harder for every point of the foe's armour", 1),
+    BLOODLUST("Bloodlust: every kill heals you two hearts", 1),
+    RETRIEVAL("Retrieval: an arrow that hits comes back to your quiver", 1),
+    SKEWER("Skewer: every arrow flies on through two more foes", 1),
+    HUNTERS_MARK("Hunter's Mark: a foe your arrow hits glows for ten seconds and takes 15% more from all you do", 1),
+    VANISH("Vanish: dodging a blow turns you invisible for three seconds", 1),
+    DASH("Dash: crouch while sprinting to dash ahead — once every four seconds", 1),
+    SMOKE_BOMB("Smoke Bomb: below a quarter of your health you vanish in smoke and foes lose you — once a minute", 1),
+    ARCANE_SURGE("Arcane Surge: Magic Missile — from a scroll or a wand — looses twice the darts", 1),
+    ARCANE_BARRIER("Arcane Barrier: out of a fight, a barrier of four hearts gathers around you", 1),
+    SPELLSTRIKE("Spellstrike: a critical blow also strikes for 1d4+1 force", 1);
 
     private final String text;
     private final int cap;
@@ -84,7 +128,7 @@ public enum Perk implements Effect {
 
     /** A feat: had or not, and no number in its line. */
     public boolean feat() {
-        return this == DUAL_WIELD || this == SECOND_WIND || this == UNDYING;
+        return !text.contains("%s");
     }
 
     /** The game's attribute this one lends, by its key ({@code max_health}), or {@code null}. */

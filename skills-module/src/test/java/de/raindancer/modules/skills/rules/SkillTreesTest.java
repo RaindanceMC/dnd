@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,5 +76,74 @@ class SkillTreesTest {
     @DisplayName("every effect id belongs to one kind of effect only")
     void effectIds() {
         assertThat(SkillCatalog.effects()).containsKeys("hearts", "dual_wield", "melee_damage");
+    }
+
+    /** Every node the five fighting skills had when each was one branch: heroes keep ranks in them. */
+    private static final Map<SkillDef, List<String>> FIRST_NODES = Map.of(
+            SkillCatalog.DEFENSE, List.of("toughness", "hearty_meals", "thick_skin", "mending", "stout", "hardened",
+                    "big_heart", "second_wind", "stoneskin", "fast_healer", "giant_blood", "iron_hide", "bottomless",
+                    "undying", "bulwark", "defense_mastery"),
+            SkillCatalog.MELEE, List.of("brawler", "quick_hands", "long_arms", "crusher", "sweeper", "bloodthirst",
+                    "veteran", "dual_wielder", "great_weapon", "flurry", "berserker", "executioner", "slayer",
+                    "warlord", "vampire", "melee_mastery"),
+            SkillCatalog.ARCHERY, List.of("steady_aim", "fletcher", "hawk_eye", "quiver", "hunter", "tracker",
+                    "piercing", "volley", "sharpshooter", "rain_of_arrows", "marksmanship", "sniper",
+                    "endless_quiver", "deadeye", "monster_hunter", "archery_mastery"),
+            SkillCatalog.AGILITY, List.of("light_feet", "cat_fall", "sidestep", "springheel", "climber", "backstabber",
+                    "evasion", "acrobat", "assassin", "windrunner", "blur", "shadowstep", "wind_walker", "phantom",
+                    "nightblade", "agility_mastery"),
+            SkillCatalog.MAGIC, List.of("studious", "orb_catcher", "lucky", "wandwright", "scribe", "alchemist",
+                    "treasure_sense", "sage", "treasure_hunter", "spellbreaker", "prospector", "apothecary",
+                    "loremaster", "archmage", "fortune", "magic_mastery"));
+
+    @Test
+    @DisplayName("the fighting skills keep every node they had, in the same skill, so no hero loses a rank")
+    void keepsOldNodes() {
+        FIRST_NODES.forEach((skill, ids) -> {
+            for (String id : ids) {
+                assertThat(skill.tree().node(id)).as(skill.id() + ":" + id).isPresent();
+                assertThat(SkillCatalog.qualify(id)).isEqualTo(skill.key(id));
+            }
+        });
+    }
+
+    @Test
+    @DisplayName("a fighting skill is a real tree: 20 nodes and more, branches stacked three rows each, each with a "
+            + "choice pair, a capstone and a badge whose mastery feature is its own")
+    void fightingTreesAreBig() {
+        Set<Perk> features = new HashSet<>();
+        for (SkillDef skill : FIRST_NODES.keySet()) {
+            var tree = skill.tree();
+            assertThat(tree.nodes()).as(skill.id()).hasSizeGreaterThanOrEqualTo(20);
+            assertThat(tree.branches()).as(skill.id()).hasSizeBetween(2, 3);
+            for (int index = 0; index < tree.branches().size(); index++) {
+                String branch = tree.branches().get(index).id();
+                var nodes = tree.nodesOf(branch);
+                String where = skill.id() + "/" + branch;
+                for (TreeNode node : nodes) {
+                    assertThat(node.row()).as(where + " " + node.id() + " row").isBetween(index * 3, index * 3 + 2);
+                }
+                assertThat(nodes.stream().filter(TreeNode::capstone)).as(where + " capstone").hasSize(1);
+                List<TreeNode> choices = nodes.stream().filter(TreeNode::choice).toList();
+                assertThat(choices).as(where + " choice pair").hasSize(2);
+                assertThat(choices.get(0).excludes()).contains(choices.get(1).id());
+                assertThat(choices.get(1).excludes()).contains(choices.get(0).id());
+                TreeNode badge = tree.masteries(branch).getFirst();
+                List<Perk> feats = badge.effects().keySet().stream().map(Perk::parse).flatMap(java.util.Optional::stream)
+                        .filter(Perk::feat).toList();
+                assertThat(feats).as(where + " mastery feature").hasSize(1);
+                assertThat(features.add(feats.getFirst())).as(where + ": " + feats.getFirst() + " is another badge's")
+                        .isTrue();
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("a feat reads without a number; every other effect has a number to show")
+    void featsRead() {
+        assertThat(Perk.AEGIS.feat()).isTrue();
+        assertThat(Perk.AEGIS.describe(1)).startsWith("Aegis:");
+        assertThat(Perk.THORNS.feat()).isFalse();
+        assertThat(Perk.THORNS.describe(15)).isEqualTo("A foe's blow hurts it back for 15% of what it did");
     }
 }

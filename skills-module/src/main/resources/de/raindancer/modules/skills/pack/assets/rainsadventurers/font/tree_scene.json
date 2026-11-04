@@ -46,6 +46,96 @@
    ]
   },
   {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/guardian.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue005"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/warden.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue006"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/arms.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue007"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/fury.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue008"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/trickshot.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue009"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/ranger.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue00a"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/acrobatics.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue00b"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/rogue.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue00c"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/mysticism.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue00d"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/battlemage.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue00e"
+   ]
+  },
+  {
    "type": "space",
    "advances": {
     "\uf808": -8,

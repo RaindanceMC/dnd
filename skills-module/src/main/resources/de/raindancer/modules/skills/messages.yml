@@ -56,3 +56,4 @@ dnd:
     dodged: "<gray>Dodged!"
     second-wind: "<green>Second Wind!</green> <gray>You catch your breath and fight on."
     undying: "<gold>Undying!</gold> <gray>A blow that should have killed you leaves you standing."
+    smoke-bomb: "<dark_gray>Smoke Bomb!</dark_gray> <gray>You vanish in smoke — the foes have lost you."

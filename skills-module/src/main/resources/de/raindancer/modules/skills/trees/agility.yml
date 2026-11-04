@@ -1,11 +1,21 @@
-# The Agility skill's tree, read by Core's SkillTree (see SkillDef). One branch for now —
-# more come — ending in its mastery badge, open once every other node of the branch not shut by a choice is at its
-# last rank. Node ids are unique across every skill's tree: a hero's ranks are kept as <skill>:<node>.
+# The Agility skill's tree, read by Core's SkillTree (see SkillDef). Three branches stacked on the
+# canvas — the first in rows 0–2, the second in 3–5, the third in 6–8 — each with a choice and a capstone, ending in
+# its mastery badge: free, open once every other node of the branch not shut by a choice is at its last rank, and
+# bringing a mastery feature of its own. Node ids are unique across every skill's tree: a hero's ranks are kept
+# as <skill>:<node>.
 branches:
   shadow:
     title: Shadow
     icon: leather_boots
     blurb: Quick feet, blows that miss you, knives in the back.
+  acrobatics:
+    title: Acrobatics
+    icon: feather
+    blurb: "Water, heights and hard landings: a body that goes anywhere, and dashes."
+  rogue:
+    title: Rogue
+    icon: black_dye
+    blurb: "Poisoned blades, quiet steps, and gone in a puff of smoke."
 
 nodes:
   light_feet: {branch: shadow, at: [0, 1], title: Light Feet, icon: leather_boots, ranks: 3, level: 1, level-step: 2, effects: {speed: 3}}
@@ -23,4 +33,34 @@ nodes:
   wind_walker: {branch: shadow, at: [4, 0], title: Wind Walker, icon: breeze_rod, cost: 2, level: 22, requires: [windrunner], effects: {speed: 6, step: 0.5}}
   phantom: {branch: shadow, at: [4, 1], title: Phantom, icon: echo_shard, capstone: true, cost: 3, level: 30, requires: [windrunner, blur, shadowstep], effects: {dodge: 6, speed: 5}}
   nightblade: {branch: shadow, at: [4, 2], title: Nightblade, icon: wither_skeleton_skull, cost: 2, level: 23, requires: [shadowstep], effects: {backstab: 25}}
-  agility_mastery: {branch: shadow, at: [5, 1], title: "Shadow Mastery", icon: echo_shard, mastery: true, cost: 0, requires: [phantom], effects: {dodge: 3, speed: 5}}
+  agility_mastery: {branch: shadow, at: [5, 1], title: "Shadow Mastery", icon: echo_shard, mastery: true, cost: 0, requires: [phantom], effects: {vanish: 1, dodge: 3, speed: 5}}
+
+  tumbler: {branch: acrobatics, at: [0, 4], title: Tumbler, icon: hay_block, ranks: 3, level: 2, level-step: 2, effects: {fall_damage: 5}}
+  strong_swimmer: {branch: acrobatics, at: [0, 3], title: Strong Swimmer, icon: tropical_fish, ranks: 2, level: 4, level-step: 2, requires: [tumbler], effects: {swim: 10}}
+  breakfall: {branch: acrobatics, at: [0, 5], title: Breakfall, icon: white_wool, ranks: 2, level: 4, level-step: 2, requires: [tumbler], effects: {fall_damage: 5}}
+  deep_lungs: {branch: acrobatics, at: [1, 3], title: Deep Lungs, icon: kelp, ranks: 2, level: 6, level-step: 2, requires: [strong_swimmer], effects: {breath: 50}}
+  parkour: {branch: acrobatics, at: [1, 4], title: Parkour, icon: scaffolding, ranks: 3, level: 6, level-step: 2, requires: [tumbler], effects: {jump: 3}}
+  rolling_landing: {branch: acrobatics, at: [1, 5], title: Rolling Landing, icon: slime_block, ranks: 2, level: 6, level-step: 2, requires: [breakfall], effects: {fall_damage: 5}}
+  waterborn: {branch: acrobatics, at: [2, 3], title: Waterborn, icon: heart_of_the_sea, choice: true, cost: 2, level: 10, requires: [deep_lungs], excludes: [freerunner], effects: {swim: 40, breath: 100}}
+  light_body: {branch: acrobatics, at: [2, 4], title: Light Body, icon: string, ranks: 3, level: 8, level-step: 2, requires: [parkour], effects: {fall_damage: 5}}
+  freerunner: {branch: acrobatics, at: [2, 5], title: Freerunner, icon: golden_boots, choice: true, cost: 2, level: 10, requires: [rolling_landing], excludes: [waterborn], effects: {fall_damage: 20, safe_fall: 2}}
+  dolphins_grace: {branch: acrobatics, at: [3, 3], title: "Dolphin's Grace", icon: nautilus_shell, cost: 2, level: 18, requires: [waterborn, light_body], effects: {swim: 30, breath: 50}}
+  featherweight: {branch: acrobatics, at: [3, 4], title: Featherweight, icon: chicken, ranks: 2, level: 16, level-step: 3, requires: [light_body], effects: {fall_damage: 5}}
+  wall_runner: {branch: acrobatics, at: [3, 5], title: Wall Runner, icon: ladder, cost: 2, level: 18, requires: [freerunner, light_body], effects: {speed: 3}}
+  daredevil: {branch: acrobatics, at: [4, 4], title: Daredevil, icon: firework_star, capstone: true, cost: 3, level: 30, requires: [dolphins_grace, featherweight, wall_runner], effects: {speed: 3, swim: 10}}
+  acrobatics_mastery: {branch: acrobatics, at: [5, 4], title: "Acrobat's Mastery", icon: wind_charge, mastery: true, cost: 0, requires: [daredevil], effects: {dash: 1}}
+
+  quiet_step: {branch: rogue, at: [0, 7], title: Quiet Step, icon: white_carpet, ranks: 3, level: 3, level-step: 2, effects: {sneak_speed: 10}}
+  toxic_blade: {branch: rogue, at: [0, 6], title: Toxic Blade, icon: spider_eye, ranks: 2, level: 5, level-step: 2, requires: [quiet_step], effects: {venom: 3}}
+  lurker: {branch: rogue, at: [0, 8], title: Lurker, icon: black_wool, ranks: 2, level: 5, level-step: 2, requires: [quiet_step], effects: {sneak_attack: 8}}
+  nightshade: {branch: rogue, at: [1, 6], title: Nightshade, icon: poisonous_potato, ranks: 2, level: 7, level-step: 2, requires: [toxic_blade], effects: {venom: 4}}
+  slippery: {branch: rogue, at: [1, 7], title: Slippery, icon: honey_bottle, ranks: 3, level: 7, level-step: 2, requires: [quiet_step], effects: {dodge: 1}}
+  ambush: {branch: rogue, at: [1, 8], title: Ambush, icon: sculk, ranks: 2, level: 7, level-step: 2, requires: [lurker], effects: {sneak_attack: 8}}
+  poisoner: {branch: rogue, at: [2, 6], title: Poisoner, icon: pufferfish, choice: true, cost: 2, level: 11, requires: [nightshade], excludes: [ambusher], effects: {venom: 20}}
+  soft_soles: {branch: rogue, at: [2, 7], title: Soft Soles, icon: leather, ranks: 3, level: 9, level-step: 2, requires: [slippery], effects: {sneak_speed: 10}}
+  ambusher: {branch: rogue, at: [2, 8], title: Ambusher, icon: sculk_sensor, choice: true, cost: 2, level: 11, requires: [ambush], excludes: [poisoner], effects: {sneak_attack: 40}}
+  deathcap: {branch: rogue, at: [3, 6], title: Deathcap, icon: brown_mushroom, cost: 2, level: 20, requires: [poisoner, soft_soles], effects: {venom: 10}}
+  cutthroat: {branch: rogue, at: [3, 7], title: Cutthroat, icon: iron_sword, ranks: 2, level: 17, level-step: 3, requires: [soft_soles], effects: {backstab: 5}}
+  from_the_dark: {branch: rogue, at: [3, 8], title: From the Dark, icon: black_candle, cost: 2, level: 20, requires: [ambusher, soft_soles], effects: {sneak_attack: 20}}
+  master_thief: {branch: rogue, at: [4, 7], title: Master Thief, icon: spyglass, capstone: true, cost: 3, level: 32, requires: [deathcap, cutthroat, from_the_dark], effects: {sneak_speed: 20, backstab: 10, venom: 5}}
+  rogue_mastery: {branch: rogue, at: [5, 7], title: "Rogue's Mastery", icon: gunpowder, mastery: true, cost: 0, requires: [master_thief], effects: {smoke_bomb: 1}}

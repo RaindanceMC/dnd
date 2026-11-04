@@ -23,7 +23,8 @@ PACK = os.path.join(HERE, "..", "..", "src", "main", "resources", "de", "raindan
 NS = "rainsadventurers"
 ASSETS = os.path.join(PACK, "assets", NS)
 ROWS = 6
-SCENES = ["vitality", "might", "marksman", "shadow", "arcana"]
+SCENES = ["vitality", "might", "marksman", "shadow", "arcana",
+          "guardian", "warden", "arms", "fury", "trickshot", "ranger", "acrobatics", "rogue", "mysticism", "battlemage"]
 
 GOLD = (222, 176, 64)
 GOLD_DARK = (122, 82, 22)
@@ -294,7 +295,288 @@ def scene_arcana(seed=5):
     return c
 
 
-PAINTERS = [scene_vitality, scene_might, scene_marksman, scene_shadow, scene_arcana]
+def scene_guardian(seed=6):
+    """A castle wall at noon, a row of round shields hung along its battlements."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        row = (y - T0) // 9
+        for x in range(W):
+            mortar = (y - T0) % 9 == 0 or (x + (11 if row % 2 else 0)) % 22 == 0
+            c.put(x, y, (70, 70, 74) if mortar else shade((150, 146, 140), 0.85 + noise(rng, x, y, 0.05)))
+    for x in range(W):
+        if (x // 14) % 2 == 0:
+            for y in range(T0, T0 + 8):
+                c.put(x, y, mix((150, 190, 230), (200, 220, 240), (y - T0) / 8))
+    colours = [(170, 40, 40), (40, 70, 150), (200, 160, 50), (40, 110, 60)]
+    for i, sx in enumerate(range(18, W, 36)):
+        sy = T0 + 34
+        for y in range(sy - 13, sy + 14):
+            for x in range(sx - 13, sx + 14):
+                d = math.hypot(x - sx, y - sy)
+                if d < 13:
+                    rim = d > 11
+                    face = colours[i % len(colours)]
+                    c.put(x, y, (110, 110, 118) if rim else shade(face, 0.8 + 0.2 * (1 - d / 13)))
+                    if d < 3:
+                        c.put(x, y, (200, 200, 210))
+    vignette(c, 0, T0, W, T1, (16, 16, 20), strength=0.5, reach=18)
+    title_band(c, (44, 52, 70), (62, 72, 96), (20, 24, 34))
+    chrome_and_inventory(c, rng, (110, 106, 100), (56, 54, 50), (156, 152, 146), (34, 34, 36))
+    return c
+
+
+def scene_warden(seed=7):
+    """Black rock split by rivers of lava, embers rising in the heat."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        v = (y - T0) / (T1 - T0)
+        for x in range(W):
+            c.put(x, y, mix((60, 24, 16), (22, 16, 16), v) if v < 0.35 else shade((40, 34, 34), 0.8 + noise(rng, x, y, 0.1)))
+    for k in range(3):
+        base = T0 + 40 + k * 14
+        for x in range(W):
+            mid = base + 4 * math.sin(x * 0.05 + k * 2.1)
+            for y in range(int(mid) - 2, int(mid) + 3):
+                if T0 <= y < T1:
+                    c.put(x, y, mix((255, 210, 80), (230, 80, 20), abs(y - mid) / 2.5))
+    for _ in range(70):
+        x, y = rng.randint(0, W - 1), rng.randint(T0, T1 - 1)
+        c.put(x, y, (255, rng.randint(120, 200), 40))
+    glow(c, W // 2, T1 - 10, (255, 120, 40), 90, 0.35)
+    vignette(c, 0, T0, W, T1, (10, 2, 0), strength=0.55, reach=18)
+    title_band(c, (70, 24, 10), (100, 36, 14), (30, 10, 4))
+    chrome_and_inventory(c, rng, (80, 66, 62), (40, 32, 30), (120, 104, 98), (26, 20, 18))
+    return c
+
+
+def scene_arms(seed=8):
+    """A smithy: a forge's glow on the left, swords and axes racked on timber."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        for x in range(W):
+            c.put(x, y, shade((92, 64, 42), 0.75 + 0.15 * math.sin(x * 0.4) + noise(rng, x, y, 0.04)))
+    for y in range(T0 + 50, T1):
+        for x in range(0, 46):
+            c.put(x, y, (60, 56, 54) if (x + y) % 7 else (40, 38, 36))
+    glow(c, 22, T0 + 52, (255, 140, 40), 60, 0.6)
+    for i, rx in enumerate(range(60, W - 6, 16)):
+        axe = i % 2 == 1
+        for y in range(T0 + 8, T0 + 62):
+            c.put(rx, y, (120, 86, 52) if axe else (190, 196, 206))
+            if not axe:
+                c.put(rx + 1, y, (130, 136, 150))
+        if axe:
+            for y in range(T0 + 8, T0 + 20):
+                for x in range(rx + 1, rx + 1 + max(1, 7 - abs(y - T0 - 14))):
+                    c.put(x, y, (170, 176, 186))
+        else:
+            for x in range(rx - 3, rx + 5):
+                c.put(x, T0 + 50, (150, 120, 60))
+    vignette(c, 0, T0, W, T1, (16, 8, 2), strength=0.5, reach=18)
+    title_band(c, (60, 36, 20), (84, 52, 30), (28, 16, 8))
+    chrome_and_inventory(c, rng, (96, 70, 46), (48, 34, 20), (140, 106, 70), (34, 26, 18))
+    return c
+
+
+def scene_fury(seed=9):
+    """A battlefield under a red sky: broken spears, banners in tatters, mist low on the ground."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        v = (y - T0) / (T1 - T0)
+        for x in range(W):
+            c.put(x, y, mix((200, 60, 40), (60, 14, 14), v) if v < 0.6 else mix((70, 30, 24), (36, 18, 16), v))
+    for _ in range(14):
+        sx = rng.randint(0, W - 1)
+        lean = rng.uniform(-0.5, 0.5)
+        top = T0 + rng.randint(20, 46)
+        for y in range(top, T1):
+            x = int(sx + (y - top) * lean)
+            if 0 <= x < W:
+                c.put(x, y, (30, 16, 14))
+    banner(c, 30, T0 + 14, 10, 26, (120, 20, 20), (20, 10, 10))
+    banner(c, 140, T0 + 20, 10, 22, (60, 20, 20), (180, 140, 60))
+    for y in range(T1 - 22, T1):
+        for x in range(W):
+            c.tint(x, y, (230, 180, 170), 0.25 * (y - T1 + 22) / 22)
+    vignette(c, 0, T0, W, T1, (20, 0, 0), strength=0.55, reach=18)
+    title_band(c, (80, 14, 14), (110, 22, 22), (36, 6, 6))
+    chrome_and_inventory(c, rng, (90, 60, 50), (46, 28, 22), (134, 96, 80), (30, 20, 18))
+    return c
+
+
+def scene_trickshot(seed=10):
+    """A night range: straw targets in a row, flaming arrows streaking at them."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        v = (y - T0) / (T1 - T0)
+        for x in range(W):
+            c.put(x, y, mix((18, 22, 50), (40, 34, 30), v))
+    for tx in (40, 96, 152):
+        ty = T0 + 50
+        for y in range(ty - 11, ty + 12):
+            for x in range(tx - 11, tx + 12):
+                d = math.hypot(x - tx, y - ty)
+                if d < 11:
+                    c.put(x, y, (220, 50, 40) if int(d // 2.5) % 2 == 0 else (230, 210, 160))
+    for k in range(5):
+        y0 = T0 + 8 + k * 7
+        x0 = rng.randint(0, 40)
+        for i in range(70):
+            x, y = x0 + i, int(y0 + i * 0.35)
+            if 0 <= x < W and T0 <= y < T1:
+                c.put(x, y, mix((255, 230, 120), (180, 60, 20), i / 70))
+        glow(c, x0 + 70, int(y0 + 24), (255, 160, 60), 16, 0.6)
+    vignette(c, 0, T0, W, T1, (4, 4, 12), strength=0.55, reach=18)
+    title_band(c, (24, 24, 50), (36, 36, 72), (10, 10, 24))
+    chrome_and_inventory(c, rng, (100, 76, 50), (52, 38, 24), (146, 114, 78), (34, 28, 22))
+    return c
+
+
+def scene_ranger(seed=11):
+    """Plains at sunset: rolling hills, a line of pines, a long light."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        v = (y - T0) / (T1 - T0)
+        for x in range(W):
+            c.put(x, y, mix((250, 180, 100), (150, 90, 120), v))
+    glow(c, 130, T0 + 30, (255, 220, 140), 50, 0.6)
+    for k, (base, colour) in enumerate(((T0 + 46, (90, 110, 70)), (T0 + 58, (70, 96, 52)), (T0 + 70, (52, 76, 40)))):
+        for x in range(W):
+            top = int(base + 6 * math.sin(x * 0.03 + k * 1.7))
+            for y in range(top, T1):
+                c.put(x, y, shade(colour, 0.9 + noise(rng, x, y, 0.04)))
+    for px in range(4, W, 11):
+        h = rng.randint(10, 18)
+        base = int(T0 + 46 + 6 * math.sin(px * 0.03))
+        for y in range(base - h, base):
+            half = (y - base + h) // 3
+            for x in range(px - half, px + half + 1):
+                if 0 <= x < W:
+                    c.put(x, y, (36, 50, 34))
+    vignette(c, 0, T0, W, T1, (30, 14, 10), strength=0.5, reach=18)
+    title_band(c, (80, 50, 30), (110, 70, 40), (36, 22, 12))
+    chrome_and_inventory(c, rng, (104, 80, 52), (54, 40, 26), (150, 118, 80), (34, 28, 22))
+    return c
+
+
+def scene_acrobatics(seed=12):
+    """Sea cliffs: a sheer rock face on the left, waves breaking far below, gulls in the wind."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        v = (y - T0) / (T1 - T0)
+        for x in range(W):
+            c.put(x, y, mix((150, 200, 240), (220, 236, 250), v) if v < 0.55
+                  else mix((40, 110, 160), (20, 60, 110), v))
+    for y in range(T0 + 44, T1):
+        for x in range(W):
+            if math.sin(x * 0.2 + y * 0.9) > 0.92:
+                c.put(x, y, (230, 240, 250))
+    for y in range(T0, T1):
+        edge = 40 + int(8 * math.sin(y * 0.15)) + (y - T0) // 6
+        for x in range(0, edge):
+            c.put(x, y, shade((120, 110, 100), 0.8 + noise(rng, x, y, 0.08)))
+    for _ in range(6):
+        gx, gy = rng.randint(70, W - 10), rng.randint(T0 + 6, T0 + 30)
+        for i in range(-3, 4):
+            c.put(gx + i, gy - (3 - abs(i)) // 2, (60, 60, 70))
+    vignette(c, 0, T0, W, T1, (6, 20, 34), strength=0.45, reach=18)
+    title_band(c, (30, 70, 110), (44, 96, 140), (12, 30, 50))
+    chrome_and_inventory(c, rng, (110, 100, 86), (56, 50, 42), (156, 146, 130), (30, 30, 32))
+    return c
+
+
+def scene_rogue(seed=13):
+    """A narrow alley at night: wet cobbles, a green glow of something brewing behind a door."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        for x in range(W):
+            wall = x < 40 or x > W - 40
+            c.put(x, y, shade((34, 30, 36) if wall else (20, 22, 30), 0.8 + noise(rng, x, y, 0.06)))
+    for y in range(T0 + 56, T1):
+        for x in range(40, W - 40):
+            stone = ((x // 6) + (y // 4)) % 2
+            c.put(x, y, (46, 48, 56) if stone else (34, 36, 44))
+    for y in range(T0 + 22, T0 + 56):
+        for x in range(84, 100):
+            c.put(x, y, (40, 26, 18))
+    glow(c, 92, T0 + 40, (90, 255, 110), 46, 0.45)
+    for _ in range(18):
+        x, y = rng.randint(70, 115), rng.randint(T0 + 10, T0 + 50)
+        c.put(x, y, (150, 255, 160))
+    vignette(c, 0, T0, W, T1, (0, 4, 2), strength=0.6, reach=18)
+    title_band(c, (20, 34, 24), (30, 50, 34), (8, 14, 10))
+    chrome_and_inventory(c, rng, (70, 60, 58), (34, 28, 26), (110, 98, 94), (22, 20, 20))
+    return c
+
+
+def scene_mysticism(seed=14):
+    """An alchemist's shelves in candlelight, bottles in every colour."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        for x in range(W):
+            c.put(x, y, shade((70, 50, 40), 0.8 + noise(rng, x, y, 0.05)))
+    colours = [(200, 60, 200), (60, 160, 240), (240, 80, 60), (80, 220, 120), (240, 200, 60), (160, 100, 255)]
+    for shelf in range(3):
+        sy = T0 + 22 + shelf * 22
+        c.hline(0, W, sy, (120, 84, 50))
+        c.hline(0, W, sy + 1, (80, 54, 30))
+        x = rng.randint(2, 8)
+        while x < W - 8:
+            colour = rng.choice(colours)
+            h = rng.randint(8, 13)
+            for y in range(sy - h, sy):
+                neck = y < sy - h + 3
+                for xx in range(x + (2 if neck else 0), x + (4 if neck else 6)):
+                    c.put(xx, y, shade(colour, 0.7 + 0.3 * (xx - x) / 6) if not neck else (200, 210, 220))
+            x += rng.randint(9, 15)
+    glow(c, 150, T0 + 30, (255, 200, 120), 60, 0.35)
+    vignette(c, 0, T0, W, T1, (12, 6, 4), strength=0.55, reach=18)
+    title_band(c, (50, 30, 60), (70, 44, 84), (22, 12, 28))
+    chrome_and_inventory(c, rng, (96, 72, 54), (48, 34, 24), (140, 108, 82), (30, 24, 20))
+    return c
+
+
+def scene_battlemage(seed=15):
+    """A storm over a tower: dark clouds, a fork of lightning, runes burning blue in the air."""
+    c = Canvas(W, height(ROWS), seed)
+    rng = random.Random(seed)
+    for y in range(T0, T1):
+        v = (y - T0) / (T1 - T0)
+        for x in range(W):
+            cloud = 0.5 + 0.5 * math.sin(x * 0.07 + math.sin(y * 0.2) * 2)
+            c.put(x, y, mix(mix((40, 44, 70), (70, 76, 100), cloud * (1 - v)), (16, 18, 30), v))
+    x = 120.0
+    for y in range(T0, T0 + 60):
+        x += rng.uniform(-1.6, 1.6)
+        for dx in (-1, 0, 1):
+            c.put(int(x) + dx, y, (230, 240, 255) if dx == 0 else (140, 170, 255))
+    glow(c, 120, T0 + 30, (150, 180, 255), 40, 0.35)
+    for y in range(T0 + 30, T1):
+        for tx in range(30, 46):
+            c.put(tx, y, shade((60, 58, 66), 0.8 + 0.2 * ((tx - 30) % 4 == 0)))
+    for _ in range(9):
+        rx, ry = rng.randint(60, W - 10), rng.randint(T0 + 40, T1 - 8)
+        for i in range(5):
+            c.put(rx + i, ry, (120, 200, 255))
+            c.put(rx + 2, ry - 2 + i, (120, 200, 255))
+    vignette(c, 0, T0, W, T1, (4, 6, 16), strength=0.55, reach=18)
+    title_band(c, (26, 30, 60), (40, 46, 86), (10, 12, 26))
+    chrome_and_inventory(c, rng, (80, 76, 86), (40, 36, 44), (120, 116, 130), (26, 24, 30))
+    return c
+
+
+PAINTERS = [scene_vitality, scene_might, scene_marksman, scene_shadow, scene_arcana,
+            scene_guardian, scene_warden, scene_arms, scene_fury, scene_trickshot, scene_ranger, scene_acrobatics,
+            scene_rogue, scene_mysticism, scene_battlemage]
 
 
 def write_scenes():

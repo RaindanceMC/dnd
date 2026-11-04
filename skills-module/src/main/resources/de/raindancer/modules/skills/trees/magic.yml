@@ -1,11 +1,21 @@
-# The Magic skill's tree, read by Core's SkillTree (see SkillDef). One branch for now —
-# more come — ending in its mastery badge, open once every other node of the branch not shut by a choice is at its
-# last rank. Node ids are unique across every skill's tree: a hero's ranks are kept as <skill>:<node>.
+# The Magic skill's tree, read by Core's SkillTree (see SkillDef). Three branches stacked on the
+# canvas — the first in rows 0–2, the second in 3–5, the third in 6–8 — each with a choice and a capstone, ending in
+# its mastery badge: free, open once every other node of the branch not shut by a choice is at its last rank, and
+# bringing a mastery feature of its own. Node ids are unique across every skill's tree: a hero's ranks are kept
+# as <skill>:<node>.
 branches:
   arcana:
     title: Arcana
     icon: enchanted_book
     blurb: Experience, treasure, and the magic items' full strength.
+  mysticism:
+    title: Mysticism
+    icon: brewing_stand
+    blurb: "Draughts that last, curses that slide off, and a barrier of light."
+  battlemage:
+    title: Battlemage
+    icon: blaze_rod
+    blurb: "Steel and sorcery: hexes on the blade, a shield of experience."
 
 nodes:
   studious: {branch: arcana, at: [0, 1], title: Studious, icon: book, ranks: 3, level: 1, level-step: 2, effects: {xp: 5}}
@@ -23,4 +33,34 @@ nodes:
   loremaster: {branch: arcana, at: [4, 0], title: Loremaster, icon: knowledge_book, cost: 2, level: 21, requires: [spellbreaker], effects: {xp: 15, vanilla_xp: 20}}
   archmage: {branch: arcana, at: [4, 1], title: Archmage, icon: nether_star, capstone: true, cost: 3, level: 30, requires: [spellbreaker, prospector, apothecary], effects: {scroll_save: 25, wand_recharge: 50, scroll_power: 30}}
   fortune: {branch: arcana, at: [4, 2], title: Fortune's Child, icon: emerald, cost: 2, level: 23, requires: [apothecary], effects: {loot: 25, luck: 1}}
-  magic_mastery: {branch: arcana, at: [5, 1], title: "Arcane Mastery", icon: nether_star, mastery: true, cost: 0, requires: [archmage], effects: {scroll_power: 20, potion_power: 20, loot: 10}}
+  magic_mastery: {branch: arcana, at: [5, 1], title: "Arcane Mastery", icon: nether_star, mastery: true, cost: 0, requires: [archmage], effects: {arcane_surge: 1, scroll_power: 20, potion_power: 20, loot: 10}}
+
+  attuned: {branch: mysticism, at: [0, 4], title: Attuned, icon: glass_bottle, ranks: 3, level: 2, level-step: 2, effects: {potion_duration: 5}}
+  lingering_draughts: {branch: mysticism, at: [0, 3], title: Lingering Draughts, icon: potion, ranks: 2, level: 4, level-step: 2, requires: [attuned], effects: {potion_duration: 5}}
+  cleansing: {branch: mysticism, at: [0, 5], title: Cleansing, icon: milk_bucket, ranks: 2, level: 4, level-step: 2, requires: [attuned], effects: {effect_shed: 5}}
+  slow_burn: {branch: mysticism, at: [1, 3], title: Slow Burn, icon: glowstone_dust, ranks: 2, level: 6, level-step: 2, requires: [lingering_draughts], effects: {potion_duration: 5}}
+  warding: {branch: mysticism, at: [1, 4], title: Warding, icon: enchanted_book, ranks: 3, level: 6, level-step: 2, requires: [attuned], effects: {magic_ward: 4}}
+  purging: {branch: mysticism, at: [1, 5], title: Purging, icon: honey_bottle, ranks: 2, level: 6, level-step: 2, requires: [cleansing], effects: {effect_shed: 5}}
+  elixirist: {branch: mysticism, at: [2, 3], title: Elixirist, icon: dragon_breath, choice: true, cost: 2, level: 10, requires: [slow_burn], excludes: [unhexed], effects: {potion_duration: 40}}
+  spellward: {branch: mysticism, at: [2, 4], title: Spellward, icon: lapis_lazuli, ranks: 3, level: 8, level-step: 2, requires: [warding], effects: {magic_ward: 4}}
+  unhexed: {branch: mysticism, at: [2, 5], title: Unhexed, icon: totem_of_undying, choice: true, cost: 2, level: 10, requires: [purging], excludes: [elixirist], effects: {effect_shed: 25}}
+  everlasting: {branch: mysticism, at: [3, 3], title: Everlasting, icon: clock, cost: 2, level: 18, requires: [elixirist, spellward], effects: {potion_duration: 20}}
+  abjurer: {branch: mysticism, at: [3, 4], title: Abjurer, icon: shulker_shell, ranks: 2, level: 16, level-step: 3, requires: [spellward], effects: {magic_ward: 8}}
+  clear_mind: {branch: mysticism, at: [3, 5], title: Clear Mind, icon: snowball, cost: 2, level: 18, requires: [unhexed, spellward], effects: {effect_shed: 15}}
+  mystic: {branch: mysticism, at: [4, 4], title: Mystic, icon: beacon, capstone: true, cost: 3, level: 30, requires: [everlasting, abjurer, clear_mind], effects: {magic_ward: 15, hearts: 1}}
+  mysticism_mastery: {branch: mysticism, at: [5, 4], title: "Mystic's Mastery", icon: end_crystal, mastery: true, cost: 0, requires: [mystic], effects: {arcane_barrier: 1}}
+
+  arcane_edge: {branch: battlemage, at: [0, 7], title: Arcane Edge, icon: amethyst_cluster, ranks: 3, level: 3, level-step: 2, effects: {hex: 3}}
+  runed_steel: {branch: battlemage, at: [0, 6], title: Runed Steel, icon: iron_sword, ranks: 2, level: 5, level-step: 2, requires: [arcane_edge], effects: {melee_damage: 3}}
+  mana_well: {branch: battlemage, at: [0, 8], title: Mana Well, icon: lapis_block, ranks: 2, level: 5, level-step: 2, requires: [arcane_edge], effects: {mana_shield: 3}}
+  witchs_bane: {branch: battlemage, at: [1, 6], title: "Witch's Bane", icon: fermented_spider_eye, ranks: 2, level: 7, level-step: 2, requires: [runed_steel], effects: {hex: 4}}
+  battle_scrolls: {branch: battlemage, at: [1, 7], title: Battle Scrolls, icon: writable_book, ranks: 3, level: 7, level-step: 2, requires: [arcane_edge], effects: {scroll_power: 5}}
+  mana_skin: {branch: battlemage, at: [1, 8], title: Mana Skin, icon: prismarine_crystals, ranks: 2, level: 7, level-step: 2, requires: [mana_well], effects: {mana_shield: 3}}
+  hexblade: {branch: battlemage, at: [2, 6], title: Hexblade, icon: wither_rose, choice: true, cost: 2, level: 11, requires: [witchs_bane], excludes: [mana_shield], effects: {hex: 20}}
+  spellsword: {branch: battlemage, at: [2, 7], title: Spellsword, icon: golden_sword, ranks: 3, level: 9, level-step: 2, requires: [battle_scrolls], effects: {attack_speed: 3}}
+  mana_shield: {branch: battlemage, at: [2, 8], title: Mana Shield, icon: conduit, choice: true, cost: 2, level: 11, requires: [mana_skin], excludes: [hexblade], effects: {mana_shield: 20}}
+  malediction: {branch: battlemage, at: [3, 6], title: Malediction, icon: soul_lantern, cost: 2, level: 20, requires: [hexblade, spellsword], effects: {hex: 10}}
+  arcane_fury: {branch: battlemage, at: [3, 7], title: Arcane Fury, icon: blaze_powder, ranks: 2, level: 17, level-step: 3, requires: [spellsword], effects: {crit_damage: 8}}
+  will_of_iron: {branch: battlemage, at: [3, 8], title: Will of Iron, icon: iron_block, cost: 2, level: 20, requires: [mana_shield, spellsword], effects: {mana_shield: 15}}
+  spellblade: {branch: battlemage, at: [4, 7], title: Spellblade, icon: netherite_sword, capstone: true, cost: 3, level: 32, requires: [malediction, arcane_fury, will_of_iron], effects: {melee_damage: 8, scroll_power: 15}}
+  battlemage_mastery: {branch: battlemage, at: [5, 7], title: "Battlemage's Mastery", icon: lightning_rod, mastery: true, cost: 0, requires: [spellblade], effects: {spellstrike: 1}}
