@@ -74,7 +74,9 @@ public final class SkillsPack {
             "battlemage",
             "prospector", "delver", "veinbreaker", "digger", "treasure_hunter", "archaeologist",
             "lumberjack", "forester", "feller", "anvil_work", "salvager", "forgemaster",
-            "fields", "pasture", "gatherer", "herbalist", "kitchen", "table", "potency", "apparatus", "pack", "stable");
+            "fields", "pasture", "gatherer", "herbalist", "kitchen", "table", "potency", "apparatus", "pack", "stable",
+            "workbench", "furnace", "mason", "architect", "haggler", "merchant", "enchanter", "anvil", "wayfarer",
+            "cartographer");
     private static final net.kyori.adventure.text.format.TextColor TREE_INK =
             net.kyori.adventure.text.format.TextColor.color(0xF1E4C6);
 

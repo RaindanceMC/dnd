@@ -888,6 +888,12 @@ PAINTERS = [scene_vitality, scene_might, scene_marksman, scene_shadow,
             scene_archaeologist, scene_lumberjack, scene_forester, scene_feller,
             scene_anvil_work, scene_salvager, scene_forgemaster] + nature_scenes.PAINTERS
 
+# Artisan, Building, Trading, Enchanting and Exploration, after the fighting skills (SkillsPack.SCENES).
+import craft_scenes  # noqa: E402
+
+SCENES += craft_scenes.SCENES
+PAINTERS += craft_scenes.painters(sys.modules[__name__])
+
 
 def write_scenes():
     out = os.path.join(ASSETS, "textures", "font", "tree_scene")

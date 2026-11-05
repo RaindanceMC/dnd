@@ -1,0 +1,38 @@
+id: skills-crafting
+title: Artisan, Building, Trading, Enchanting, Exploration
+summary: The skills of making, building, trading, enchanting and travelling — what each tree's branches do.
+intro: |
+  Five skills for everything that is not a fight. Each has two branches, a choice and a capstone in each, and a mastery badge at the end of every branch. {run:/skills}, then a skill, for its tree.
+icon: CRAFTING_TABLE
+category: Progress & rewards
+order: 42
+module: dnd
+aliases: [artisan, crafting, smelting, building, mason, trading, enchanting, anvil, exploration, cartographer, auto-smelt]
+keywords: [craft, smelt, furnace, auto-smelt, reach, refund, climb, quick undo, discount, emerald, restock, wandering trader, lapis, bookshelf, anvil, orbs, sprint, horse, map, compass, structure, loot]
+commands: [skills]
+related: [skills, skills-trees, skills-blueprints]
+sections:
+  - question: What does Artisan do?
+    title: Artisan — workbench and furnace
+    text: |
+      <white>Workbench</white>: a chance a craft makes one more of what it makes, or gives one ingredient back — only for real recipes of two kinds of ingredient or more, never for dyeing and bleaching, never more than 64 extras a minute. Tools, weapons and armour you craft last longer (it says so on them); the mastery adds Unbreaking I to them.
+      <white>Furnace</white>: a furnace or blast furnace you close with something in it smelts faster, burns its fuel longer and now and then smelts double — until a hopper feeds it, then it is nobody's. Food is Cooking's, not this. The capstone <white>Molten Touch</white> smelts the ores you mine as they drop (sneak to keep them raw); the mastery adds a furnace's experience and a quarter of them twice.
+  - question: What does Building do?
+    title: Building — mason and architect
+    text: |
+      <white>Mason</white>: more reach for blocks, a chance a block you place is not used up (a plain full block; a refunded one drops nothing when broken, so nobody gets rich placing and breaking), faster climbing up ladders, vines and scaffolding. The capstone <white>Quick Undo</white> breaks a block you placed in the last five seconds at one hit; the mastery refills your hand from your inventory when a stack runs out.
+      <white>Architect</white>: blueprints — see the blueprint page.
+  - question: What does Trading do?
+    title: Trading — haggler and merchant
+    text: |
+      <white>Haggler</white>: villagers' prices lower for you, and a chance a trade paying emeralds gives one more; the mastery keeps demand from ever raising what they ask of you. <white>Merchant</white>: a villager's trade you use up comes back by itself after twenty minutes, sooner the more you learn; wandering traders cheaper and with more uses for you; the mastery has villagers learn twice as much from your trades.
+  - question: What does Enchanting do?
+    title: Enchanting — table and anvil
+    text: |
+      <white>Enchanting table</white>: a chance the levels or the lapis an enchantment cost come back, more orb experience, and bookshelves counted that are not there — up to the fifteen a table uses. <white>Fresh Offers</white>: sneak and right-click a table with an empty hand for new offers, for a level, once a minute. The mastery lets the table offer treasure enchantments like Mending, never a curse.
+      <white>Anvil</white>: anvil work costs fewer levels (it never makes something past Too Expensive possible), and a chance it does not wear the anvil; the mastery means your work never makes an item dearer to work again.
+  - question: What does Exploration do?
+    title: Exploration — wayfarer and cartographer
+    text: |
+      <white>Wayfarer</white>: faster while sprinting, sprinting and jumping tire you less, faster swimming, a quicker horse (or Runner instead), and more experience from a biome seen for the first time; the mastery makes you 30% faster on paths, gravel, cobble and bricks.
+      <white>Cartographer</white>: maps you start are drawn further out; sneak and use a compass and it points to the nearest village, ruin, wreck or temple within reach — once every five minutes; a chance a structure's chest you open first holds one more of something. The mastery shows where you are, which way you face and the biome while you hold a compass or a map.

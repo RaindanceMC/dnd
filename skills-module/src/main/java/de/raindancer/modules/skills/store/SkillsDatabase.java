@@ -28,7 +28,23 @@ public final class SkillsDatabase {
             "ALTER TABLE hero ADD COLUMN subclass TEXT NOT NULL DEFAULT ''",
             // 0.11.0: the skill tree. The class, scores, slots and the rest stay as they were written, unread.
             "ALTER TABLE hero ADD COLUMN nodes TEXT NOT NULL DEFAULT ''",
-            "ALTER TABLE hero ADD COLUMN respec_at INTEGER NOT NULL DEFAULT 0");
+            "ALTER TABLE hero ADD COLUMN respec_at INTEGER NOT NULL DEFAULT 0",
+            // 0.14.0: Building's blueprints, a player's each by name (BlueprintBook).
+            """
+            CREATE TABLE IF NOT EXISTS blueprint (
+                player TEXT NOT NULL,
+                name TEXT NOT NULL,
+                width INTEGER NOT NULL,
+                height INTEGER NOT NULL,
+                length INTEGER NOT NULL,
+                anchor_x INTEGER NOT NULL,
+                anchor_y INTEGER NOT NULL,
+                anchor_z INTEGER NOT NULL,
+                data BLOB NOT NULL,
+                saved_at INTEGER NOT NULL,
+                PRIMARY KEY (player, name)
+            )
+            """);
 
     private SkillsDatabase() {
     }

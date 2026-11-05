@@ -334,6 +334,96 @@
    ]
   },
   {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/workbench.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue025"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/furnace.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue026"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/mason.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue027"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/architect.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue028"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/haggler.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue029"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/merchant.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue02a"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/enchanter.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue02b"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/anvil.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue02c"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/wayfarer.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue02d"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/cartographer.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue02e"
+   ]
+  },
+  {
    "type": "space",
    "advances": {
     "\uf808": -8,

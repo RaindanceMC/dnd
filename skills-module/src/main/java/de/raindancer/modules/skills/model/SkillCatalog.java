@@ -27,19 +27,19 @@ public final class SkillCatalog {
             "Quick feet, blows that miss you, knives in the back.", FIGHTING);
     public static final SkillDef MAGIC = new SkillDef("magic", "Magic", Material.ENCHANTED_BOOK, 14, "✧",
             "Scrolls, wands and potions at their full strength — and more to find.", FIGHTING);
-    public static final SkillDef FARMING = new SkillDef("farming", "Farming", Material.WHEAT, 18, "☘",
+    public static final SkillDef FARMING = new SkillDef("farming", "Farming", Material.WHEAT, 24, "☘",
             "Fuller harvests, crops that plant and grow themselves, twins in the pasture.",
             List.of(FarmingEffect.values()));
-    public static final SkillDef FORAGING = new SkillDef("foraging", "Foraging", Material.SWEET_BERRIES, 19, "✿",
+    public static final SkillDef FORAGING = new SkillDef("foraging", "Foraging", Material.SWEET_BERRIES, 25, "✿",
             "Berries, flowers and mushrooms: more of them, rare finds, bone meal that goes further.",
             List.of(ForagingEffect.values()));
-    public static final SkillDef ALCHEMY = new SkillDef("alchemy", "Alchemy", Material.BREWING_STAND, 24, "⚗",
+    public static final SkillDef ALCHEMY = new SkillDef("alchemy", "Alchemy", Material.BREWING_STAND, 27, "⚗",
             "Potions that last longer and hit harder, a spare from the stand, ingredients saved.",
             List.of(AlchemyEffect.values()));
-    public static final SkillDef COOKING = new SkillDef("cooking", "Cooking", Material.CAMPFIRE, 25, "♨",
+    public static final SkillDef COOKING = new SkillDef("cooking", "Cooking", Material.CAMPFIRE, 26, "♨",
             "Meals that fill more and bless you, extra servings, a furnace that hurries.",
             List.of(CookingEffect.values()));
-    public static final SkillDef TAMING = new SkillDef("taming", "Taming", Material.LEAD, 26, "♞",
+    public static final SkillDef TAMING = new SkillDef("taming", "Taming", Material.LEAD, 28, "♞",
             "Wolves and cats that bite harder and live longer, horses that run, leap and never fall.",
             List.of(TamingEffect.values()));
 
@@ -55,9 +55,25 @@ public final class SkillCatalog {
     public static final SkillDef SMITHING = new SkillDef("smithing", "Smithing", Material.ANVIL, 23, "⚒",
             "Cheaper anvil work, never too expensive; salvage, sturdier gear, templates kept.",
             List.of(de.raindancer.modules.skills.skill.smithing.SmithingEffect.values()));
+    public static final SkillDef ARTISAN = new SkillDef("artisan", "Artisan", Material.CRAFTING_TABLE, 30, "⚙",
+            "Crafting and smelting: more from every craft, faster furnaces, ores that come out smelted.",
+            List.of(de.raindancer.modules.skills.skill.artisan.ArtisanEffect.values()));
+    public static final SkillDef BUILDING = new SkillDef("building", "Building", Material.BRICKS, 31, "⌂",
+            "Longer arms, blocks to spare — and blueprints, pasted from your own blocks.",
+            List.of(de.raindancer.modules.skills.skill.building.BuildingEffect.values()));
+    public static final SkillDef TRADING = new SkillDef("trading", "Trading", Material.EMERALD, 32, "⚖",
+            "Lower prices, extra emeralds, trades that come back sooner.",
+            List.of(de.raindancer.modules.skills.skill.trading.TradingEffect.values()));
+    public static final SkillDef ENCHANTING = new SkillDef("enchanting", "Enchanting", Material.ENCHANTING_TABLE, 33,
+            "✪", "Levels and lapis back, stronger offers, cheaper anvils.",
+            List.of(de.raindancer.modules.skills.skill.enchanting.EnchantingEffect.values()));
+    public static final SkillDef EXPLORATION = new SkillDef("exploration", "Exploration", Material.COMPASS, 34, "⚑",
+            "Faster travel, wider maps, a compass that finds ruins and more in their chests.",
+            List.of(de.raindancer.modules.skills.skill.exploration.ExplorationEffect.values()));
 
     private static final List<SkillDef> ALL = List.of(DEFENSE, MELEE, ARCHERY, AGILITY, MAGIC, MINING, EXCAVATION,
-            WOODCUTTING, SMITHING, FARMING, FORAGING, ALCHEMY, COOKING, TAMING);
+            WOODCUTTING, SMITHING, FARMING, FORAGING, COOKING, ALCHEMY, TAMING, ARTISAN, BUILDING, TRADING, ENCHANTING,
+            EXPLORATION);
 
     /** Which skill holds each node id: for ranks kept before there were skills, by node id alone. */
     private static volatile Map<String, SkillDef> owners;

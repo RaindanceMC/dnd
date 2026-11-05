@@ -1,0 +1,42 @@
+# The Trading skill's tree, read by Core's SkillTree (see SkillDef): the haggler in rows 0-2, the merchant in rows 3-5,
+# each ending in its mastery badge. Node ids are unique across every skill's tree.
+branches:
+  haggler:
+    title: Haggler
+    icon: emerald
+    blurb: Lower prices, and an emerald more now and then.
+  merchant:
+    title: Merchant
+    icon: bell
+    blurb: Trades that come back sooner, wandering traders who like you.
+
+nodes:
+  bargainer: {branch: haggler, at: [0, 1], title: Bargainer, icon: emerald, ranks: 3, level: 1, level-step: 2, effects: {discount: 3}}
+  small_change: {branch: haggler, at: [0, 0], title: Small Change, icon: gold_nugget, ranks: 3, level: 1, level-step: 2, requires: [bargainer], effects: {emerald_bonus: 2}}
+  honest_face: {branch: haggler, at: [0, 2], title: Honest Face, icon: villager_spawn_egg, ranks: 2, level: 2, level-step: 2, requires: [bargainer], effects: {discount: 2}}
+  tip_jar: {branch: haggler, at: [1, 0], title: Tip Jar, icon: decorated_pot, ranks: 2, level: 4, level-step: 2, requires: [small_change], effects: {emerald_bonus: 2}}
+  hard_bargain: {branch: haggler, at: [1, 1], title: Hard Bargain, icon: emerald_block, ranks: 3, level: 4, level-step: 2, requires: [bargainer], effects: {discount: 3}}
+  familiar_face: {branch: haggler, at: [1, 2], title: Familiar Face, icon: player_head, ranks: 2, level: 5, level-step: 2, requires: [honest_face], effects: {discount: 2}}
+  sweet_talker: {branch: haggler, at: [2, 0], title: Sweet Talker, icon: cake, choice: true, cost: 2, level: 9, requires: [tip_jar], excludes: [bulk_buyer], effects: {emerald_bonus: 8}}
+  shrewd: {branch: haggler, at: [2, 1], title: Shrewd, icon: spyglass, ranks: 3, level: 11, level-step: 3, requires: [hard_bargain], effects: {discount: 2, emerald_bonus: 1}}
+  bulk_buyer: {branch: haggler, at: [2, 2], title: Bulk Buyer, icon: barrel, choice: true, cost: 2, level: 9, requires: [familiar_face], excludes: [sweet_talker], effects: {discount: 8}}
+  silver_purse: {branch: haggler, at: [3, 0], title: Silver Purse, icon: bundle, ranks: 2, level: 14, level-step: 3, requires: [sweet_talker], effects: {emerald_bonus: 3}}
+  market_sense: {branch: haggler, at: [3, 1], title: Market Sense, icon: clock, ranks: 2, level: 14, level-step: 3, requires: [shrewd], effects: {discount: 2}}
+  wholesale: {branch: haggler, at: [3, 2], title: Wholesale, icon: chest_minecart, level: 16, requires: [bulk_buyer], effects: {discount: 3}}
+  master_haggler: {branch: haggler, at: [4, 1], title: Master Haggler, icon: emerald_block, capstone: true, cost: 3, level: 30, requires: [silver_purse, market_sense, wholesale], effects: {discount: 5, emerald_bonus: 5}}
+  haggler_mastery: {branch: haggler, at: [5, 1], title: "Haggler's Mastery", icon: totem_of_undying, mastery: true, cost: 0, requires: [master_haggler], effects: {silver_tongue: 1, discount: 5}}
+
+  peddler: {branch: merchant, at: [0, 4], title: Peddler, icon: bell, level: 3, effects: {restock: 20}}
+  road_friend: {branch: merchant, at: [0, 3], title: Road Friend, icon: lead, ranks: 3, level: 3, level-step: 2, requires: [peddler], effects: {wanderer_discount: 5}}
+  stock_keeper: {branch: merchant, at: [0, 5], title: Stock Keeper, icon: chest, ranks: 3, level: 4, level-step: 2, requires: [peddler], effects: {restock: 15}}
+  caravan: {branch: merchant, at: [1, 3], title: Caravan, icon: llama_spawn_egg, ranks: 2, level: 6, level-step: 2, requires: [road_friend], effects: {wanderer_stock: 1}}
+  regular_customer: {branch: merchant, at: [1, 4], title: Regular Customer, icon: name_tag, ranks: 2, level: 6, level-step: 2, requires: [peddler], effects: {restock: 15}}
+  ledger: {branch: merchant, at: [1, 5], title: Ledger, icon: writable_book, ranks: 2, level: 7, level-step: 2, requires: [stock_keeper], effects: {restock: 10}}
+  wanderers_friend: {branch: merchant, at: [2, 3], title: "Wanderer's Friend", icon: wandering_trader_spawn_egg, choice: true, cost: 2, level: 10, requires: [caravan], excludes: [steady_supply], effects: {wanderer_discount: 20}}
+  trade_routes: {branch: merchant, at: [2, 4], title: Trade Routes, icon: map, ranks: 2, level: 12, level-step: 3, requires: [regular_customer], effects: {wanderer_stock: 1, restock: 10}}
+  steady_supply: {branch: merchant, at: [2, 5], title: Steady Supply, icon: hay_block, choice: true, cost: 2, level: 10, requires: [ledger], excludes: [wanderers_friend], effects: {restock: 50}}
+  exotic_goods: {branch: merchant, at: [3, 3], title: Exotic Goods, icon: blue_ice, ranks: 2, level: 15, level-step: 3, requires: [wanderers_friend], effects: {wanderer_discount: 5}}
+  guild_contacts: {branch: merchant, at: [3, 4], title: Guild Contacts, icon: lectern, ranks: 2, level: 15, level-step: 3, requires: [trade_routes], effects: {wanderer_stock: 1}}
+  warehouse: {branch: merchant, at: [3, 5], title: Warehouse, icon: barrel, level: 17, requires: [steady_supply], effects: {restock: 20}}
+  trade_baron: {branch: merchant, at: [4, 4], title: Trade Baron, icon: gold_block, capstone: true, cost: 3, level: 30, requires: [exotic_goods, guild_contacts, warehouse], effects: {restock: 40, wanderer_stock: 2}}
+  merchant_mastery: {branch: merchant, at: [5, 4], title: "Merchant's Mastery", icon: beacon, mastery: true, cost: 0, requires: [trade_baron], effects: {merchant_prince: 1, wanderer_discount: 10}}

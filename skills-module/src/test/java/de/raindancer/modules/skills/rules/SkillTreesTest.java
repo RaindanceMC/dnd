@@ -49,6 +49,27 @@ class SkillTreesTest {
     }
 
     @Test
+    @DisplayName("no node is written twice in one tree — the second would silently replace the first")
+    void noNodeTwice() throws java.io.IOException {
+        for (SkillDef skill : SkillCatalog.all()) {
+            String path = "/de/raindancer/modules/skills/trees/" + skill.id() + ".yml";
+            try (var in = SkillTreesTest.class.getResourceAsStream(path)) {
+                assertThat(in).as(path).isNotNull();
+                long written = new String(in.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8).lines()
+                        .filter(line -> line.matches("^  [a-z_]+: \\{.*")).count();
+                assertThat(skill.tree().nodes()).as(skill.id()).hasSize((int) written);
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("every skill has a place of its own in the list and a badge of its own")
+    void ownPlaceAndBadge() {
+        assertThat(SkillCatalog.all()).extracting(SkillDef::order).doesNotHaveDuplicates();
+        assertThat(SkillCatalog.all()).extracting(SkillDef::badge).doesNotHaveDuplicates();
+    }
+
+    @Test
     @DisplayName("no two lines of a skill share a slot; every icon is an item; every effect is used somewhere")
     void drawable() {
         Set<String> used = new HashSet<>();

@@ -1,0 +1,43 @@
+# The Artisan skill's tree, read by Core's SkillTree (see SkillDef): the workbench in rows 0-2, the furnace in rows 3-5,
+# each ending in its mastery badge. Node ids are unique across every skill's tree: a hero's ranks are kept as
+# <skill>:<node>.
+branches:
+  workbench:
+    title: Workbench
+    icon: crafting_table
+    blurb: More from every craft, ingredients back, tools that last.
+  furnace:
+    title: Furnace
+    icon: blast_furnace
+    blurb: Faster furnaces, fuel that lasts, double smelts — and ores that come out smelted.
+
+nodes:
+  apprentice: {branch: workbench, at: [0, 1], title: Apprentice, icon: crafting_table, ranks: 3, level: 1, level-step: 2, effects: {craft_extra: 3}}
+  careful_hands: {branch: workbench, at: [0, 0], title: Careful Hands, icon: stick, ranks: 3, level: 1, level-step: 2, requires: [apprentice], effects: {ingredient_refund: 3}}
+  tempered: {branch: workbench, at: [0, 2], title: Tempered, icon: iron_pickaxe, ranks: 3, level: 2, level-step: 2, requires: [apprentice], effects: {tougher_tools: 10}}
+  scrap_saver: {branch: workbench, at: [1, 0], title: Scrap Saver, icon: hopper, ranks: 2, level: 4, level-step: 2, requires: [careful_hands], effects: {ingredient_refund: 3}}
+  handy_crafter: {branch: workbench, at: [1, 1], title: Handy Crafter, icon: loom, ranks: 3, level: 4, level-step: 2, requires: [apprentice], effects: {craft_extra: 3}}
+  hardened_steel: {branch: workbench, at: [1, 2], title: Hardened Steel, icon: iron_ingot, ranks: 2, level: 5, level-step: 2, requires: [tempered], effects: {tougher_tools: 15}}
+  sparing_hands: {branch: workbench, at: [2, 0], title: Sparing Hands, icon: bundle, choice: true, cost: 2, level: 8, requires: [scrap_saver], excludes: [prolific], effects: {ingredient_refund: 8}}
+  guild_crafter: {branch: workbench, at: [2, 1], title: Guild Crafter, icon: smithing_table, ranks: 3, level: 10, level-step: 3, requires: [handy_crafter], effects: {craft_extra: 2, ingredient_refund: 2}}
+  prolific: {branch: workbench, at: [2, 2], title: Prolific, icon: chest, choice: true, cost: 2, level: 8, requires: [hardened_steel], excludes: [sparing_hands], effects: {craft_extra: 8}}
+  reworker: {branch: workbench, at: [3, 0], title: Reworker, icon: composter, ranks: 2, level: 14, level-step: 3, requires: [sparing_hands], effects: {ingredient_refund: 4}}
+  fine_work: {branch: workbench, at: [3, 1], title: Fine Work, icon: clock, ranks: 2, level: 13, level-step: 3, requires: [guild_crafter], effects: {craft_extra: 3}}
+  toolsmith: {branch: workbench, at: [3, 2], title: Toolsmith, icon: diamond_axe, ranks: 2, level: 14, level-step: 3, requires: [prolific], effects: {tougher_tools: 25}}
+  master_crafter: {branch: workbench, at: [4, 1], title: Master Crafter, icon: diamond_pickaxe, capstone: true, cost: 3, level: 30, requires: [fine_work, reworker, toolsmith], effects: {craft_extra: 5, ingredient_refund: 5, tougher_tools: 25}}
+  workbench_mastery: {branch: workbench, at: [5, 1], title: "Artisan's Mastery", icon: netherite_pickaxe, mastery: true, cost: 0, requires: [master_crafter], effects: {masterwork: 1, tougher_tools: 25}}
+
+  fire_feeder: {branch: furnace, at: [0, 4], title: Fire Feeder, icon: furnace, ranks: 3, level: 1, level-step: 2, effects: {furnace_speed: 10}}
+  coal_saver: {branch: furnace, at: [0, 3], title: Coal Saver, icon: coal, ranks: 3, level: 2, level-step: 2, requires: [fire_feeder], effects: {fuel_last: 10}}
+  smelter: {branch: furnace, at: [0, 5], title: Smelter, icon: raw_iron, ranks: 3, level: 2, level-step: 2, requires: [fire_feeder], effects: {double_smelt: 3}}
+  long_burn: {branch: furnace, at: [1, 3], title: Long Burn, icon: charcoal, ranks: 2, level: 5, level-step: 2, requires: [coal_saver], effects: {fuel_last: 10}}
+  glowing_coals: {branch: furnace, at: [1, 4], title: Glowing Coals, icon: magma_block, ranks: 3, level: 4, level-step: 2, requires: [fire_feeder], effects: {furnace_speed: 10}}
+  ore_refiner: {branch: furnace, at: [1, 5], title: Ore Refiner, icon: raw_gold, ranks: 2, level: 5, level-step: 2, requires: [smelter], effects: {double_smelt: 3}}
+  great_bellows: {branch: furnace, at: [2, 3], title: Great Bellows, icon: campfire, choice: true, cost: 2, level: 9, requires: [long_burn], excludes: [banked_coals], effects: {furnace_speed: 30}}
+  blast_master: {branch: furnace, at: [2, 4], title: Blast Master, icon: blast_furnace, ranks: 3, level: 11, level-step: 3, requires: [glowing_coals], effects: {furnace_speed: 10, double_smelt: 2}}
+  banked_coals: {branch: furnace, at: [2, 5], title: Banked Coals, icon: coal_block, choice: true, cost: 2, level: 9, requires: [ore_refiner], excludes: [great_bellows], effects: {fuel_last: 40}}
+  white_heat: {branch: furnace, at: [3, 3], title: White Heat, icon: blaze_powder, ranks: 2, level: 15, level-step: 3, requires: [great_bellows], effects: {furnace_speed: 10}}
+  refiner: {branch: furnace, at: [3, 4], title: Refiner, icon: gold_ingot, ranks: 2, level: 14, level-step: 3, requires: [blast_master], effects: {double_smelt: 4}}
+  deep_embers: {branch: furnace, at: [3, 5], title: Deep Embers, icon: lava_bucket, ranks: 2, level: 15, level-step: 3, requires: [banked_coals], effects: {fuel_last: 20}}
+  molten_touch: {branch: furnace, at: [4, 4], title: Molten Touch, icon: netherite_scrap, capstone: true, cost: 3, level: 30, requires: [white_heat, refiner, deep_embers], effects: {auto_smelt: 1, double_smelt: 5}}
+  furnace_mastery: {branch: furnace, at: [5, 4], title: "Smelter's Mastery", icon: netherite_ingot, mastery: true, cost: 0, requires: [molten_touch], effects: {forge_heart: 1, furnace_speed: 20}}

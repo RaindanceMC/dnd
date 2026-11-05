@@ -1,0 +1,61 @@
+# Rain's Skills — what Artisan, Building, Trading, Enchanting and Exploration say (CraftSkills defines these).
+#
+# Offered as a floor: anything an owner already wrote in their own messages.yml wins. Every placeholder a line asks
+# for is supplied where it is sent.
+dnd:
+
+  artisan:
+    tougher-lore: "<dark_aqua>Artisan-made: lasts <percent>% longer"
+
+  blueprint:
+    usage: "<gray>/skills blueprint mark  ·  save <name>  ·  list  ·  paste <name> [rotate 90|180|270]  ·  undo  ·  delete <name>"
+    no-draftsman: "<red>Blueprints come with the Architect's Draftsman node.</red> <gray><white>/skills building"
+    tool-name: "<gold>Blueprint marker"
+    tool-lore: "<gray>Right-click two opposite corners of a box"
+    marking: "<gold>Mark a box</gold> <gray>up to <white><edge></white> blocks a side: right-click two opposite corners with the marker. Left-click takes a corner back, shift-right-click puts the marker away, shift-left-click gives up."
+    corner: "<gray>First corner set. Now the opposite one."
+    marked: "<green>Box marked: <white><width> × <height> × <length></white>.</green> <gray>Stand near it and <white>/skills blueprint save <name>"
+    marked-too-big: "<yellow>That box is <white><width> × <height> × <length></white>, and your blueprints may be <white><edge></white> blocks a side."
+    corner-removed: "<gray>Corner taken back."
+    mark-help: "<gray>Right-click a block to set a corner; two make a box."
+    mark-cancelled: "<gray>Marking given up."
+    mark-done: "<green>Marked.</green> <gray>The marker is put away; the box waits for <white>/skills blueprint save <name>"
+    nothing-marked: "<red>Mark a box first:</red> <gray><white>/skills blueprint mark"
+    other-world: "<red>The box you marked is in another world."
+    bad-name: "<red>A blueprint's name is up to 24 small letters, digits, - and _."
+    too-big: "<red>Too big: <white><width> × <height> × <length></white>, and your blueprints may be <white><edge></white> blocks a side.</red> <gray>Larger ones come with the Architect's nodes."
+    no-room: "<red>You keep <white><slots></white> blueprint(s) and have that many.</red> <gray>Delete one, or learn more of the Architect."
+    too-far: "<red>Stand within <white><blocks></white> blocks of the box:</red> <gray>a paste lands the same way round wherever you stand then."
+    saving: "<gray>Drawing <white><name></white>…"
+    saved: "<green>Blueprint <white><name></white> saved</green> <gray>(<width> × <height> × <length>). <white>/skills blueprint paste <name>"
+    unreadable: "<red>The blueprints could not be read or written just now. Try again in a moment."
+    list-empty: "<gray>No blueprints yet: <white>/skills blueprint mark</white>, then <white>save <name>"
+    list-head: "<gold>Your blueprints</gold> <gray>(<count> of <slots>):"
+    list-line: "<gray> · <white><name></white> <dark_gray><width> × <height> × <length>"
+    unknown: "<red>You have no blueprint called <white><name></white>."
+    deleted: "<gray>Blueprint <white><name></white> deleted."
+    turning-is-mastery: "<red>Turning a blueprint comes with the Architect's Mastery."
+    bad-turn: "<red>Turn it by 90, 180 or 270:</red> <gray><white>/skills blueprint paste <name> rotate 90"
+    ghost: "<aqua>A ghost of <white><name></white> stands where it would go.</aqua> <gray>The same command again within <white><seconds></white> seconds, from where you stand, builds it."
+    protected: "<red><count> block(s) of <white><name></white> would stand where you may not build. Nothing was placed."
+    missing: "<red>Not enough for <white><name></white> — missing <white><list></white>. Nothing was placed."
+    nothing-to-place: "<yellow>All of <white><name></white> is there already, or something stands in its way."
+    pasting: "<gray>Building <white><name></white>: <white><blocks></white> block(s)…"
+    pasted: "<green><name> is built:</green> <gray><white><placed></white> block(s), <white><free></white> of them for nothing; <white><skipped></white> left out where something stands. <white>/skills blueprint undo</white> takes it back for ten minutes."
+    busy: "<yellow>A paste of yours is still going up."
+    nothing-to-undo: "<gray>Nothing to undo."
+    undo-expired: "<gray>Your last paste is too old to undo."
+    undo-too-far: "<red>Go back to <white><name></white> to undo it."
+    undone: "<green><name> taken down:</green> <gray><white><blocks></white> block(s), and what they cost is back in your inventory."
+
+  enchanting:
+    rerolled: "<light_purple>The table shows you something new.</light_purple> <gray>One level spent."
+    reroll-wait: "<gray>The table needs <white><seconds></white> more second(s) before it shows you anything new."
+    reroll-no-level: "<red>New offers cost a level, and you have none."
+
+  exploration:
+    sensing: "<gray>The needle trembles…"
+    sensed: "<aqua>Your compass points to something <white><blocks></white> blocks away."
+    sensed-nothing: "<gray>Nothing within <white><chunks></white> chunks. The needle settles."
+    sense-wait: "<gray>Your compass needs <white><seconds></white> more second(s) to settle."
+    reading: "<gold><x></gold> <gray>/</gray> <gold><y></gold> <gray>/</gray> <gold><z></gold>  <white><facing></white>  <gray><biome>"
