@@ -1,0 +1,26 @@
+id: skills-farming
+title: Farming
+summary: The Farming skill — fuller harvests, crops that plant and grow themselves, twins and more from the pasture.
+intro: |
+  Fields and pasture: what you sow and what you raise gives more. {run:/skills farming} shows the tree.
+icon: WHEAT
+category: Progress & rewards
+order: 48
+module: dnd
+aliases: [farming, farmer, crops, harvest, green-thumb, reaper, twins, pasture]
+keywords: [farming, crops, wheat, carrots, potatoes, harvest, replant, hoe, growth, breeding, twins, sheep, wool, animals]
+commands: [skills]
+related: [skills, skills-trees]
+sections:
+  - question: What do the Fields give?
+    title: Fields
+    text: |
+      A grown crop you break may drop its crop twice — never its seeds — and a melon or pumpkin the world grew too. Crops within six blocks of you grow faster while you are there and not away, your hoe may take no wear, and the choice is <white>Green Thumb</white> (a grown crop plants itself again from its own seeds) or <white>Bountiful</white> (more doubled crops). The capstone is Harvest Moon; the mastery badge, <gold>Reaper</gold>: break a grown crop with a hoe and the grown crops around it are reaped too.
+  - question: What does the Pasture give?
+    title: Pasture
+    text: |
+      Animals you breed may bring <white>twins</white>, babies you feed grow up sooner, sheep you shear give more wool and animals you kill may drop their meat, leather, feathers or wool twice — never what they carried. The choice is Twin Births or Prime Cuts, the capstone Land of Plenty, the mastery badge <gold>Herdmaster</gold>: animals you breed may breed again at once.
+  - question: Can a farm do it for me?
+    title: Farms
+    text: |
+      No. Only a crop or melon you break yourself counts, only one the world grew (a placed melon, a crop half-grown, a water-and-piston or villager farm gives nothing extra), and twins come only from parents that were raised — never from spawn eggs or a spawner.

@@ -1,0 +1,26 @@
+id: skills-foraging
+title: Foraging
+summary: The Foraging skill — more berries and honey, flowers and mushrooms twice, rare finds and bone meal that goes further.
+intro: |
+  Whatever grows wild is yours to gather. {run:/skills foraging} shows the tree.
+icon: SWEET_BERRIES
+category: Progress & rewards
+order: 49
+module: dnd
+aliases: [foraging, forager, berries, flowers, mushrooms, bone-meal, bloom, bramble-kin, rare-finds]
+keywords: [foraging, berries, sweet berries, glow berries, honey, hive, flowers, mushrooms, bone meal, rare find, sapling]
+commands: [skills]
+related: [skills, skills-trees]
+sections:
+  - question: What does the Gatherer give?
+    title: Gatherer
+    text: |
+      More berries from every bush and vine you pick, another honeycomb now and then when you shear a hive, and <white>rare finds</white>: glow berries, apples or honey from a bush; seeds of the old flowers or honey from a flower; glow lichen, a spore blossom or a shroomlight from a mushroom. The choice is Honey Hunter or Truffle Nose, the capstone Forest's Bounty, the mastery badge <gold>Bramble Kin</gold>: berry bushes never prick you, and one bush in four you pick is ripe again at once.
+  - question: What does the Herbalist give?
+    title: Herbalist
+    text: |
+      A flower or mushroom the world grew may drop twice, and bone meal you use may not be used up. The choice is Green Fingers (more bone meal saved) or Wild Harvest (more flowers twice), the capstone Druid, the mastery badge <gold>Bloom</gold>: bone meal grows a sapling, a berry bush or a stem all the way at once.
+  - question: Why did a flower not drop twice?
+    title: What counts
+    text: |
+      Only what the world grew counts: never a flower or mushroom somebody placed, and never one bone meal made in the last half hour — bone meal on grass makes flowers, and those would otherwise turn back into more bone meal than they took.

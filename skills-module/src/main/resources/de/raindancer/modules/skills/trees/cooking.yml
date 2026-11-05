@@ -1,0 +1,38 @@
+# The Cooking skill's tree, read by Core's SkillTree (see SkillDef): 2 branches stacked on the canvas, three rows
+# each, every one with a choice, a capstone and a free mastery badge. Node ids are unique across every skill.
+branches:
+  kitchen:
+    title: Kitchen
+    icon: furnace
+    blurb: Furnaces and smokers that hurry, fuel that lasts, a second serving.
+  table:
+    title: Table
+    icon: bread
+    blurb: Meals that fill you more and bless you after, a stomach for anything, a feast.
+
+nodes:
+  stoker: {branch: kitchen, at: [0, 1], title: "Stoker", icon: coal, ranks: 3, level: 1, level-step: 2, effects: {cook_speed: 10}}
+  second_helping: {branch: kitchen, at: [1, 0], title: "Second Helping", icon: bowl, ranks: 3, level: 3, level-step: 2, requires: [stoker], effects: {cook_servings: 8}}
+  bellows: {branch: kitchen, at: [1, 1], title: "Bellows", icon: furnace, ranks: 2, level: 3, level-step: 2, requires: [stoker], effects: {cook_speed: 10}}
+  dry_wood: {branch: kitchen, at: [1, 2], title: "Dry Wood", icon: oak_log, ranks: 2, level: 3, level-step: 2, requires: [stoker], effects: {cook_fuel: 15}}
+  big_pot: {branch: kitchen, at: [2, 0], title: "Big Pot", icon: cauldron, choice: true, cost: 2, level: 8, requires: [second_helping], excludes: [charcoal_burner], effects: {cook_servings: 15}}
+  hot_coals: {branch: kitchen, at: [2, 1], title: "Hot Coals", icon: magma_block, ranks: 2, level: 6, level-step: 2, requires: [bellows], effects: {cook_speed: 10}}
+  charcoal_burner: {branch: kitchen, at: [2, 2], title: "Charcoal Burner", icon: charcoal, choice: true, cost: 2, level: 8, requires: [dry_wood], excludes: [big_pot], effects: {cook_fuel: 40}}
+  leftovers: {branch: kitchen, at: [3, 0], title: "Leftovers", icon: cooked_chicken, ranks: 2, level: 12, level-step: 3, requires: [big_pot, hot_coals], effects: {cook_servings: 8}}
+  roaring_fire: {branch: kitchen, at: [3, 1], title: "Roaring Fire", icon: blaze_powder, level: 12, requires: [hot_coals], effects: {cook_speed: 15}}
+  slow_embers: {branch: kitchen, at: [3, 2], title: "Slow Embers", icon: campfire, ranks: 2, level: 12, level-step: 3, requires: [charcoal_burner, hot_coals], effects: {cook_fuel: 15}}
+  head_cook: {branch: kitchen, at: [4, 1], title: "Head Cook", icon: smoker, capstone: true, cost: 3, level: 25, requires: [leftovers, roaring_fire, slow_embers], effects: {cook_servings: 15, cook_speed: 10}}
+  master_chef: {branch: kitchen, at: [5, 1], title: "Master Chef", icon: cake, mastery: true, cost: 0, requires: [head_cook], effects: {cook_master_chef: 1, cook_servings: 5}}
+
+  good_appetite: {branch: table, at: [0, 4], title: "Good Appetite", icon: bread, ranks: 3, level: 1, level-step: 2, effects: {cook_filling: 10}}
+  comfort_food: {branch: table, at: [1, 3], title: "Comfort Food", icon: mushroom_stew, ranks: 2, level: 3, level-step: 2, requires: [good_appetite], effects: {cook_well_fed: 10}}
+  seasoning: {branch: table, at: [1, 4], title: "Seasoning", icon: sugar, ranks: 2, level: 3, level-step: 2, requires: [good_appetite], effects: {cook_filling: 10}}
+  herb_garden: {branch: table, at: [1, 5], title: "Herb Garden", icon: fern, ranks: 2, level: 3, level-step: 2, requires: [good_appetite], effects: {cook_well_fed: 10}}
+  iron_stomach: {branch: table, at: [2, 3], title: "Iron Stomach", icon: rotten_flesh, choice: true, cost: 2, level: 8, requires: [comfort_food], excludes: [gourmet], effects: {cook_iron_stomach: 1}}
+  slow_supper: {branch: table, at: [2, 4], title: "Slow Supper", icon: baked_potato, ranks: 2, level: 6, level-step: 2, requires: [seasoning], effects: {cook_filling: 10}}
+  gourmet: {branch: table, at: [2, 5], title: "Gourmet", icon: rabbit_stew, choice: true, cost: 2, level: 8, requires: [herb_garden], excludes: [iron_stomach], effects: {cook_well_fed: 20}}
+  hearty_stew: {branch: table, at: [3, 3], title: "Hearty Stew", icon: beetroot_soup, ranks: 2, level: 12, level-step: 3, requires: [iron_stomach, slow_supper], effects: {cook_filling: 10}}
+  spice_rack: {branch: table, at: [3, 4], title: "Spice Rack", icon: cocoa_beans, ranks: 2, level: 12, level-step: 3, requires: [slow_supper], effects: {cook_well_fed: 10}}
+  banquet: {branch: table, at: [3, 5], title: "Banquet", icon: pumpkin_pie, ranks: 2, level: 12, level-step: 3, requires: [gourmet, slow_supper], effects: {cook_filling: 5}}
+  host: {branch: table, at: [4, 4], title: "Host", icon: cooked_mutton, capstone: true, cost: 3, level: 25, requires: [hearty_stew, spice_rack, banquet], effects: {cook_filling: 15, cook_well_fed: 10}}
+  feast: {branch: table, at: [5, 4], title: "Feast", icon: suspicious_stew, mastery: true, cost: 0, requires: [host], effects: {cook_feast: 1, cook_filling: 5}}

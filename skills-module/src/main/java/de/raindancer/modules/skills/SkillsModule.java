@@ -133,6 +133,12 @@ public final class SkillsModule implements FlexModule {
         context.listener(new CombatListener(services));
         context.listener(new ItemListener(services));
         de.raindancer.modules.skills.skill.gathering.GatheringSkills.enable(context, services);
+        // Farming, Foraging, Cooking, Alchemy and Taming: each its own package, listener and timers.
+        de.raindancer.modules.skills.skill.farming.FarmingListener.start(context, services);
+        de.raindancer.modules.skills.skill.foraging.ForagingListener.start(context, services);
+        de.raindancer.modules.skills.skill.cooking.CookingListener.start(context, services);
+        de.raindancer.modules.skills.skill.alchemy.AlchemyListener.start(context, services);
+        de.raindancer.modules.skills.skill.taming.TamingListener.start(context, services);
         enableMach(context, settings, messages, itemForge);
         // Experience for what players do — never for ordinary monsters, so a mob farm pays nothing.
         Object listening = de.raindancer.core.world.activity.Activities.listen(context.plugin(), combat::did);

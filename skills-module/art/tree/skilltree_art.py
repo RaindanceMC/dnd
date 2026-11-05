@@ -18,6 +18,7 @@ sys.path.insert(0, CORE_ART)
 from canvas import (Canvas, W, chest_well, inventory_well, hotbar_well, label_y, height, mix, wood, well,  # noqa: E402
                     vignette, shade)
 import tree as core_tree  # noqa: E402
+import nature_scenes  # noqa: E402
 
 PACK = os.path.join(HERE, "..", "..", "src", "main", "resources", "de", "raindancer", "modules", "skills", "pack")
 NS = "rainsadventurers"
@@ -27,7 +28,7 @@ SCENES = ["vitality", "might", "marksman", "shadow", "arcana", "guardian",
           "warden", "arms", "fury", "trickshot", "ranger", "acrobatics",
           "rogue", "mysticism", "battlemage", "prospector", "delver", "veinbreaker",
           "digger", "treasure_hunter", "archaeologist", "lumberjack", "forester", "feller",
-          "anvil_work", "salvager", "forgemaster"]
+          "anvil_work", "salvager", "forgemaster"] + nature_scenes.SCENES
 
 GOLD = (222, 176, 64)
 GOLD_DARK = (122, 82, 22)
@@ -885,7 +886,7 @@ PAINTERS = [scene_vitality, scene_might, scene_marksman, scene_shadow,
             scene_rogue, scene_mysticism, scene_battlemage, scene_prospector,
             scene_delver, scene_veinbreaker, scene_digger, scene_treasure_hunter,
             scene_archaeologist, scene_lumberjack, scene_forester, scene_feller,
-            scene_anvil_work, scene_salvager, scene_forgemaster]
+            scene_anvil_work, scene_salvager, scene_forgemaster] + nature_scenes.PAINTERS
 
 
 def write_scenes():

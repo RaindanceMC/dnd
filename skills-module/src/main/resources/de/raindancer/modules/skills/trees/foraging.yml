@@ -1,0 +1,38 @@
+# The Foraging skill's tree, read by Core's SkillTree (see SkillDef): 2 branches stacked on the canvas, three rows
+# each, every one with a choice, a capstone and a free mastery badge. Node ids are unique across every skill.
+branches:
+  gatherer:
+    title: Gatherer
+    icon: sweet_berries
+    blurb: Berries by the basket, honey from every hive, and things nobody else finds.
+  herbalist:
+    title: Herbalist
+    icon: poppy
+    blurb: Flowers and mushrooms twice over, bone meal that goes further, and blooms at once.
+
+nodes:
+  berry_picker: {branch: gatherer, at: [0, 1], title: "Berry Picker", icon: sweet_berries, ranks: 3, level: 1, level-step: 2, effects: {forage_berries: 20}}
+  beekeeper: {branch: gatherer, at: [1, 0], title: "Beekeeper", icon: honeycomb, ranks: 3, level: 3, level-step: 2, requires: [berry_picker], effects: {forage_honey: 15}}
+  keen_eye: {branch: gatherer, at: [1, 1], title: "Keen Eye", icon: spyglass, ranks: 2, level: 3, level-step: 2, requires: [berry_picker], effects: {forage_rare: 2}}
+  deep_pockets: {branch: gatherer, at: [1, 2], title: "Deep Pockets", icon: bundle, ranks: 2, level: 3, level-step: 2, requires: [berry_picker], effects: {forage_berries: 20}}
+  honey_hunter: {branch: gatherer, at: [2, 0], title: "Honey Hunter", icon: honey_bottle, choice: true, cost: 2, level: 8, requires: [beekeeper], excludes: [truffle_nose], effects: {forage_honey: 25}}
+  sweet_tooth: {branch: gatherer, at: [2, 1], title: "Sweet Tooth", icon: glow_berries, ranks: 2, level: 6, level-step: 2, requires: [keen_eye], effects: {forage_berries: 20}}
+  truffle_nose: {branch: gatherer, at: [2, 2], title: "Truffle Nose", icon: brown_mushroom, choice: true, cost: 2, level: 8, requires: [deep_pockets], excludes: [honey_hunter], effects: {forage_rare: 5}}
+  hive_mind: {branch: gatherer, at: [3, 0], title: "Hive Mind", icon: beehive, ranks: 2, level: 12, level-step: 3, requires: [honey_hunter, sweet_tooth], effects: {forage_honey: 15}}
+  rare_find: {branch: gatherer, at: [3, 1], title: "Rare Find", icon: emerald, ranks: 2, level: 12, level-step: 3, requires: [sweet_tooth], effects: {forage_rare: 2}}
+  overflowing: {branch: gatherer, at: [3, 2], title: "Overflowing", icon: apple, ranks: 2, level: 12, level-step: 3, requires: [truffle_nose, sweet_tooth], effects: {forage_berries: 25}}
+  forest_bounty: {branch: gatherer, at: [4, 1], title: "Forest's Bounty", icon: honey_block, capstone: true, cost: 3, level: 25, requires: [hive_mind, rare_find, overflowing], effects: {forage_berries: 30, forage_rare: 3}}
+  bramble_kin: {branch: gatherer, at: [5, 1], title: "Bramble Kin", icon: spruce_sapling, mastery: true, cost: 0, requires: [forest_bounty], effects: {forage_bramble: 1, forage_berries: 10}}
+
+  wildflowers: {branch: herbalist, at: [0, 4], title: "Wildflowers", icon: poppy, ranks: 3, level: 1, level-step: 2, effects: {forage_wild: 10}}
+  bone_saver: {branch: herbalist, at: [1, 3], title: "Bone Saver", icon: bone_meal, ranks: 2, level: 3, level-step: 2, requires: [wildflowers], effects: {forage_bone_meal: 10}}
+  mushroom_lore: {branch: herbalist, at: [1, 4], title: "Mushroom Lore", icon: red_mushroom, ranks: 2, level: 3, level-step: 2, requires: [wildflowers], effects: {forage_wild: 10}}
+  rare_blooms: {branch: herbalist, at: [1, 5], title: "Rare Blooms", icon: torchflower, ranks: 2, level: 3, level-step: 2, requires: [wildflowers], effects: {forage_rare: 2}}
+  green_fingers: {branch: herbalist, at: [2, 3], title: "Green Fingers", icon: bone, choice: true, cost: 2, level: 8, requires: [bone_saver], excludes: [wild_harvest], effects: {forage_bone_meal: 20}}
+  spore_sense: {branch: herbalist, at: [2, 4], title: "Spore Sense", icon: crimson_fungus, ranks: 2, level: 6, level-step: 2, requires: [mushroom_lore], effects: {forage_wild: 10}}
+  wild_harvest: {branch: herbalist, at: [2, 5], title: "Wild Harvest", icon: sunflower, choice: true, cost: 2, level: 8, requires: [rare_blooms], excludes: [green_fingers], effects: {forage_wild: 20}}
+  compost_heap: {branch: herbalist, at: [3, 3], title: "Compost Heap", icon: composter, ranks: 2, level: 12, level-step: 3, requires: [green_fingers, spore_sense], effects: {forage_bone_meal: 5}}
+  meadow_walker: {branch: herbalist, at: [3, 4], title: "Meadow Walker", icon: cornflower, ranks: 2, level: 12, level-step: 3, requires: [spore_sense], effects: {forage_rare: 2}}
+  fairy_ring: {branch: herbalist, at: [3, 5], title: "Fairy Ring", icon: warped_fungus, ranks: 2, level: 12, level-step: 3, requires: [wild_harvest, spore_sense], effects: {forage_wild: 5}}
+  druid: {branch: herbalist, at: [4, 4], title: "Druid", icon: flowering_azalea, capstone: true, cost: 3, level: 25, requires: [compost_heap, meadow_walker, fairy_ring], effects: {forage_wild: 10, forage_bone_meal: 5}}
+  bloom: {branch: herbalist, at: [5, 4], title: "Bloom", icon: pink_petals, mastery: true, cost: 0, requires: [druid], effects: {forage_bloom: 1, forage_wild: 5}}

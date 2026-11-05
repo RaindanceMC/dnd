@@ -75,3 +75,12 @@ dnd:
     salvage-moved: "<red>The item is no longer in your hand; nothing was salvaged."
     template-kept: "<gold>The template survives the work.</gold> <gray>It is back in your bag."
     scrap-back: "<dark_red>Forgemaster:</dark_red> <gray>a netherite scrap comes back from the work."
+
+  nature:
+    rare-find: "<gold>A rare find:</gold> <white><item>"
+    feast: "<gold><player></gold> <gray>shares the meal with you."
+    brew-longer: "<!italic><dark_purple>Brewed with care: lasts <percent>% longer"
+    brew-stronger: "<!italic><dark_purple>Brewed with care: a level stronger"
+    bottomless: "<light_purple>The flask is still full."
+    tamed: "<green>It trusts you at once."
+    loyal: "<gold><pet></gold> <gray>clings on and runs to you."

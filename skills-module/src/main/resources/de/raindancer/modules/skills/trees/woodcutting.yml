@@ -29,9 +29,9 @@ nodes:
   forester: {branch: forester, at: [0, 4], title: Forester, icon: oak_sapling, ranks: 3, level: 1, level-step: 2, effects: {chop_sapling: 5}}
   orchard: {branch: forester, at: [1, 3], title: Orchard, icon: apple, ranks: 2, level: 3, level-step: 2, requires: [forester], effects: {chop_apple: 3}}
   twig_gatherer: {branch: forester, at: [1, 5], title: Twig Gatherer, icon: stick, ranks: 2, level: 3, level-step: 2, requires: [forester], effects: {chop_sticks: 10}}
-  green_thumb: {branch: forester, at: [2, 4], title: Green Thumb, icon: birch_sapling, ranks: 3, level: 6, level-step: 2, requires: [orchard, twig_gatherer], effects: {chop_sapling: 5}}
-  orchard_keeper: {branch: forester, at: [3, 3], title: Orchard Keeper, icon: golden_apple, choice: true, cost: 2, level: 12, requires: [green_thumb], excludes: [seed_saver], effects: {chop_apple: 10}}
-  seed_saver: {branch: forester, at: [3, 5], title: Seed Saver, icon: jungle_sapling, choice: true, cost: 2, level: 12, requires: [green_thumb], excludes: [orchard_keeper], effects: {chop_sapling: 15}}
+  sapling_tender: {branch: forester, at: [2, 4], title: Sapling Tender, icon: birch_sapling, ranks: 3, level: 6, level-step: 2, requires: [orchard, twig_gatherer], effects: {chop_sapling: 5}}
+  orchard_keeper: {branch: forester, at: [3, 3], title: Orchard Keeper, icon: golden_apple, choice: true, cost: 2, level: 12, requires: [sapling_tender], excludes: [seed_saver], effects: {chop_apple: 10}}
+  seed_saver: {branch: forester, at: [3, 5], title: Seed Saver, icon: jungle_sapling, choice: true, cost: 2, level: 12, requires: [sapling_tender], excludes: [orchard_keeper], effects: {chop_sapling: 15}}
   canopy_walker: {branch: forester, at: [4, 4], title: Canopy Walker, icon: oak_leaves, ranks: 2, level: 16, level-step: 4, requires: [orchard_keeper, seed_saver], effects: {chop_apple: 2, chop_sticks: 10}}
   ancient_grove: {branch: forester, at: [5, 4], title: Ancient Grove, icon: cherry_sapling, capstone: true, cost: 3, level: 28, requires: [canopy_walker], effects: {chop_sapling: 5, chop_apple: 5, chop_sticks: 10}}
   forester_mastery: {branch: forester, at: [6, 4], title: "Forester's Mastery", icon: bone_meal, mastery: true, cost: 0, requires: [ancient_grove], effects: {chop_replant: 1}}
