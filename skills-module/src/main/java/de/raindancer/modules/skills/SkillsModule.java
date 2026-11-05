@@ -56,7 +56,7 @@ import java.util.random.RandomGenerator;
  */
 public final class SkillsModule implements FlexModule {
 
-    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Skills", "0.14.0")
+    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Skills", "0.14.1")
             .describedAs("Skills with trees of their own, levelled by playing, with mastery badges — and magic items.")
             .by("Raindancer118");
 
@@ -77,6 +77,14 @@ public final class SkillsModule implements FlexModule {
     public void enable(ModuleContext context) {
         log = context.log();
         server = context.plugin().getServer();
+        try {
+            int carried = de.raindancer.modules.skills.store.OldFolder.carryOver(context.dataFolder());
+            if (carried > 0) {
+                log.info("{} file(s) of RainsAdventurers' folder taken over; the old folder is left as it was.", carried);
+            }
+        } catch (java.io.UncheckedIOException failed) {
+            log.warn("RainsAdventurers' folder could not be taken over: {}", failed.getMessage());
+        }
         SettingsStore<SkillsSettings> settings = context.settings(SkillsSettings.class, SkillsSettings.DEFAULTS);
 
         context.core().messages().defineFrom(SkillsModule.class.getResourceAsStream("messages.yml"),

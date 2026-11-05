@@ -20,7 +20,7 @@
 
     <!-- This repository's own versions: bump them here. CI publishes a new version on the next push to master. -->
     <properties>
-        <skills-module.version>0.14.0</skills-module.version>
+        <skills-module.version>0.14.1</skills-module.version>
         <rainscore.version>2.37.2</rainscore.version>
         <modules-wrapper.version>1.11.0</modules-wrapper.version>
     </properties>
