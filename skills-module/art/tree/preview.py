@@ -43,6 +43,15 @@ def icon(name):
     return None
 
 
+CORE_UI = os.path.join(HERE, "..", "..", "..", "..", "..", "RainsCore", "src", "main", "resources", "de", "raindancer",
+                       "core", "pack", "assets", "rainscore", "textures", "item", "ui")
+
+
+def core_ui(name):
+    """Core's own menu arrows, as a viewer wearing the pack sees them."""
+    return Image.open(os.path.join(CORE_UI, name + ".png")).convert("RGBA")
+
+
 def page(branch, tree, ranks, left=0):
     """The window over columns left .. left + 4 of the branch's canvas."""
     window = Image.open(os.path.join(FONT, "tree_scene", branch + ".png")).convert("RGBA")
@@ -69,9 +78,10 @@ def page(branch, tree, ranks, left=0):
         img = icon(node["icon"])
         if img:
             window.alpha_composite(img, (8 + 36 * (node["at"][0] - left), 18 + 36 * node["at"][1]))
-    for col, name in ((0, "arrow"), (2, "spectral_arrow"), (3, "arrow"), (4, tree["branches"][branch]["icon"]),
-                      (5, "arrow"), (6, "spectral_arrow"), (7, "writable_book"), (8, "barrier")):
-        img = icon(name)
+    for col, name in ((0, "ui:arrow_back"), (2, "ui:arrow_up"), (3, "ui:arrow_left"),
+                      (4, tree["branches"][branch]["icon"]), (5, "ui:arrow_right"), (6, "ui:arrow_down"),
+                      (7, "writable_book"), (8, "barrier")):
+        img = core_ui(name[3:]) if name.startswith("ui:") else icon(name)
         if img:
             window.alpha_composite(img, (8 + 18 * col, 18 + 18 * 5))
     return window
