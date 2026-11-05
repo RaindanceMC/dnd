@@ -3,12 +3,13 @@ The dragon: a western dragon on four legs with a pair of bat wings — horned he
 from brow to tail, amber belly plates, a spade at the tail's end. Companion that fights and grows; ridden at
 mastery. Built at full size; BetterModel scales the young ones down.
 
-    python3 dragon.py        # builds it in a running Blockbench, saves dragon.bbmodel and preview sheets
+    python3 dragon.py [gold|crystal|verdant ...]   # builds each style in a running Blockbench: dragon_<style>.bbmodel,
+                                                  # its texture and preview sheets
 """
 import math
 import os
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 import beastkit as kit
 from beastkit import (Bone, armour_plate, feathers, gait, hexrgb, keys, mirror, mix, noise, plate_edge, ramp_at,
@@ -16,13 +17,42 @@ from beastkit import (Bone, armour_plate, feathers, gait, hexrgb, keys, mirror, 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-CRIMSON = [hexrgb(h) for h in ("#4a1216", "#7e2224", "#b23a30", "#d9573f", "#f08a62")]
-AMBER = [hexrgb(h) for h in ("#a8743a", "#d4a25a", "#efc982", "#fbe6b2")]
+# One model, three dragons: the style sets every colour (scales, belly plates, horns, the wing blades, the eyes) and
+# how a blade is drawn — a feather with a shaft (gold), a crystal shard in two facets (crystal), a leaf with veins
+# (verdant). Each style builds its own .bbmodel.
+STYLES = {
+    "gold": {"scale": ("#7d7466", "#bdb5a6", "#e2dccf", "#f6f2ea", "#ffffff"),
+             "belly": ("#7a4a0e", "#b97c16", "#e2a828", "#f8d65a"),
+             "horn": ("#6a4410", "#a8701c", "#dca83a", "#f6d870"),
+             "blade": ("#fbf8f0", "#f2e6c8", "#f2b440", "#e8780c"), "blade_line": "#a87a3a",
+             "under": ("#d8d0c0", "#c8b48c", "#e09a3a", "#c0600e"), "kind": "feather",
+             "eye": ("#1c6ab8", "#7ad0ff")},
+    "crystal": {"scale": ("#3a0c2c", "#6c1a52", "#a02c7a", "#cc4a9e", "#ec86c6"),
+                "belly": ("#4a1440", "#76245e", "#a8407e", "#d26aa4"),
+                "horn": ("#7a2a5c", "#c45a98", "#f08cc4", "#ffd0ea"),
+                "blade": ("#ffd6ec", "#ff9ccc", "#ff5aa8", "#c81e78"), "blade_line": "#8a1458",
+                "under": ("#f0a8cc", "#e07ab0", "#d04c94", "#9a1662"), "kind": "crystal",
+                "eye": ("#e8e8ff", "#ffffff")},
+    "verdant": {"scale": ("#1a3a0e", "#2f6418", "#4e9424", "#7cc436", "#b4ea66"),
+                "belly": ("#6a5a12", "#a8901e", "#d8c040", "#f2e47a"),
+                "horn": ("#6a4410", "#a8701c", "#dca83a", "#f6d870"),
+                "blade": ("#9ae84a", "#5cc42a", "#2e8c18", "#1a5a0e"), "blade_line": "#0e3a08",
+                "under": ("#7cc444", "#4e9c26", "#2c7016", "#164a0a"), "kind": "leaf",
+                "eye": ("#d84a0a", "#ffc040")},
+}
+STYLE = {}
+SCALE = BELLY = HORN = BLADE = UNDER = EYE = []
+BLADE_LINE = None
 BONE_ = [hexrgb(h) for h in ("#463c30", "#776a56", "#ad9f80", "#ddd2b6")]
-MEMBRANE = [hexrgb(h) for h in ("#6a1a20", "#93303a", "#bb4c4c", "#dc7466")]
-MEMBRANE_UNDER = [hexrgb(h) for h in ("#a04a46", "#c8665a", "#e28a74", "#f2ae92")]
-VEIN = hexrgb("#1c0507")
 DARK = hexrgb("#120406")
+
+
+def apply_style(name):
+    global STYLE, SCALE, BELLY, HORN, BLADE, UNDER, EYE, BLADE_LINE
+    STYLE = STYLES[name]
+    SCALE, BELLY, HORN, BLADE, UNDER, EYE = ([hexrgb(h) for h in STYLE[k]] for k in
+                                             ("scale", "belly", "horn", "blade", "under", "eye"))
+    BLADE_LINE = hexrgb(STYLE["blade_line"])
 
 
 # ------------------------------------------------------------------------------------------------ painting
@@ -34,9 +64,9 @@ def belly(tile, rng):
     for y in range(size):
         for x in range(size):
             k = 0.75 - 0.5 * (y % 5) / 5 + 0.05 * ((x // 3 + y // 5) % 2)
-            c = ramp_at(AMBER, k)
+            c = ramp_at(BELLY, k)
             if y % 5 == 4:
-                c = AMBER[0]
+                c = BELLY[0]
             px[x, y] = c + (255,)
 
 
@@ -46,9 +76,9 @@ def horn(tile, rng):
     size = tile.size[0]
     for y in range(size):
         for x in range(size):
-            c = ramp_at(BONE_, 0.9 - 0.7 * y / size)
+            c = ramp_at(HORN, 0.9 - 0.7 * y / size)
             if y % 4 == 3:
-                c = mix(c, BONE_[0], 0.35)
+                c = mix(c, HORN[0], 0.35)
             px[x, y] = c + (255,)
 
 
@@ -62,14 +92,14 @@ def big_eye(image):
         for x in range(w):
             d = math.hypot(x - cx, y - cy) / r
             if d > 1.0:
-                px[x, y] = CRIMSON[2] + (255,)
+                px[x, y] = SCALE[2] + (255,)
                 continue
             if d > 0.82:
                 c = hexrgb("#2a0e10")
             elif math.hypot(x - cx, y - cy - 0.3) / r < 0.42:
                 c = (18, 10, 14)
             else:
-                c = mix(hexrgb("#e08a20"), hexrgb("#ffe080"), max(0.0, (y - cy) / r + 0.3))
+                c = mix(EYE[0], EYE[1], max(0.0, (y - cy) / r + 0.3))
             for hx, hy, hr in ((-0.3, -0.35, 0.22), (0.25, 0.2, 0.1)):
                 if math.hypot(x - cx - hx * r, y - cy - hy * r) / r < hr:
                     c = (255, 255, 255)
@@ -78,18 +108,17 @@ def big_eye(image):
 
 def paint_atlas():
     atlas = kit.Atlas()
-    atlas.tile("scale", lambda t, r: feathers(t, r, CRIMSON[1:], 6, 5, CRIMSON[0]), 1)
-    atlas.tile("plates", lambda t, r: feathers(t, r, CRIMSON[1:], 10, 8, CRIMSON[0]), 2)
+    atlas.tile("scale", lambda t, r: feathers(t, r, SCALE[1:], 6, 5, SCALE[0]), 1)
+    atlas.tile("plates", lambda t, r: feathers(t, r, SCALE[1:], 10, 8, SCALE[0]), 2)
     atlas.tile("belly", belly, 3)
     atlas.tile("horn", horn, 4)
     atlas.tile("claw", lambda t, r: smooth(t, r, [(10, 8, 8), (34, 28, 26), (78, 70, 64)], 0.9, 0.0), 5)
     atlas.tile("teeth", lambda t, r: smooth(t, r, BONE_[1:] + [hexrgb("#f4eedd")], 1.0, 0.5), 6)
     atlas.tile("mouth", lambda t, r: smooth(t, r, [hexrgb("#2a0608"), hexrgb("#5a1418"), hexrgb("#8a2a2c")], 0.8, 0.1), 7)
-    atlas.tile("skin", lambda t, r: smooth(t, r, CRIMSON[:4], 0.75, 0.25), 9)
+    atlas.tile("skin", lambda t, r: smooth(t, r, SCALE[1:], 0.8, 0.3), 9)
     atlas.tile("leather", lambda t, r: smooth(t, r, [hexrgb(h) for h in ("#2e1c10", "#4a2e18", "#6a4426", "#8a5c34")],
                                               0.9, 0.2), 10)
     atlas.tile("plate_edge", plate_edge, 11)
-    atlas.tile("blush", lambda t, r: smooth(t, r, [hexrgb("#e87a78"), hexrgb("#f4a09a")], 0.9, 0.4), 12)
     return atlas
 
 
@@ -106,9 +135,9 @@ ARM = (("wing_humerus", SHOULDER, 18.0, -25.0), ("wing_forearm", (18.0, -7.0), 3
 FINGERS = ((0.0, 30.0), (-22.5, 28.0), (-45.0, 24.0))   # cube rotation in the hand, length
 FLANK = (6.5, 15.0)   # where the membrane meets the body
 W_PX = 4               # pixels per unit of the painted membrane
-WING_SCALE = 1.4
-HEAD = 1.75   # cute: a big head, short legs
-LEGS = 0.72
+WING_SCALE = 1.6
+HEAD = 1.35   # stylised: a big, readable head
+LEGS = 1.0
 
 
 def turn(p, pivot, degrees):
@@ -149,59 +178,125 @@ def membrane_outline():
     return lead + trail, elbow, wrist, tips
 
 
-def membrane_images():
-    """(top, under, owner) painted over the whole spread wing in wing coordinates; owner says which bone's panel
-    shows each pixel."""
+def resample(points, n):
+    """n points evenly along a polyline."""
+    lengths = [math.dist(points[i], points[i + 1]) for i in range(len(points) - 1)]
+    total, out = sum(lengths), []
+    for k in range(n):
+        target, i = total * k / (n - 1), 0
+        while i < len(lengths) - 1 and target > lengths[i]:
+            target -= lengths[i]
+            i += 1
+        t = min(1.0, target / lengths[i]) if lengths[i] else 0.0
+        a, b = points[i], points[i + 1]
+        out.append((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t))
+    return out
+
+
+def blades():
+    """The wing's blades as (base, tip, width), innermost first: long two-tone blades fanning from the wrist across
+    the hand and from the arm back to the flank, each tip reaching a little past the scalloped edge so the edge
+    is the blades' own points."""
     outline, elbow, wrist, tips = membrane_outline()
-    x0, z0, w, h = 0.0, -14.0, 72, 50
+    trail = outline[4:]                      # from the first finger's tip round to the flank
+    hand_part = trail[:trail.index(tips[2]) + 1]
+    arm_part = trail[trail.index(tips[2]):]
+    out = []
+    arm_line = [wrist, elbow, SHOULDER, (SHOULDER[0] + 0.5, SHOULDER[1] + 6.0)]
+    arm_tips = resample(arm_part, 10)
+    for k, tip in enumerate(reversed(arm_tips)):          # flank first: it lies underneath
+        f = k / (len(arm_tips) - 1)
+        base = resample(arm_line, 11)[10 - round(f * 10)]
+        out.append((base, tip, 3.6))
+    hand_tips = resample(hand_part, 13)
+    for k, tip in enumerate(reversed(hand_tips)):
+        base = (wrist[0] + (tip[0] - wrist[0]) * 0.18, wrist[1] + (tip[1] - wrist[1]) * 0.18)
+        out.append((base, tip, 4.2))
+    return out, outline, elbow, wrist, tips
+
+
+def blade_colour(f, across, ramp, kind):
+    """The colour along a blade (f 0 at the base .. 1 at the tip) and across it (-1 .. 1)."""
+    c = ramp_at(ramp, 0.15 + 0.85 * f ** 1.4)
+    if kind == "feather" and abs(across) < 0.12:
+        c = mix(c, (255, 255, 255), 0.5)                       # the shaft
+    elif kind == "crystal":
+        c = mix(c, (255, 255, 255), 0.28) if across < 0 else mix(c, ramp[-1], 0.25)   # two facets
+    elif kind == "leaf":
+        if abs(across) < 0.1 or abs(abs(across) - (f * 3.0) % 1.0) < 0.08:
+            c = mix(c, ramp[-1], 0.55)                         # midrib and side veins
+    return c
+
+
+def membrane_images():
+    """(top, under, owner) painted over the whole spread wing in wing coordinates: first the membrane, then the
+    blades over it from the flank out to the leading finger; owner says which bone's panel shows each pixel."""
+    fan, outline, elbow, wrist, tips = blades()
+    x0, z0, w, h = -4.0, -16.0, 80, 58
     size = (int(w * W_PX), int(h * W_PX))
 
     def px(p):
         return ((p[0] - x0) * W_PX, (p[1] - z0) * W_PX)
+
+    def world(i, j):
+        return (x0 + (i + 0.5) / W_PX, z0 + (j + 0.5) / W_PX)
+    shapes = []
+    for base, tip, width in fan:
+        d = (tip[0] - base[0], tip[1] - base[1])
+        length = math.hypot(*d)
+        u = (d[0] / length, d[1] / length)
+        n = (-u[1], u[0])
+        tip2 = (tip[0] + u[0] * 1.6, tip[1] + u[1] * 1.6)
+
+        def at(f, side, hw):
+            return (base[0] + d[0] * f + n[0] * side * hw, base[1] + d[1] * f + n[1] * side * hw)
+        poly = [at(0, -1, width * 0.35), at(0.75, -1, width * 0.55), tip2, at(0.75, 1, width * 0.55),
+                at(0, 1, width * 0.35)]
+        shapes.append((poly, base, u, n, length + 1.6, width))
     mask = Image.new("L", size, 0)
-    ImageDraw.Draw(mask).polygon([px(p) for p in outline], fill=255)
+    draw = ImageDraw.Draw(mask)
+    draw.polygon([px(p) for p in outline], fill=255)
+    for poly, *_ in shapes:
+        draw.polygon([px(p) for p in poly], fill=255)
     m = mask.load()
+    images = []
+    for ramp in (BLADE, UNDER):
+        image = Image.new("RGBA", size, (0, 0, 0, 0))
+        out = image.load()
+        for j in range(size[1]):
+            for i in range(size[0]):
+                if m[i, j]:
+                    out[i, j] = ramp_at(ramp, 0.35) + (255,)       # membrane between the blades
+        for poly, base, u, n, length, width in shapes:
+            one = Image.new("L", size, 0)
+            ImageDraw.Draw(one).polygon([px(p) for p in poly], fill=255)
+            inner = one.filter(ImageFilter.MinFilter(3))
+            o1, i1 = one.load(), inner.load()
+            bx = [px(p)[0] for p in poly]
+            by = [px(p)[1] for p in poly]
+            for j in range(max(0, int(min(by))), min(size[1], int(max(by)) + 1)):
+                for i in range(max(0, int(min(bx))), min(size[0], int(max(bx)) + 1)):
+                    if not o1[i, j]:
+                        continue
+                    p = world(i, j)
+                    rel = (p[0] - base[0], p[1] - base[1])
+                    f = max(0.0, min(1.0, (rel[0] * u[0] + rel[1] * u[1]) / length))
+                    across = (rel[0] * n[0] + rel[1] * n[1]) / (width * 0.55)
+                    c = blade_colour(f, across, ramp, STYLE["kind"])
+                    if not i1[i, j]:
+                        c = BLADE_LINE                                # the dark line round each blade
+                    out[i, j] = c + (255,)
+        images.append(image)
 
     def side_of(p, a, b):
         return (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0])
-    images = []
-    for ramp in (MEMBRANE, MEMBRANE_UNDER):
-        image = Image.new("RGBA", size, (0, 0, 0, 0))
-        out = image.load()
-        rays = [wrist] + tips
-        for j in range(size[1]):
-            for i in range(size[0]):
-                if not m[i, j]:
-                    continue
-                p = (x0 + (i + 0.5) / W_PX, z0 + (j + 0.5) / W_PX)
-                # lighter in the middle of each cell between bones, darker towards the bones and the free edge
-                dists = [abs(side_of(p, wrist, t)) / math.dist(wrist, t) for t in tips]
-                dists.append(abs(side_of(p, elbow, wrist)) / math.dist(elbow, wrist))
-                near = min(dists)
-                k = 0.25 + min(0.55, near * 0.07) + 0.08 * noise("mem", i // 6, j // 6)
-                angle = math.atan2(p[1] - wrist[1], p[0] - wrist[0])
-                spoke = abs(math.sin(angle * 9.0))
-                if spoke < 0.06 and math.dist(p, wrist) > 4:
-                    k -= 0.18     # veins fanning out from the wrist between the fingers
-                ring = math.dist(p, wrist) % 5.0
-                if ring < 0.25:
-                    k -= 0.06     # faint creases across
-                out[i, j] = ramp_at(ramp, k) + (255,)
-        # the free edge: a dark rim one pixel in
-        edge = mask.filter(__import__("PIL.ImageFilter", fromlist=["MinFilter"]).MinFilter(5))
-        e = edge.load()
-        for j in range(size[1]):
-            for i in range(size[0]):
-                if m[i, j] and not e[i, j]:
-                    out[i, j] = mix(out[i, j][:3], VEIN, 0.6) + (255,)
-        images.append(image)
     owner = Image.new("L", size, 0)
     o = owner.load()
     for j in range(size[1]):
         for i in range(size[0]):
             if not m[i, j]:
                 continue
-            p = (x0 + (i + 0.5) / W_PX, z0 + (j + 0.5) / W_PX)
+            p = world(i, j)
             if side_of(p, wrist, tips[2]) < 0.3 * math.dist(wrist, tips[2]) and p[0] > wrist[0] - 2:
                 o[i, j] = 3
             elif side_of(p, elbow, ((tips[2][0] + FLANK[0]) / 2 + 4, (tips[2][1] + FLANK[1]) / 2)) < 0:
@@ -276,20 +371,24 @@ FOLD_LENGTH = 36.0
 
 
 def fold_colour(s, t):
+    """The folded wing: the forearm along the top, then the blades laid back in rows, their points along the
+    lower edge and at the back."""
     top = 0.0 if s < 16 else (s - 16) * 0.12
-    bottom = (3.5 + s * 1.0 if s < 8 else 11.5 if s < 25 else 11.5 - (s - 25) * 0.42) + 0.7 * math.sin(s * 0.8)
-    if s < 0 or s > FOLD_LENGTH or not top <= t <= bottom:
+    lane_w = 2.2
+    lane = int(t // lane_w)
+    end = FOLD_LENGTH - lane * 2.6 - (0 if lane % 2 else 1.2)
+    across = ((t % lane_w) / lane_w) * 2 - 1
+    tip = end - 3.0 * abs(across)
+    bottom = 3.5 + s * 1.2 if s < 8 else 13.0
+    if s < 0 or s > FOLD_LENGTH or not top <= t <= bottom or s > tip:
         return None
-    fingers = [1.2 + s * 0.06, 3.0 + s * 0.11, 4.6 + s * 0.17]
-    if t < 1.6 and s < 17:
-        c = ramp_at(CRIMSON, 0.55 - 0.2 * t)          # the forearm on top
-    elif any(abs(t - f) < 0.45 for f in fingers):
-        c = ramp_at(CRIMSON, 0.5)                      # a finger running back
+    if t < 1.8 and s < 17:
+        c = ramp_at(SCALE, 0.7 - 0.2 * t)                     # the forearm on top
     else:
-        pleat = math.sin(s * 1.1 + t * 0.6)
-        c = ramp_at(MEMBRANE, 0.45 + 0.22 * pleat - 0.1 * (t / 12))
-    if bottom - t < 0.5 or t - top < 0.4:
-        c = mix(c, VEIN, 0.6)
+        f = max(0.0, min(1.0, s / max(1.0, end)))
+        c = blade_colour(f, across, BLADE, STYLE["kind"])
+        if abs(across) > 0.86 or tip - s < 0.5:
+            c = BLADE_LINE
     return c + (255,)
 
 
@@ -355,53 +454,71 @@ def chunky(leg, extra=0.5):
 def build_rig():
     root = Bone("root", (0, 0, 0))
     body = root.bone("body_main", (0, 20, 4))
-    # cute: a round barrel of a body, a soft low crest
-    body.rounded("waist", (-7.6, 12.2, -4.0), (7.6, 25.8, 8.0), "scale", 3.0, {"down": "belly", "up": "plates"})
-    body.rounded("hips", (-7.0, 13.0, 6.0), (7.0, 25.2, 14.5), "scale", 2.8, {"down": "belly", "up": "plates"})
-    spine(body, -2.0, 12.5, 25.4, 1.8, step=3.4)
+    body.rounded("waist", (-7.2, 13.0, -4.0), (7.2, 26.2, 10.0), "scale", 2.0, {"down": "belly", "up": "plates"})
+    body.rounded("hips", (-7.0, 13.6, 8.0), (7.0, 26.0, 18.0), "scale", 2.0, {"down": "belly", "up": "plates"})
+    spine(body, -3.0, 18.0, 25.8, 3.6)
 
     chest = body.bone("chest", (0, 20, -8))
-    chest.rounded("chest", (-8.4, 11.8, -14.6), (8.4, 27.2, -2.6), "scale", 3.0,
+    chest.rounded("chest", (-8.6, 12.0, -17.5), (8.6, 28.4, -2.6), "scale", 2.4,
                   {"north": "belly", "down": "belly", "up": "plates"})
-    spine(chest, -12.0, -3.0, 26.8, 1.8, step=3.4)
+    spine(chest, -15.0, -3.0, 28.0, 4.2)
 
-    # a short, thick neck carrying a big head
-    parent, z, y = chest, -12.0, 24.0
-    for i, (angle, r) in enumerate(zip((32, 4, -24), (4.6, 4.2, 3.9))):
+    # a proud neck: four segments up out of the chest and over, gold plates down the throat
+    parent, z, y = chest, -15.0, 24.0
+    for i, (angle, r) in enumerate(zip((34, 10, -12, -22), (4.6, 4.1, 3.7, 3.4))):
         name = "hi_neck_2" if i == 1 else f"neck_{i + 1}"
         seg = parent.bone(name, (0, y, z), (angle, 0, 0))
-        seg.rounded(f"neck_{i + 1}", (-r, y - r, z - 3.8), (r, y + r, z + 0.6), "scale", 1.4,
+        seg.rounded(f"neck_{i + 1}", (-r, y - r, z - 4.8), (r, y + r, z + 0.6), "scale", 1.0,
                     {"down": "belly", "up": "plates"})
-        spine(seg, z - 3.4, z, y + r - 0.4, 1.4, step=2.2)
-        parent, z = seg, z - 3.4
+        spine(seg, z - 4.4, z, y + r - 0.3, 3.0 - i * 0.3, step=2.4)
+        parent, z = seg, z - 4.4
     head = parent.bone("head", (0, y, z), (-12, 0, 0))
     hz = z
-    # chibi head: a round skull, a short soft snout, huge eyes set forward, nub horns and fin ears
-    head.rounded("skull", (-4.0, y - 2.6, hz - 7.4), (4.0, y + 3.8, hz + 0.8), "scale", 1.8, {"down": "belly"})
-    head.rounded("snout", (-2.8, y - 2.4, hz - 11.2), (2.8, y + 1.0, hz - 6.6), "scale", 1.2, {"down": "belly"})
-    head.cube("nostril_r", (1.0, y + 0.2, hz - 11.25), (1.5, y + 0.6, hz - 10.9), "mouth")
-    head.cube("nostril_l", (-1.5, y + 0.2, hz - 11.25), (-1.0, y + 0.6, hz - 10.9), "mouth")
-    head.cube("eye_r", (3.7, y - 0.6, hz - 7.2), (4.1, y + 2.8, hz - 3.8), "scale", paint={"east": ("eye", big_eye)})
-    head.cube("eye_l", (-4.1, y - 0.6, hz - 7.2), (-3.7, y + 2.8, hz - 3.8), "scale", paint={"west": ("eye", big_eye)},
+    # the head: a long snout under a gold ridge, glowing eyes under heavy brows, a crown of horns behind
+    head.rounded("skull", (-3.8, y - 2.6, hz - 7.6), (3.8, y + 3.2, hz + 0.8), "scale", 1.2, {"down": "belly"})
+    head.rounded("snout", (-2.6, y - 2.4, hz - 14.6), (2.6, y + 1.4, hz - 6.8), "scale", 0.8, {"down": "belly"})
+    head.cube("snout_ridge", (-1.1, y + 1.2, hz - 14.0), (1.1, y + 2.1, hz - 6.4), "horn")
+    head.cube("nose_horn", (-0.5, y + 1.6, hz - 13.6), (0.5, y + 3.4, hz - 12.0), "horn", rot=("x", 22.5),
+              origin=(0, y + 1.8, hz - 12.8))
+    head.cube("nostril_r", (0.9, y + 0.6, hz - 14.7), (1.6, y + 1.1, hz - 14.2), "mouth")
+    head.cube("nostril_l", (-1.6, y + 0.6, hz - 14.7), (-0.9, y + 1.1, hz - 14.2), "mouth")
+    head.cube("brow_r", (2.2, y + 2.2, hz - 8.4), (4.0, y + 3.4, hz - 3.4), "horn", rot=("y", -22.5),
+              origin=(3.0, y + 2.8, hz - 6.0))
+    head.cube("brow_l", (-4.0, y + 2.2, hz - 8.4), (-2.2, y + 3.4, hz - 3.4), "horn", rot=("y", 22.5),
+              origin=(-3.0, y + 2.8, hz - 6.0))
+    head.cube("eye_r", (3.65, y + 0.2, hz - 7.6), (4.0, y + 2.4, hz - 4.6), "scale", paint={"east": ("eye", big_eye)})
+    head.cube("eye_l", (-4.0, y + 0.2, hz - 7.6), (-3.65, y + 2.4, hz - 4.6), "scale", paint={"west": ("eye", big_eye)},
               mirror_uv=True)
-    head.cube("fang_r", (1.6, y - 3.2, hz - 10.4), (2.2, y - 2.3, hz - 9.8), "teeth")
-    head.cube("fang_l", (-2.2, y - 3.2, hz - 10.4), (-1.6, y - 2.3, hz - 9.8), "teeth")
-    for side, sx, rot in (("r", 1, -22.5), ("l", -1, 22.5)):   # fin ears, webbed between three soft spines
-        x0, x1 = sorted((sx * 3.4, sx * 3.9))
-        head.cube(f"ear_{side}", (x0, y + 0.4, hz - 1.0), (x1, y + 3.2, hz + 3.0), "plates", rot=("y", rot),
-                  origin=(sx * 3.6, y + 1.6, hz - 1.0))
-        head.cube(f"ear_spine_{side}", (x0 - 0.05, y + 2.6, hz - 0.8), (x1 + 0.05, y + 3.4, hz + 3.8), "horn",
-                  rot=("y", rot), origin=(sx * 3.6, y + 1.6, hz - 1.0))
-    horn_r = head.bone("horn_r", (2.2, y + 3.4, hz - 2.4), (-40, -14, 0))
-    horn_r.cube("horn_base_r", (1.4, y + 2.6, hz - 3.2), (3.0, y + 4.2, hz + 0.6), "horn")
-    horn_r.cube("horn_tip_r", (1.75, y + 2.95, hz + 0.4), (2.65, y + 3.85, hz + 2.8), "horn", rot=("x", 22.5),
-                origin=(2.2, y + 3.4, hz + 0.4))
-    horn_r.scale(0.7)
+    for i in range(5):
+        z_ = hz - 13.6 + i * 1.5
+        head.cube(f"tooth_r{i}", (1.9, y - 3.1, z_), (2.4, y - 2.2, z_ + 0.6), "teeth")
+        head.cube(f"tooth_l{i}", (-2.4, y - 3.1, z_), (-1.9, y - 2.2, z_ + 0.6), "teeth")
+    for i, (dy, dz) in enumerate(((-1.8, -1.6), (-0.4, -0.2), (1.0, 1.0))):   # the frill: gold spines down the cheek
+        head.cube(f"frill_r{i}", (3.4, y + dy, hz + dz - 1.0), (4.0, y + dy + 1.0, hz + dz + 3.4), "horn",
+                  rot=("y", -22.5), origin=(3.6, y + dy, hz + dz))
+        head.cube(f"frill_l{i}", (-4.0, y + dy, hz + dz - 1.0), (-3.4, y + dy + 1.0, hz + dz + 3.4), "horn",
+                  rot=("y", 22.5), origin=(-3.6, y + dy, hz + dz))
+    for i in range(3):                                                       # crest spikes on the crown
+        z_ = hz - 5.0 + i * 2.2
+        head.cube(f"crest{i}", (-0.45, y + 2.8, z_), (0.45, y + 5.0 - i * 0.5, z_ + 1.6), "horn", rot=("x", 22.5),
+                  origin=(0, y + 3.0, z_ + 0.8))
+    horn_r = head.bone("horn_r", (2.6, y + 2.6, hz - 1.6), (-30, -18, 0))   # the great horns, swept back
+    horn_r.cube("horn_base_r", (1.4, y + 1.4, hz - 2.6), (3.8, y + 3.8, hz + 3.6), "horn")
+    horn_r.cube("horn_mid_r", (1.8, y + 1.8, hz + 3.2), (3.4, y + 3.4, hz + 9.0), "horn", rot=("x", 22.5),
+                origin=(2.6, y + 2.6, hz + 3.2))
+    horn_r.cube("horn_tip_r", (2.2, y + 1.0, hz + 8.2), (3.0, y + 1.8, hz + 12.6), "horn", rot=("x", 45),
+                origin=(2.6, y + 1.4, hz + 8.2))
+    horn_r.cube("horn_low_r", (2.6, y - 1.6, hz - 1.4), (3.8, y - 0.4, hz + 4.8), "horn", rot=("x", 22.5),
+                origin=(3.2, y - 1.0, hz - 1.0))
     kit.mirror_x(horn_r, head)
     jaw = head.bone("jaw", (0, y - 2.0, hz - 1.0))
-    jaw.rounded("jaw", (-2.6, y - 3.5, hz - 10.0), (2.6, y - 2.0, hz - 0.8), "scale", 0.7, {"down": "belly"})
-    jaw.cube("tongue", (-1.2, y - 2.4, hz - 9.4), (1.2, y - 2.0, hz - 2.0), "mouth")
-    head.cube("palate", (-1.6, y - 2.0, hz - 10.2), (1.6, y - 1.6, hz - 1.2), "mouth")
+    jaw.rounded("jaw", (-2.4, y - 4.0, hz - 13.8), (2.4, y - 2.1, hz - 0.8), "scale", 0.6, {"down": "belly"})
+    jaw.cube("tongue", (-1.2, y - 2.4, hz - 11.5), (1.2, y - 2.0, hz - 2.0), "mouth")
+    for i in range(4):
+        z_ = hz - 12.6 + i * 1.6
+        jaw.cube(f"fang_r{i}", (1.4, y - 2.2, z_), (1.9, y - 1.4, z_ + 0.6), "teeth")
+        jaw.cube(f"fang_l{i}", (-1.9, y - 2.2, z_), (-1.4, y - 1.4, z_ + 0.6), "teeth")
+    head.cube("palate", (-1.9, y - 2.1, hz - 13.4), (1.9, y - 1.6, hz - 1.2), "mouth")
 
     # forelegs: shoulder, a long forearm, a broad foot with four hooked claws
     arm = body.bone("arm_r", (5.4, 20.0, -9.0), (14, 0, 0))
@@ -427,19 +544,18 @@ def build_rig():
     claws(hpaw, "hr", (4.0, 5.3, 6.7, 8.0), 0.3, 9.0)
     thigh.scale(LEGS)
     chunky(thigh)
-    thigh.shift(0, 0, -2.5)
     kit.mirror_x(thigh, body)
 
     # the tail: seven segments, drooping then lifting, the crest running on to a spade at the end
-    parent, z, y = body, 14.5, 22.5
-    for i, (angle, r) in enumerate(zip((-14, -2, 10, 16, 20), (3.6, 3.0, 2.4, 1.8, 1.3))):
+    parent, z, y = body, 17.5, 22.5
+    for i, (angle, r) in enumerate(zip((-18, -8, -2, 4, 8, 10, 12), (3.8, 3.3, 2.8, 2.4, 2.0, 1.6, 1.25))):
         seg = parent.bone(f"tail_{i + 1}", (0, y, z), (angle, 0, 0))
         seg.rounded(f"tail_{i + 1}", (-r, y - r, z - 0.6), (r, y + r, z + 5.6), "scale", min(0.7, r * 0.3),
                     {"down": "belly", "up": "plates"})
-        spine(seg, z, z + 5.0, y + r - 0.4, 1.3, step=3.0)
+        spine(seg, z, z + 5.0, y + r - 0.3, max(1.2, 2.8 - i * 0.25), step=2.6)
         parent, z = seg, z + 5.2
     spade = parent.bone("tail_spade", (0, y, z))
-    spade.cube("spade", (-2.2, y - 0.3, z + 0.6), (2.2, y + 0.3, z + 5.0), "plates", rot=("y", 45), origin=(0, y, z + 2.8))
+    spade.cube("spade", (-2.6, y - 0.3, z + 0.4), (2.6, y + 0.3, z + 5.6), "horn", rot=("y", 45), origin=(0, y, z + 3.0))
     spade.cube("spade_rib", (-0.4, y - 0.5, z - 0.4), (0.4, y + 0.5, z + 6.0), "horn")
 
     build_wing(body)
@@ -461,10 +577,10 @@ def build_armour(body, chest, head):
     armour_plate(helm, "helm_snout", (-2.4, y + 1.6, hz - 12.4), (2.4, y + 2.0, hz - 7.0), "up", mirror=False)
     armour_plate(helm, "helm_cheek", (3.9, y - 1.8, hz - 3.6), (4.3, y + 1.0, hz + 0.4), "east", scallop=True)
     peytral = chest.bone("armor_chest", chest.pivot)
-    armour_plate(peytral, "breastplate", (-4.4, 13.4, -15.5), (4.4, 25.6, -15.0), "north", mirror=False, scallop=True,
+    armour_plate(peytral, "breastplate", (-4.4, 13.0, -18.6), (4.4, 26.6, -18.1), "north", mirror=False, scallop=True,
                  lames=3)
-    armour_plate(peytral, "breast_wing", (4.3, 13.4, -15.5), (8.6, 25.6, -15.0), "north", rot=("y", -45),
-                 origin=(4.3, 20.0, -15.25), scallop=True, lames=3)
+    armour_plate(peytral, "breast_wing", (4.3, 13.0, -18.6), (8.8, 26.6, -18.1), "north", rot=("y", -45),
+                 origin=(4.3, 20.0, -18.35), scallop=True, lames=3)
     saddle = body.bone("armor_saddle", body.pivot)
     saddle.cube("saddle", (-5.6, 26.8, -1.0), (5.6, 28.0, 9.0), "leather")
     saddle.cube("saddle_cantle", (-3.6, 27.8, 7.4), (3.6, 29.6, 9.0), "leather")
@@ -479,12 +595,12 @@ FOLDED = {"wing_root_r": {"scale": keys((0, (0, 0, 0)))}, "wing_root_l": {"scale
           "wingfold_r": {"scale": keys((0, (1, 1, 1)))}, "wingfold_l": {"scale": keys((0, (1, 1, 1)))}}
 SPREAD = {"wing_root_r": {"scale": keys((0, (1, 1, 1)))}, "wing_root_l": {"scale": keys((0, (1, 1, 1)))},
           "wingfold_r": {"scale": keys((0, (0, 0, 0)))}, "wingfold_l": {"scale": keys((0, (0, 0, 0)))}}
-NECK = ("neck_1", "hi_neck_2", "neck_3")
+NECK = ("neck_1", "hi_neck_2", "neck_3", "neck_4")
 
 
 def tail(length, amp, freq=1):
     out = {f"tail_{i + 1}": {"rotation": wave(length, amp * (0.5 + 0.18 * i), -0.1 * i, axis=1, freq=freq)}
-           for i in range(5)}
+           for i in range(7)}
     out["tail_spade"] = {"rotation": wave(length, amp * 1.6, -0.75, axis=1, freq=freq)}
     return out
 
@@ -513,7 +629,7 @@ TUCKED = {"arm_r": {"rotation": keys((0, (50, 0, 0)))}, "foreshin_r": {"rotation
           "forepaw_r": {"rotation": keys((0, (30, 0, 0)))},
           "thigh_r": {"rotation": keys((0, (55, 0, 0)))}, "hindshin_r": {"rotation": keys((0, (-20, 0, 0)))},
           "hindhock_r": {"rotation": keys((0, (30, 0, 0)))}, "hindpaw_r": {"rotation": keys((0, (35, 0, 0)))}}
-STRAIGHT_TAIL = {f"tail_{i + 1}": {"rotation": keys((0, ((14, 2, -10, -16, -20)[i], 0, 0)))} for i in range(5)}
+STRAIGHT_TAIL = {f"tail_{i + 1}": {"rotation": keys((0, ((18, 8, 2, -4, -8, -10, -12)[i], 0, 0)))} for i in range(7)}
 
 
 def dragon_animations():
@@ -579,20 +695,21 @@ def dragon_animations():
     ]
 
 
-def main():
-    atlas = paint_atlas()
-    rig = build_rig()
-    print("built", kit.build("dragon", rig, atlas, HERE))
-    print("animations", kit.animations(dragon_animations()))
-    kit.save_project(os.path.join(HERE, "dragon.bbmodel"))
-    for animation, time, armour, picture in (("idle", 0.0, False, "dragon_preview.png"),
-                                             ("glide", 0.5, False, "dragon_flight.png"),
-                                             ("idle", 0.0, True, "dragon_armour.png")):
-        kit.show("armor_", armour)
-        kit.frame(animation, time)
-        print(kit.shots(os.path.join(HERE, picture), [(35, 18), (90, 8), (-145, 25), (0, 10)], target=[0, 22, 0],
-                        distance=170))
+def main(styles=None):
+    for style in styles or list(STYLES):
+        apply_style(style)
+        name = f"dragon_{style}"
+        print(style, "built", kit.build(name, build_rig(), paint_atlas(), HERE))
+        print(style, "animations", kit.animations(dragon_animations()))
+        kit.save_project(os.path.join(HERE, name + ".bbmodel"))
+        for animation, time, armour, picture in (("idle", 0.0, False, "preview"), ("glide", 0.5, False, "flight"),
+                                                 ("idle", 0.0, True, "armour")):
+            kit.show("armor_", armour)
+            kit.frame(animation, time)
+            print(kit.shots(os.path.join(HERE, f"{name}_{picture}.png"), [(35, 18), (90, 8), (-145, 25), (0, 10)],
+                            target=[0, 22, 0], distance=170))
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    main(sys.argv[1:])
