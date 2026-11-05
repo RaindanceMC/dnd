@@ -1,11 +1,21 @@
-# The Archery skill's tree, read by Core's SkillTree (see SkillDef). One branch for now —
-# more come — ending in its mastery badge, open once every other node of the branch not shut by a choice is at its
-# last rank. Node ids are unique across every skill's tree: a hero's ranks are kept as <skill>:<node>.
+# The Archery skill's tree, read by Core's SkillTree (see SkillDef). Three branches stacked on the
+# canvas — the first in rows 0–2, the second in 3–5, the third in 6–8 — each with a choice and a capstone, ending in
+# its mastery badge: free, open once every other node of the branch not shut by a choice is at its last rank, and
+# bringing a mastery feature of its own. Node ids are unique across every skill's tree: a hero's ranks are kept
+# as <skill>:<node>.
 branches:
   marksman:
     title: Marksman
     icon: bow
     blurb: Arrows that hit harder, fly further and come back.
+  trickshot:
+    title: Trick Shots
+    icon: tipped_arrow
+    blurb: "Arrows that burn, arrows that pin, arrows that find the head."
+  ranger:
+    title: Ranger
+    icon: crossbow
+    blurb: "Fast arrows, close shots, and quarry marked and run down."
 
 nodes:
   steady_aim: {branch: marksman, at: [0, 1], title: Steady Aim, icon: arrow, ranks: 3, level: 1, level-step: 2, effects: {ranged_damage: 5}}
@@ -23,4 +33,34 @@ nodes:
   endless_quiver: {branch: marksman, at: [4, 0], title: Endless Quiver, icon: chiseled_bookshelf, cost: 2, level: 22, requires: [rain_of_arrows], effects: {arrow_save: 25}}
   deadeye: {branch: marksman, at: [4, 1], title: Deadeye, icon: crossbow, capstone: true, cost: 3, level: 30, requires: [rain_of_arrows, marksmanship, sniper], effects: {ranged_damage: 20, arrow_save: 15}}
   monster_hunter: {branch: marksman, at: [4, 2], title: Monster Hunter, icon: zombie_head, cost: 2, level: 23, requires: [sniper], effects: {undead_damage: 25}}
-  archery_mastery: {branch: marksman, at: [5, 1], title: "Archer's Mastery", icon: spectral_arrow, mastery: true, cost: 0, requires: [deadeye], effects: {ranged_damage: 10, arrow_save: 10}}
+  archery_mastery: {branch: marksman, at: [5, 1], title: "Archer's Mastery", icon: spectral_arrow, mastery: true, cost: 0, requires: [deadeye], effects: {retrieval: 1, ranged_damage: 10, arrow_save: 10}}
+
+  called_shot: {branch: trickshot, at: [0, 4], title: Called Shot, icon: spectral_arrow, ranks: 3, level: 2, level-step: 2, effects: {headshot: 5}}
+  pitch_arrows: {branch: trickshot, at: [0, 3], title: Pitch Arrows, icon: coal, ranks: 2, level: 4, level-step: 2, requires: [called_shot], effects: {ignite: 5}}
+  barbed_heads: {branch: trickshot, at: [0, 5], title: Barbed Heads, icon: pointed_dripstone, ranks: 2, level: 4, level-step: 2, requires: [called_shot], effects: {pin: 4}}
+  fire_arrows: {branch: trickshot, at: [1, 3], title: Fire Arrows, icon: torch, ranks: 2, level: 6, level-step: 2, requires: [pitch_arrows], effects: {ignite: 5}}
+  eye_for_the_head: {branch: trickshot, at: [1, 4], title: Eye for the Head, icon: carved_pumpkin, ranks: 3, level: 6, level-step: 2, requires: [called_shot], effects: {headshot: 5}}
+  tanglefoot: {branch: trickshot, at: [1, 5], title: Tanglefoot, icon: cobweb, ranks: 2, level: 6, level-step: 2, requires: [barbed_heads], effects: {pin: 4}}
+  fire_archer: {branch: trickshot, at: [2, 3], title: Fire Archer, icon: fire_charge, choice: true, cost: 2, level: 10, requires: [fire_arrows], excludes: [pinning_shot], effects: {ignite: 30}}
+  weak_spots: {branch: trickshot, at: [2, 4], title: Weak Spots, icon: spider_eye, ranks: 3, level: 8, level-step: 2, requires: [eye_for_the_head], effects: {headshot: 5}}
+  pinning_shot: {branch: trickshot, at: [2, 5], title: Pinning Shot, icon: tripwire_hook, choice: true, cost: 2, level: 10, requires: [tanglefoot], excludes: [fire_archer], effects: {pin: 25}}
+  wildfire: {branch: trickshot, at: [3, 3], title: Wildfire, icon: campfire, cost: 2, level: 18, requires: [fire_archer, weak_spots], effects: {ignite: 15}}
+  trick_shooter: {branch: trickshot, at: [3, 4], title: Trick Shooter, icon: lightning_rod, ranks: 2, level: 16, level-step: 3, requires: [weak_spots], effects: {ranged_damage: 4}}
+  staked: {branch: trickshot, at: [3, 5], title: Staked, icon: lead, cost: 2, level: 18, requires: [pinning_shot, weak_spots], effects: {pin: 15}}
+  trickster: {branch: trickshot, at: [4, 4], title: Trickster, icon: firework_rocket, capstone: true, cost: 3, level: 30, requires: [wildfire, trick_shooter, staked], effects: {headshot: 15, ranged_damage: 5}}
+  trickshot_mastery: {branch: trickshot, at: [5, 4], title: Trickshot Mastery, icon: arrow, mastery: true, cost: 0, requires: [trickster], effects: {skewer: 1}}
+
+  strong_draw: {branch: ranger, at: [0, 7], title: Strong Draw, icon: string, ranks: 3, level: 3, level-step: 2, effects: {velocity: 3}}
+  quick_nock: {branch: ranger, at: [0, 6], title: Quick Nock, icon: feather, ranks: 2, level: 5, level-step: 2, requires: [strong_draw], effects: {velocity: 4}}
+  close_quarters: {branch: ranger, at: [0, 8], title: Close Quarters, icon: leather, ranks: 2, level: 5, level-step: 2, requires: [strong_draw], effects: {close_shot: 5}}
+  light_shafts: {branch: ranger, at: [1, 6], title: Light Shafts, icon: bamboo, ranks: 2, level: 7, level-step: 2, requires: [quick_nock], effects: {velocity: 4}}
+  rangers_pace: {branch: ranger, at: [1, 7], title: "Ranger's Pace", icon: fern, ranks: 3, level: 7, level-step: 2, requires: [strong_draw], effects: {speed: 1}}
+  gut_shot: {branch: ranger, at: [1, 8], title: Gut Shot, icon: rabbit_hide, ranks: 2, level: 7, level-step: 2, requires: [close_quarters], effects: {close_shot: 5}}
+  swift_arrows: {branch: ranger, at: [2, 6], title: Swift Arrows, icon: phantom_membrane, choice: true, cost: 2, level: 11, requires: [light_shafts], excludes: [point_blank], effects: {velocity: 15}}
+  stalker: {branch: ranger, at: [2, 7], title: Stalker, icon: recovery_compass, ranks: 3, level: 9, level-step: 2, requires: [rangers_pace], effects: {ranged_damage: 3}}
+  point_blank: {branch: ranger, at: [2, 8], title: Point Blank, icon: crossbow, choice: true, cost: 2, level: 11, requires: [gut_shot], excludes: [swift_arrows], effects: {close_shot: 30}}
+  windborne: {branch: ranger, at: [3, 6], title: Windborne, icon: breeze_rod, cost: 2, level: 20, requires: [swift_arrows, stalker], effects: {velocity: 8}}
+  huntsman: {branch: ranger, at: [3, 7], title: Huntsman, icon: rabbit_foot, ranks: 2, level: 17, level-step: 3, requires: [stalker], effects: {long_shot: 5}}
+  brawling_archer: {branch: ranger, at: [3, 8], title: Brawling Archer, icon: leather_horse_armor, cost: 2, level: 20, requires: [point_blank, stalker], effects: {close_shot: 15}}
+  pathfinder: {branch: ranger, at: [4, 7], title: Pathfinder, icon: map, capstone: true, cost: 3, level: 32, requires: [windborne, huntsman, brawling_archer], effects: {ranged_damage: 10, speed: 3}}
+  ranger_mastery: {branch: ranger, at: [5, 7], title: "Ranger's Mastery", icon: glow_ink_sac, mastery: true, cost: 0, requires: [pathfinder], effects: {hunters_mark: 1}}

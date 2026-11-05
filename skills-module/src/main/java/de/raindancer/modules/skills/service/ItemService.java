@@ -55,6 +55,11 @@ public final class ItemService implements ISkillsService {
         return combat.chance(player, perk) * 100;
     }
 
+    /** Magic Missile's darts: twice as many with Arcane Surge. */
+    private int darts(Player player, int darts) {
+        return combat.chance(player, Perk.ARCANE_SURGE) > 0 ? darts * 2 : darts;
+    }
+
     /** A potion has been drunk: what it does beside being emptied. */
     public void drink(Player player, MagicItem item) {
         switch (item) {
@@ -88,7 +93,7 @@ public final class ItemService implements ISkillsService {
             return;
         }
         int tier = ItemTags.tierOf(scroll);
-        if (!scrolls.cast(player, kind.get(), tier, percent(player, Perk.SCROLL_POWER), 3)) {
+        if (!scrolls.cast(player, kind.get(), tier, percent(player, Perk.SCROLL_POWER), darts(player, 3))) {
             messages.send(player, "dnd.item.nothing-there", "scroll", kind.get().title());
             effects.play(player.getUniqueId(), Cues.NO);
             return;
@@ -114,7 +119,8 @@ public final class ItemService implements ISkillsService {
             forge.charge(wand, charges, rule.chargedAt(stored, chargedAt, now, every));
             return;
         }
-        if (scrolls.cast(player, Scroll.MAGIC_MISSILE, 1, percent(player, Perk.SCROLL_POWER), 3 * spending)) {
+        if (scrolls.cast(player, Scroll.MAGIC_MISSILE, 1, percent(player, Perk.SCROLL_POWER),
+                darts(player, 3 * spending))) {
             forge.charge(wand, charges - spending, rule.chargedAt(stored, chargedAt, now, every));
         } else {
             messages.send(player, "dnd.item.nothing-there", "scroll", Scroll.MAGIC_MISSILE.title());

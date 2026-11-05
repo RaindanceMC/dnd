@@ -2,6 +2,7 @@ package de.raindancer.modules.skills.screen;
 
 import de.raindancer.core.platform.util.Times;
 import de.raindancer.core.ui.effect.Cues;
+import de.raindancer.core.ui.menu.Backdrop;
 import de.raindancer.core.ui.menu.Icons;
 import de.raindancer.core.ui.menu.Menu;
 import de.raindancer.core.ui.tree.NodeState;
@@ -81,6 +82,27 @@ public final class SkillTreeMenu extends TreeMenu implements ISkillsScreen {
         String scene = tree().branches().isEmpty() ? skill.id() : tree().branches().getFirst().id();
         return new Page(MINI.deserialize("<dark_gray>" + skill.title()), nodes, edges,
                 SkillsPack.treeBackdrop(scene), summary(hero));
+    }
+
+    /** The painting of the branch the window is on: branches are stacked down the canvas, three rows each. */
+    @Override
+    protected Backdrop backdrop() {
+        Backdrop scene = SkillsPack.treeBackdrop(branchAt(view().row()));
+        return scene != null ? scene : super.backdrop();
+    }
+
+    /** The branch whose rows the window, from {@code row} down, shows the most of. */
+    private String branchAt(int row) {
+        String best = null;
+        int bestTop = Integer.MIN_VALUE;
+        for (TreeBranch branch : tree().branches()) {
+            int top = tree().nodesOf(branch.id()).stream().mapToInt(TreeNode::row).min().orElse(Integer.MAX_VALUE);
+            if (best == null || (top <= row + 1 && top > bestTop)) {
+                best = branch.id();
+                bestTop = top <= row + 1 ? top : Integer.MIN_VALUE;
+            }
+        }
+        return best == null ? skill.id() : best;
     }
 
     @Override

@@ -7,8 +7,8 @@ icon: NETHER_STAR
 category: Progress & rewards
 order: 41
 module: dnd
-aliases: [skill-trees, adventurer-tree, feats, dual-wielder, unlearn, respec, mastery-badge, badges]
-keywords: [branch, node, rank, choice, capstone, feat, dual wielder, second wind, undying, unlearn, points]
+aliases: [skill-trees, adventurer-tree, feats, dual-wielder, unlearn, respec, mastery-badge, badges, mastery-features]
+keywords: [branch, node, rank, choice, capstone, feat, dual wielder, second wind, undying, unlearn, points, aegis, dash, smoke bomb, mana shield, thorns, riposte]
 commands: [skills]
 related: [skills, adventurer-items]
 sections:
@@ -23,15 +23,28 @@ sections:
   - question: What is in the fighting skills?
     title: Defense, Melee, Archery, Agility, Magic
     text: |
-      <white>Defense</white>: more hearts, armour and toughness, less damage taken, healing out of a fight, less hunger; Second Wind or Stoneskin; capstone <white>Undying</white>. <white>Melee</white>: melee damage, faster attacks, critical and sweeping blows, lifesteal, reach, rage below half health; <white>Dual Wielder</white> or Great Weapon Master; capstone Warlord. <white>Archery</white>: arrow damage, Long Shot from twenty blocks, arrows not used up; Volley or Sharpshooter; capstone Deadeye. <white>Agility</white>: speed, dodging, higher jumps, softer falls, blows from behind; Acrobat or Assassin; capstone Phantom. <white>Magic</white>: more experience, magic items found more often, luck, faster mining, stronger scrolls, wands and potions; Sage or Treasure Hunter; capstone Archmage.
+      Each has three branches, stacked down its canvas — scroll down, or click the middle button for the next one.
+      <white>Defense</white>: <white>Vitality</white> (hearts, armour, healing out of a fight; Second Wind or Stoneskin; capstone Undying), <white>Guardian</white> (armour, thorns, a riposte after your shield stops a blow; Spiked Shield or Riposte; capstone Juggernaut), <white>Warden</white> (less damage from fire, explosions and arrows; Salamander or Blast Shelter; capstone Warden).
+      <white>Melee</white>: <white>Might</white> (damage, faster attacks, crits, lifesteal; <white>Dual Wielder</white> or Great Weapon Master; capstone Warlord), <white>Arms</white> (the sword's school or the axe's; Blademaster or Axeman; capstone Armsmaster), <white>Fury</white> (bleeding, stuns, more damage for every kill in a row; Hemorrhage or Bonebreaker; capstone Rampage).
+      <white>Archery</white>: <white>Marksman</white> (arrow damage, Long Shot, arrows not used up; Volley or Sharpshooter; capstone Deadeye), <white>Trick Shots</white> (hits to the head, burning and pinning arrows; Fire Archer or Pinning Shot; capstone Trickster), <white>Ranger</white> (faster arrows, Point Blank within six blocks; Swift Arrows or Point Blank; capstone Pathfinder).
+      <white>Agility</white>: <white>Shadow</white> (speed, dodging, blows from behind; Acrobat or Assassin; capstone Phantom), <white>Acrobatics</white> (softer falls, swimming, breath; Waterborn or Freerunner; capstone Daredevil), <white>Rogue</white> (quiet steps, poisoned blades, blows while sneaking; Poisoner or Ambusher; capstone Master Thief).
+      <white>Magic</white>: <white>Arcana</white> (experience, magic items found more often, stronger scrolls, wands and potions; Sage or Treasure Hunter; capstone Archmage), <white>Mysticism</white> (potions that last longer, harmful effects that wear off sooner, less damage from magic; Elixirist or Unhexed; capstone Mystic), <white>Battlemage</white> (hexes, a Mana Shield that pays hurts with experience; Hexblade or Mana Shield; capstone Spellblade).
   - question: What do the feats do?
     title: Feats
     text: |
       <white>Dual Wielder</white>: hold a weapon in your off hand and every melee blow is followed by a strike from it, for half its damage. <white>Second Wind</white>: dropping below a third of your health heals you a third, once every two minutes. <white>Undying</white>: a blow that would kill you leaves you one heart instead, once every ten minutes — a totem in your hand goes first.
+  - question: What does each mastery bring?
+    title: Mastery features
+    text: |
+      <white>Defense</white> — Vitality: <white>Pure Blood</white>, poison and wither do you no harm. Guardian: <white>Aegis</white>, your shield never wears out and a blow it stops throws the striker back. Warden: <white>Fireproof</white>, you never catch fire.
+      <white>Melee</white> — Might: <white>Executioner</white>, a blow that leaves a monster below a fifth of its health finishes it (not a boss). Arms: <white>Sunder</white>, 1% more damage for every point of the foe's armour. Fury: <white>Bloodlust</white>, every kill heals two hearts.
+      <white>Archery</white> — Marksman: <white>Retrieval</white>, an arrow that hits comes back to your quiver. Trick Shots: <white>Skewer</white>, arrows fly on through two more foes. Ranger: <white>Hunter's Mark</white>, a foe you hit glows for ten seconds and takes 15% more from everything you do.
+      <white>Agility</white> — Shadow: <white>Vanish</white>, a dodge turns you invisible for three seconds. Acrobatics: <white>Dash</white>, crouch while sprinting to dash ahead, every four seconds. Rogue: <white>Smoke Bomb</white>, below a quarter of your health you vanish in smoke and monsters lose you, once a minute.
+      <white>Magic</white> — Arcana: <white>Arcane Surge</white>, Magic Missile looses twice the darts. Mysticism: <white>Arcane Barrier</white>, out of a fight four hearts of absorption gather around you. Battlemage: <white>Spellstrike</white>, a critical blow also strikes for 1d4+1 force.
   - question: Does it count against players?
     title: Between players
     text: |
-      Hearts and armour always count. Of the damage, dodging and damage-taken bonuses, <white>{setting:dnd:pvp-percent|percent}</white> counts when players fight each other. Whether players can hurt each other at all is the server's PvP rule.
+      Hearts and armour always count. Of the damage, dodging, damage-taken and thorns bonuses and the chances on a hit (bleeding, stuns, venom, hexes, burning, pinning), <white>{setting:dnd:pvp-percent|percent}</white> counts when players fight each other. Whether players can hurt each other at all is the server's PvP rule.
   - question: Can I unlearn it?
     title: Unlearning
     text: |

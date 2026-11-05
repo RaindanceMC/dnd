@@ -55,7 +55,7 @@ class SkillRuleTest {
     void mastery() {
         assertThat(rule.refusal(hero(50, Map.of("melee:brawler", 1)), SkillCatalog.MELEE, "melee_mastery"))
                 .contains(SkillRule.Refusal.UNFINISHED);
-        assertThat(rule.masteryBranches(SkillCatalog.MELEE)).hasSize(1);
+        assertThat(rule.masteryBranches(SkillCatalog.MELEE)).hasSize(3);
         assertThat(rule.mastered(hero(50, Map.of()), SkillCatalog.MELEE)).isZero();
     }
 

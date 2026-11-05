@@ -1,11 +1,21 @@
-# The Defense skill's tree, read by Core's SkillTree (see SkillDef). One branch for now —
-# more come — ending in its mastery badge, open once every other node of the branch not shut by a choice is at its
-# last rank. Node ids are unique across every skill's tree: a hero's ranks are kept as <skill>:<node>.
+# The Defense skill's tree, read by Core's SkillTree (see SkillDef). Three branches stacked on the
+# canvas — the first in rows 0–2, the second in 3–5, the third in 6–8 — each with a choice and a capstone, ending in
+# its mastery badge: free, open once every other node of the branch not shut by a choice is at its last rank, and
+# bringing a mastery feature of its own. Node ids are unique across every skill's tree: a hero's ranks are kept
+# as <skill>:<node>.
 branches:
   vitality:
     title: Vitality
     icon: golden_apple
     blurb: More hearts, harder skin, a body that mends and will not die.
+  guardian:
+    title: Guardian
+    icon: shield
+    blurb: "A shield that stops everything, and blows that come back at the striker."
+  warden:
+    title: Warden
+    icon: blaze_powder
+    blurb: "Fire, blasts and arrows: what the world throws at you, shrugged off."
 
 nodes:
   toughness: {branch: vitality, at: [0, 1], title: Toughness, icon: apple, ranks: 3, level: 1, level-step: 2, effects: {hearts: 1}}
@@ -23,4 +33,34 @@ nodes:
   bottomless: {branch: vitality, at: [4, 0], title: Bottomless Stomach, icon: cake, cost: 2, level: 21, requires: [fast_healer], effects: {hunger_save: 25}}
   undying: {branch: vitality, at: [4, 1], title: Undying, icon: totem_of_undying, capstone: true, cost: 3, level: 30, requires: [fast_healer, giant_blood, iron_hide], effects: {undying: 1, hearts: 2}}
   bulwark: {branch: vitality, at: [4, 2], title: Bulwark, icon: netherite_ingot, cost: 2, level: 23, requires: [iron_hide], effects: {damage_taken: 5, knockback: 30}}
-  defense_mastery: {branch: vitality, at: [5, 1], title: "Defender's Mastery", icon: netherite_chestplate, mastery: true, cost: 0, requires: [undying], effects: {hearts: 2, damage_taken: 5}}
+  defense_mastery: {branch: vitality, at: [5, 1], title: "Defender's Mastery", icon: netherite_chestplate, mastery: true, cost: 0, requires: [undying], effects: {pure_blood: 1, hearts: 2, damage_taken: 5}}
+
+  shield_up: {branch: guardian, at: [0, 4], title: Shield Up, icon: shield, ranks: 3, level: 2, level-step: 2, effects: {armour: 1}}
+  spiked_rim: {branch: guardian, at: [0, 3], title: Spiked Rim, icon: iron_bars, ranks: 2, level: 4, level-step: 2, requires: [shield_up], effects: {thorns: 3}}
+  braced: {branch: guardian, at: [0, 5], title: Braced, icon: anvil, ranks: 2, level: 4, level-step: 2, requires: [shield_up], effects: {knockback: 10}}
+  bramble_mail: {branch: guardian, at: [1, 3], title: Bramble Mail, icon: sweet_berries, ranks: 2, level: 6, level-step: 2, requires: [spiked_rim], effects: {thorns: 3}}
+  steadfast: {branch: guardian, at: [1, 4], title: Steadfast, icon: chainmail_chestplate, ranks: 3, level: 6, level-step: 2, requires: [shield_up], effects: {toughness: 1}}
+  counterweight: {branch: guardian, at: [1, 5], title: Counterweight, icon: iron_ingot, ranks: 2, level: 6, level-step: 2, requires: [braced], effects: {riposte: 10}}
+  spiked_shield: {branch: guardian, at: [2, 3], title: Spiked Shield, icon: cactus, choice: true, cost: 2, level: 10, requires: [bramble_mail], excludes: [riposte], effects: {thorns: 15}}
+  shield_wall: {branch: guardian, at: [2, 4], title: Shield Wall, icon: oak_planks, ranks: 3, level: 8, level-step: 2, requires: [steadfast], effects: {damage_taken: 2}}
+  riposte: {branch: guardian, at: [2, 5], title: Riposte, icon: golden_sword, choice: true, cost: 2, level: 10, requires: [counterweight], excludes: [spiked_shield], effects: {riposte: 40}}
+  briar_heart: {branch: guardian, at: [3, 3], title: Briar Heart, icon: rose_bush, cost: 2, level: 18, requires: [spiked_shield, shield_wall], effects: {thorns: 10}}
+  unmoved: {branch: guardian, at: [3, 4], title: Unmoved, icon: obsidian, ranks: 2, level: 16, level-step: 3, requires: [shield_wall], effects: {knockback: 15}}
+  counterstrike: {branch: guardian, at: [3, 5], title: Counterstrike, icon: diamond_sword, cost: 2, level: 18, requires: [riposte, shield_wall], effects: {riposte: 30}}
+  juggernaut: {branch: guardian, at: [4, 4], title: Juggernaut, icon: netherite_helmet, capstone: true, cost: 3, level: 30, requires: [briar_heart, unmoved, counterstrike], effects: {armour: 2, toughness: 2, thorns: 5, riposte: 20}}
+  guardian_mastery: {branch: guardian, at: [5, 4], title: "Guardian's Mastery", icon: shield, mastery: true, cost: 0, requires: [juggernaut], effects: {aegis: 1, armour: 1}}
+
+  weathered: {branch: warden, at: [0, 7], title: Weathered, icon: campfire, ranks: 3, level: 3, level-step: 2, effects: {fire_ward: 5, blast_ward: 5}}
+  ash_skin: {branch: warden, at: [0, 6], title: Ash Skin, icon: magma_cream, ranks: 2, level: 5, level-step: 2, requires: [weathered], effects: {fire_ward: 5}}
+  sandbagged: {branch: warden, at: [0, 8], title: Sandbagged, icon: sand, ranks: 2, level: 5, level-step: 2, requires: [weathered], effects: {blast_ward: 5}}
+  ember_walker: {branch: warden, at: [1, 6], title: Ember Walker, icon: blaze_powder, ranks: 2, level: 7, level-step: 2, requires: [ash_skin], effects: {fire_ward: 5}}
+  arrow_catcher: {branch: warden, at: [1, 7], title: Arrow Catcher, icon: arrow, ranks: 3, level: 7, level-step: 2, requires: [weathered], effects: {arrow_ward: 5}}
+  sappers_ears: {branch: warden, at: [1, 8], title: "Sapper's Ears", icon: tnt, ranks: 2, level: 7, level-step: 2, requires: [sandbagged], effects: {blast_ward: 5}}
+  salamander: {branch: warden, at: [2, 6], title: Salamander, icon: fire_charge, choice: true, cost: 2, level: 11, requires: [ember_walker], excludes: [blast_shelter], effects: {fire_ward: 25}}
+  turtle_shell: {branch: warden, at: [2, 7], title: Turtle Shell, icon: turtle_helmet, ranks: 3, level: 9, level-step: 2, requires: [arrow_catcher], effects: {arrow_ward: 5}}
+  blast_shelter: {branch: warden, at: [2, 8], title: Blast Shelter, icon: creeper_head, choice: true, cost: 2, level: 11, requires: [sappers_ears], excludes: [salamander], effects: {blast_ward: 25}}
+  flameheart: {branch: warden, at: [3, 6], title: Flameheart, icon: magma_block, cost: 2, level: 20, requires: [salamander, turtle_shell], effects: {fire_ward: 10}}
+  deflector: {branch: warden, at: [3, 7], title: Deflector, icon: target, ranks: 2, level: 17, level-step: 3, requires: [turtle_shell], effects: {arrow_ward: 10}}
+  bombproof: {branch: warden, at: [3, 8], title: Bombproof, icon: crying_obsidian, cost: 2, level: 20, requires: [blast_shelter, turtle_shell], effects: {blast_ward: 10}}
+  warden: {branch: warden, at: [4, 7], title: Warden, icon: respawn_anchor, capstone: true, cost: 3, level: 32, requires: [flameheart, deflector, bombproof], effects: {fire_ward: 10, blast_ward: 10, arrow_ward: 10}}
+  warden_mastery: {branch: warden, at: [5, 7], title: "Warden's Mastery", icon: lava_bucket, mastery: true, cost: 0, requires: [warden], effects: {fireproof: 1}}

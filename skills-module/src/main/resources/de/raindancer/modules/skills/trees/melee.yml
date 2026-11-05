@@ -1,11 +1,21 @@
-# The Melee skill's tree, read by Core's SkillTree (see SkillDef). One branch for now —
-# more come — ending in its mastery badge, open once every other node of the branch not shut by a choice is at its
-# last rank. Node ids are unique across every skill's tree: a hero's ranks are kept as <skill>:<node>.
+# The Melee skill's tree, read by Core's SkillTree (see SkillDef). Three branches stacked on the
+# canvas — the first in rows 0–2, the second in 3–5, the third in 6–8 — each with a choice and a capstone, ending in
+# its mastery badge: free, open once every other node of the branch not shut by a choice is at its last rank, and
+# bringing a mastery feature of its own. Node ids are unique across every skill's tree: a hero's ranks are kept
+# as <skill>:<node>.
 branches:
   might:
     title: Might
     icon: iron_sword
     blurb: Harder, faster blows; two blades at once, or one great one.
+  arms:
+    title: Arms
+    icon: iron_axe
+    blurb: "A school of steel: the sword's edge or the axe's weight."
+  fury:
+    title: Fury
+    icon: redstone
+    blurb: "Wounds that bleed, blows that stun, and a fight that feeds itself."
 
 nodes:
   brawler: {branch: might, at: [0, 1], title: Brawler, icon: wooden_sword, ranks: 3, level: 1, level-step: 2, effects: {melee_damage: 4}}
@@ -23,4 +33,34 @@ nodes:
   slayer: {branch: might, at: [4, 0], title: Undead Slayer, icon: skeleton_skull, cost: 2, level: 21, requires: [flurry], effects: {undead_damage: 30}}
   warlord: {branch: might, at: [4, 1], title: Warlord, icon: netherite_sword, capstone: true, cost: 3, level: 30, requires: [flurry, berserker, executioner], effects: {melee_damage: 15, lifesteal: 3}}
   vampire: {branch: might, at: [4, 2], title: Vampire, icon: wither_rose, cost: 2, level: 23, requires: [executioner], effects: {lifesteal: 4}}
-  melee_mastery: {branch: might, at: [5, 1], title: "Weapon Mastery", icon: netherite_sword, mastery: true, cost: 0, requires: [warlord], effects: {melee_damage: 10, attack_speed: 5}}
+  melee_mastery: {branch: might, at: [5, 1], title: "Weapon Mastery", icon: netherite_sword, mastery: true, cost: 0, requires: [warlord], effects: {execute: 1, melee_damage: 10, attack_speed: 5}}
+
+  weapon_drill: {branch: arms, at: [0, 4], title: Weapon Drill, icon: wooden_axe, ranks: 3, level: 2, level-step: 2, effects: {sword_damage: 3, axe_damage: 3}}
+  fencer: {branch: arms, at: [0, 3], title: Fencer, icon: stone_sword, ranks: 2, level: 4, level-step: 2, requires: [weapon_drill], effects: {sword_damage: 4}}
+  woodsmans_swing: {branch: arms, at: [0, 5], title: "Woodsman's Swing", icon: stone_axe, ranks: 2, level: 4, level-step: 2, requires: [weapon_drill], effects: {axe_damage: 4}}
+  lunge: {branch: arms, at: [1, 3], title: Lunge, icon: stick, ranks: 2, level: 6, level-step: 2, requires: [fencer], effects: {reach: 0.25}}
+  conditioning: {branch: arms, at: [1, 4], title: Conditioning, icon: leather_chestplate, ranks: 3, level: 6, level-step: 2, requires: [weapon_drill], effects: {attack_speed: 3}}
+  heavy_hands: {branch: arms, at: [1, 5], title: Heavy Hands, icon: iron_axe, ranks: 2, level: 6, level-step: 2, requires: [woodsmans_swing], effects: {crit_damage: 5}}
+  blademaster: {branch: arms, at: [2, 3], title: Blademaster, icon: diamond_sword, choice: true, cost: 2, level: 10, requires: [lunge], excludes: [axeman], effects: {sword_damage: 25}}
+  practised: {branch: arms, at: [2, 4], title: Practised, icon: grindstone, ranks: 3, level: 8, level-step: 2, requires: [conditioning], effects: {melee_damage: 3}}
+  axeman: {branch: arms, at: [2, 5], title: Axeman, icon: diamond_axe, choice: true, cost: 2, level: 10, requires: [heavy_hands], excludes: [blademaster], effects: {axe_damage: 25}}
+  flowing_steel: {branch: arms, at: [3, 3], title: Flowing Steel, icon: golden_sword, cost: 2, level: 18, requires: [blademaster, practised], effects: {sword_damage: 10, attack_speed: 5}}
+  armour_breaker: {branch: arms, at: [3, 4], title: Armour Breaker, icon: chainmail_chestplate, ranks: 2, level: 16, level-step: 3, requires: [practised], effects: {crit_damage: 10}}
+  cleaver: {branch: arms, at: [3, 5], title: Cleaver, icon: netherite_axe, cost: 2, level: 18, requires: [axeman, practised], effects: {axe_damage: 15}}
+  armsmaster: {branch: arms, at: [4, 4], title: Armsmaster, icon: netherite_sword, capstone: true, cost: 3, level: 30, requires: [flowing_steel, armour_breaker, cleaver], effects: {sword_damage: 10, axe_damage: 10, melee_damage: 5}}
+  arms_mastery: {branch: arms, at: [5, 4], title: Arms Mastery, icon: smithing_table, mastery: true, cost: 0, requires: [armsmaster], effects: {sunder: 1}}
+
+  bloodletter: {branch: fury, at: [0, 7], title: Bloodletter, icon: redstone, ranks: 3, level: 3, level-step: 2, effects: {bleed: 3}}
+  serrated_edge: {branch: fury, at: [0, 6], title: Serrated Edge, icon: flint, ranks: 2, level: 5, level-step: 2, requires: [bloodletter], effects: {bleed: 3}}
+  skullcracker: {branch: fury, at: [0, 8], title: Skullcracker, icon: bone, ranks: 2, level: 5, level-step: 2, requires: [bloodletter], effects: {stun: 3}}
+  open_wounds: {branch: fury, at: [1, 6], title: Open Wounds, icon: red_dye, ranks: 2, level: 7, level-step: 2, requires: [serrated_edge], effects: {bleed: 4}}
+  killing_spree: {branch: fury, at: [1, 7], title: Killing Spree, icon: rotten_flesh, ranks: 3, level: 7, level-step: 2, requires: [bloodletter], effects: {momentum: 1}}
+  concussion: {branch: fury, at: [1, 8], title: Concussion, icon: anvil, ranks: 2, level: 7, level-step: 2, requires: [skullcracker], effects: {stun: 4}}
+  hemorrhage: {branch: fury, at: [2, 6], title: Hemorrhage, icon: nether_wart, choice: true, cost: 2, level: 11, requires: [open_wounds], excludes: [bonebreaker], effects: {bleed: 15}}
+  frenzy: {branch: fury, at: [2, 7], title: Frenzy, icon: blaze_powder, ranks: 3, level: 9, level-step: 2, requires: [killing_spree], effects: {momentum: 1}}
+  bonebreaker: {branch: fury, at: [2, 8], title: Bonebreaker, icon: bone_block, choice: true, cost: 2, level: 11, requires: [concussion], excludes: [hemorrhage], effects: {stun: 15}}
+  exsanguinate: {branch: fury, at: [3, 6], title: Exsanguinate, icon: crimson_fungus, cost: 2, level: 20, requires: [hemorrhage, frenzy], effects: {bleed: 10}}
+  battle_trance: {branch: fury, at: [3, 7], title: Battle Trance, icon: fermented_spider_eye, ranks: 2, level: 17, level-step: 3, requires: [frenzy], effects: {rage: 10}}
+  pulverise: {branch: fury, at: [3, 8], title: Pulverise, icon: mace, cost: 2, level: 20, requires: [bonebreaker, frenzy], effects: {stun: 10}}
+  rampage: {branch: fury, at: [4, 7], title: Rampage, icon: dragon_head, capstone: true, cost: 3, level: 32, requires: [exsanguinate, battle_trance, pulverise], effects: {momentum: 2, lifesteal: 2}}
+  fury_mastery: {branch: fury, at: [5, 7], title: Fury Mastery, icon: ghast_tear, mastery: true, cost: 0, requires: [rampage], effects: {bloodlust: 1}}
