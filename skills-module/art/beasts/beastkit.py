@@ -70,6 +70,16 @@ class Bone:
                 cube["inflate"] *= factor
         return self
 
+    def shift(self, dx, dy, dz):
+        """Moves this bone and everything under it."""
+        d = (dx, dy, dz)
+        for b in self.walk():
+            b.pivot = [b.pivot[i] + d[i] for i in range(3)]
+            for cube in b.cubes:
+                for k in ("from", "to", "origin"):
+                    cube[k] = [cube[k][i] + d[i] for i in range(3)]
+        return self
+
     def walk(self):
         yield self
         for child in self.children:

@@ -16,11 +16,11 @@ from beastkit import (Bone, armour_plate, feathers, gait, hexrgb, keys, mirror, 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-CRIMSON = [hexrgb(h) for h in ("#25080c", "#451014", "#6e191b", "#972823", "#bf4430")]
-AMBER = [hexrgb(h) for h in ("#5e3a12", "#8f6020", "#bf8c36", "#e2b862")]
+CRIMSON = [hexrgb(h) for h in ("#4a1216", "#7e2224", "#b23a30", "#d9573f", "#f08a62")]
+AMBER = [hexrgb(h) for h in ("#a8743a", "#d4a25a", "#efc982", "#fbe6b2")]
 BONE_ = [hexrgb(h) for h in ("#463c30", "#776a56", "#ad9f80", "#ddd2b6")]
-MEMBRANE = [hexrgb(h) for h in ("#2c080c", "#4c1014", "#6f1a1c", "#922a25")]
-MEMBRANE_UNDER = [hexrgb(h) for h in ("#5a1a1a", "#7e2b25", "#a24333", "#c0624a")]
+MEMBRANE = [hexrgb(h) for h in ("#6a1a20", "#93303a", "#bb4c4c", "#dc7466")]
+MEMBRANE_UNDER = [hexrgb(h) for h in ("#a04a46", "#c8665a", "#e28a74", "#f2ae92")]
 VEIN = hexrgb("#1c0507")
 DARK = hexrgb("#120406")
 
@@ -52,16 +52,28 @@ def horn(tile, rng):
             px[x, y] = c + (255,)
 
 
-def eye(tile, rng):
-    """A 4 x 4 dragon eye in the tile's corner: hot yellow iris, black slit pupil, a dark lid rim."""
-    px = tile.load()
-    for y in range(tile.size[0]):
-        for x in range(tile.size[0]):
-            px[x, y] = CRIMSON[0] + (255,)
-    colours = {"r": CRIMSON[1], "i": hexrgb("#ffd23a"), "o": hexrgb("#ff8a1a"), "p": (10, 4, 4)}
-    for y, row in enumerate(["ipii", "ipio", "ipoo", "rpor"]):
-        for x, ch in enumerate(row):
-            px[x, y] = colours[ch] + (255,)
+def big_eye(image):
+    """A big round eye painted to the face's own size: dark rim, amber iris lighter below, a large pupil, two
+    catch-lights up front — most of the cute is this."""
+    w, h = image.size
+    px = image.load()
+    cx, cy, r = (w - 1) / 2, (h - 1) / 2, min(w, h) / 2
+    for y in range(h):
+        for x in range(w):
+            d = math.hypot(x - cx, y - cy) / r
+            if d > 1.0:
+                px[x, y] = CRIMSON[2] + (255,)
+                continue
+            if d > 0.82:
+                c = hexrgb("#2a0e10")
+            elif math.hypot(x - cx, y - cy - 0.3) / r < 0.42:
+                c = (18, 10, 14)
+            else:
+                c = mix(hexrgb("#e08a20"), hexrgb("#ffe080"), max(0.0, (y - cy) / r + 0.3))
+            for hx, hy, hr in ((-0.3, -0.35, 0.22), (0.25, 0.2, 0.1)):
+                if math.hypot(x - cx - hx * r, y - cy - hy * r) / r < hr:
+                    c = (255, 255, 255)
+            px[x, y] = c + (255,)
 
 
 def paint_atlas():
@@ -73,11 +85,11 @@ def paint_atlas():
     atlas.tile("claw", lambda t, r: smooth(t, r, [(10, 8, 8), (34, 28, 26), (78, 70, 64)], 0.9, 0.0), 5)
     atlas.tile("teeth", lambda t, r: smooth(t, r, BONE_[1:] + [hexrgb("#f4eedd")], 1.0, 0.5), 6)
     atlas.tile("mouth", lambda t, r: smooth(t, r, [hexrgb("#2a0608"), hexrgb("#5a1418"), hexrgb("#8a2a2c")], 0.8, 0.1), 7)
-    atlas.tile("eye", eye, 8, fixed=True)
     atlas.tile("skin", lambda t, r: smooth(t, r, CRIMSON[:4], 0.75, 0.25), 9)
     atlas.tile("leather", lambda t, r: smooth(t, r, [hexrgb(h) for h in ("#2e1c10", "#4a2e18", "#6a4426", "#8a5c34")],
                                               0.9, 0.2), 10)
     atlas.tile("plate_edge", plate_edge, 11)
+    atlas.tile("blush", lambda t, r: smooth(t, r, [hexrgb("#e87a78"), hexrgb("#f4a09a")], 0.9, 0.4), 12)
     return atlas
 
 
@@ -94,7 +106,9 @@ ARM = (("wing_humerus", SHOULDER, 18.0, -25.0), ("wing_forearm", (18.0, -7.0), 3
 FINGERS = ((0.0, 30.0), (-22.5, 28.0), (-45.0, 24.0))   # cube rotation in the hand, length
 FLANK = (6.5, 15.0)   # where the membrane meets the body
 W_PX = 4               # pixels per unit of the painted membrane
-WING_SCALE = 1.6
+WING_SCALE = 1.4
+HEAD = 1.75   # cute: a big head, short legs
+LEGS = 0.72
 
 
 def turn(p, pivot, degrees):
@@ -306,7 +320,6 @@ def build_folded_wing(body):
     fold.cube("fold_thumb_r", (5.6, 30.2, -13.4), (6.8, 31.2, -11.2), "skin")
     fold.cube("fold_claw_r", (5.8, 29.6, -14.4), (6.6, 31.0, -13.2), "claw")
     fold.rounded("fold_forearm_r", (5.2, 28.8, -9.0), (7.4, 30.8, 6.0), "scale", 0.5)
-    fold.scale(1.15)
     kit.mirror_x(fold, body)
 
 
@@ -331,66 +344,64 @@ def claws(bone, side, xs, y, z):
         bone.cube(f"claw{i}_tip_{side}", (x - 0.3, y - 0.3, z - 2.4), (x + 0.3, y + 0.7, z - 1.5), "claw")
 
 
+def chunky(leg, extra=0.5):
+    """Short legs read cute when they stay thick: every cube a little fuller."""
+    for b in leg.walk():
+        for c in b.cubes:
+            if c["material"] != "claw":
+                c["inflate"] += extra
+
+
 def build_rig():
     root = Bone("root", (0, 0, 0))
     body = root.bone("body_main", (0, 20, 4))
-    body.rounded("waist", (-6.8, 13.4, -4.0), (6.8, 26.0, 10.0), "scale", 1.6, {"down": "belly", "up": "plates"})
-    body.rounded("hips", (-6.6, 14.4, 8.5), (6.6, 26.2, 18.5), "scale", 1.6, {"down": "belly", "up": "plates"})
-    spine(body, -3.0, 18.0, 25.8, 3.8)
+    # cute: a round barrel of a body, a soft low crest
+    body.rounded("waist", (-7.6, 12.2, -4.0), (7.6, 25.8, 8.0), "scale", 3.0, {"down": "belly", "up": "plates"})
+    body.rounded("hips", (-7.0, 13.0, 6.0), (7.0, 25.2, 14.5), "scale", 2.8, {"down": "belly", "up": "plates"})
+    spine(body, -2.0, 12.5, 25.4, 1.8, step=3.4)
 
     chest = body.bone("chest", (0, 20, -8))
-    chest.rounded("chest", (-9.0, 11.6, -18.2), (9.0, 29.0, -2.6), "scale", 2.2,
+    chest.rounded("chest", (-8.4, 11.8, -14.6), (8.4, 27.2, -2.6), "scale", 3.0,
                   {"north": "belly", "down": "belly", "up": "plates"})
-    spine(chest, -16.0, -3.0, 28.6, 4.4)
+    spine(chest, -12.0, -3.0, 26.8, 1.8, step=3.4)
 
-    # the S-neck: five segments rising steeply out of the chest, then bending forward to carry the head level
-    parent, z, y = chest, -15.0, 24.0
-    for i, (angle, r) in enumerate(zip((30, 12, 4, -14, -20), (4.9, 4.3, 3.8, 3.4, 3.1))):
-        name = "hi_neck_4" if i == 3 else f"neck_{i + 1}"
+    # a short, thick neck carrying a big head
+    parent, z, y = chest, -12.0, 24.0
+    for i, (angle, r) in enumerate(zip((32, 4, -24), (4.6, 4.2, 3.9))):
+        name = "hi_neck_2" if i == 1 else f"neck_{i + 1}"
         seg = parent.bone(name, (0, y, z), (angle, 0, 0))
-        seg.rounded(f"neck_{i + 1}", (-r, y - r, z - 5.0), (r, y + r, z + 0.6), "scale", 0.8,
+        seg.rounded(f"neck_{i + 1}", (-r, y - r, z - 3.8), (r, y + r, z + 0.6), "scale", 1.4,
                     {"down": "belly", "up": "plates"})
-        spine(seg, z - 4.5, z, y + r - 0.2, 3.0 - i * 0.25, step=2.4)
-        parent, z = seg, z - 4.6
+        spine(seg, z - 3.4, z, y + r - 0.4, 1.4, step=2.2)
+        parent, z = seg, z - 3.4
     head = parent.bone("head", (0, y, z), (-12, 0, 0))
     hz = z
-    head.rounded("skull", (-3.9, y - 2.6, hz - 7.0), (3.9, y + 3.2, hz + 0.8), "scale", 1.0, {"down": "belly"})
-    head.rounded("snout", (-2.7, y - 2.4, hz - 14.6), (2.7, y + 1.6, hz - 6.4), "scale", 0.7, {"down": "belly"})
-    head.cube("brow_r", (2.0, y + 2.0, hz - 7.6), (3.6, y + 3.2, hz - 2.6), "plates", rot=("y", -22.5),
-              origin=(2.8, y + 2.6, hz - 5))
-    head.cube("brow_l", (-3.6, y + 2.0, hz - 7.6), (-2.0, y + 3.2, hz - 2.6), "plates", rot=("y", 22.5),
-              origin=(-2.8, y + 2.6, hz - 5))
-    head.cube("snout_ridge", (-0.7, y + 1.2, hz - 13.0), (0.7, y + 2.0, hz - 6.0), "plates")
-    head.cube("nose_horn", (-0.4, y + 1.2, hz - 13.4), (0.4, y + 3.0, hz - 12.2), "horn", rot=("x", 22.5),
-              origin=(0, y + 1.4, hz - 12.8))
-    head.cube("nostril_r", (0.8, y + 0.6, hz - 14.1), (1.7, y + 1.3, hz - 13.2), "mouth")
-    head.cube("nostril_l", (-1.7, y + 0.6, hz - 14.1), (-0.8, y + 1.3, hz - 13.2), "mouth")
-    head.cube("eye_r", (3.7, y + 0.6, hz - 6.8), (4.05, y + 2.0, hz - 4.6), "eye", faces={"east": "eye"})
-    head.cube("eye_l", (-4.05, y + 0.6, hz - 6.8), (-3.7, y + 2.0, hz - 4.6), "eye", faces={"west": "eye"})
-    for i in range(5):
-        z_ = hz - 13.2 + i * 1.5
-        head.cube(f"tooth_r{i}", (2.0, y - 3.1, z_), (2.5, y - 2.3, z_ + 0.6), "teeth")
-        head.cube(f"tooth_l{i}", (-2.5, y - 3.1, z_), (-2.0, y - 2.3, z_ + 0.6), "teeth")
-    for i, (dy, dz) in enumerate(((-1.6, -1.0), (-0.4, 0.2), (0.8, 1.2))):   # the frill: spines down the cheek
-        head.cube(f"frill_r{i}", (3.6, y + dy, hz + dz - 1.0), (4.1, y + dy + 0.9, hz + dz + 2.2), "horn",
-                  rot=("y", -22.5), origin=(3.8, y + dy, hz + dz))
-        head.cube(f"frill_l{i}", (-4.1, y + dy, hz + dz - 1.0), (-3.6, y + dy + 0.9, hz + dz + 2.2), "horn",
-                  rot=("y", 22.5), origin=(-3.8, y + dy, hz + dz))
-    horn_r = head.bone("horn_r", (2.4, y + 2.6, hz - 1.6), (-32, -16, 0))
-    horn_r.cube("horn_base_r", (1.3, y + 1.5, hz - 2.4), (3.5, y + 3.7, hz + 3.6), "horn")
-    horn_r.cube("horn_mid_r", (1.7, y + 1.9, hz + 3.2), (3.1, y + 3.3, hz + 8.6), "horn", rot=("x", 22.5),
-                origin=(2.4, y + 2.6, hz + 3.2))
-    horn_r.cube("horn_tip_r", (2.05, y + 1.0, hz + 7.8), (2.75, y + 1.8, hz + 12.0), "horn", rot=("x", 45),
-                origin=(2.4, y + 1.4, hz + 7.8))
+    # chibi head: a round skull, a short soft snout, huge eyes set forward, nub horns and fin ears
+    head.rounded("skull", (-4.0, y - 2.6, hz - 7.4), (4.0, y + 3.8, hz + 0.8), "scale", 1.8, {"down": "belly"})
+    head.rounded("snout", (-2.8, y - 2.4, hz - 11.2), (2.8, y + 1.0, hz - 6.6), "scale", 1.2, {"down": "belly"})
+    head.cube("nostril_r", (1.0, y + 0.2, hz - 11.25), (1.5, y + 0.6, hz - 10.9), "mouth")
+    head.cube("nostril_l", (-1.5, y + 0.2, hz - 11.25), (-1.0, y + 0.6, hz - 10.9), "mouth")
+    head.cube("eye_r", (3.7, y - 0.6, hz - 7.2), (4.1, y + 2.8, hz - 3.8), "scale", paint={"east": ("eye", big_eye)})
+    head.cube("eye_l", (-4.1, y - 0.6, hz - 7.2), (-3.7, y + 2.8, hz - 3.8), "scale", paint={"west": ("eye", big_eye)},
+              mirror_uv=True)
+    head.cube("fang_r", (1.6, y - 3.2, hz - 10.4), (2.2, y - 2.3, hz - 9.8), "teeth")
+    head.cube("fang_l", (-2.2, y - 3.2, hz - 10.4), (-1.6, y - 2.3, hz - 9.8), "teeth")
+    for side, sx, rot in (("r", 1, -22.5), ("l", -1, 22.5)):   # fin ears, webbed between three soft spines
+        x0, x1 = sorted((sx * 3.4, sx * 3.9))
+        head.cube(f"ear_{side}", (x0, y + 0.4, hz - 1.0), (x1, y + 3.2, hz + 3.0), "plates", rot=("y", rot),
+                  origin=(sx * 3.6, y + 1.6, hz - 1.0))
+        head.cube(f"ear_spine_{side}", (x0 - 0.05, y + 2.6, hz - 0.8), (x1 + 0.05, y + 3.4, hz + 3.8), "horn",
+                  rot=("y", rot), origin=(sx * 3.6, y + 1.6, hz - 1.0))
+    horn_r = head.bone("horn_r", (2.2, y + 3.4, hz - 2.4), (-40, -14, 0))
+    horn_r.cube("horn_base_r", (1.4, y + 2.6, hz - 3.2), (3.0, y + 4.2, hz + 0.6), "horn")
+    horn_r.cube("horn_tip_r", (1.75, y + 2.95, hz + 0.4), (2.65, y + 3.85, hz + 2.8), "horn", rot=("x", 22.5),
+                origin=(2.2, y + 3.4, hz + 0.4))
+    horn_r.scale(0.7)
     kit.mirror_x(horn_r, head)
     jaw = head.bone("jaw", (0, y - 2.0, hz - 1.0))
-    jaw.rounded("jaw", (-2.4, y - 4.2, hz - 13.6), (2.4, y - 2.2, hz - 0.8), "scale", 0.5, {"down": "belly"})
-    jaw.cube("tongue", (-1.2, y - 2.3, hz - 11.5), (1.2, y - 1.9, hz - 2.0), "mouth")
-    for i in range(4):
-        z_ = hz - 12.4 + i * 1.6
-        jaw.cube(f"fang_r{i}", (1.3, y - 2.1, z_), (1.8, y - 1.3, z_ + 0.6), "teeth")
-        jaw.cube(f"fang_l{i}", (-1.8, y - 2.1, z_), (-1.3, y - 1.3, z_ + 0.6), "teeth")
-    head.cube("palate", (-1.9, y - 2.2, hz - 13.2), (1.9, y - 1.6, hz - 1.0), "mouth")
+    jaw.rounded("jaw", (-2.6, y - 3.5, hz - 10.0), (2.6, y - 2.0, hz - 0.8), "scale", 0.7, {"down": "belly"})
+    jaw.cube("tongue", (-1.2, y - 2.4, hz - 9.4), (1.2, y - 2.0, hz - 2.0), "mouth")
+    head.cube("palate", (-1.6, y - 2.0, hz - 10.2), (1.6, y - 1.6, hz - 1.2), "mouth")
 
     # forelegs: shoulder, a long forearm, a broad foot with four hooked claws
     arm = body.bone("arm_r", (5.4, 20.0, -9.0), (14, 0, 0))
@@ -400,6 +411,8 @@ def build_rig():
     paw = shin.bone("forepaw_r", (5.7, 4.4, -8.6), (16, 0, 0))
     paw.rounded("forepaw_r", (3.3, 0.4, -12.4), (8.1, 3.2, -6.4), "scale", 0.7, {"down": "belly"})
     claws(paw, "fr", (3.9, 5.1, 6.3, 7.5), 0.4, -12.4)
+    arm.scale(LEGS)
+    chunky(arm)
     kit.mirror_x(arm, body)
 
     # hind legs: a heavy thigh, the shin back to a high hock, a long foot forward
@@ -412,15 +425,18 @@ def build_rig():
     hpaw = hock.bone("hindpaw_r", (6.0, 2.0, 13.8), (12, 0, 0))
     hpaw.rounded("hindpaw_r", (3.4, 0.3, 9.0), (8.6, 3.0, 15.4), "scale", 0.7, {"down": "belly"})
     claws(hpaw, "hr", (4.0, 5.3, 6.7, 8.0), 0.3, 9.0)
+    thigh.scale(LEGS)
+    chunky(thigh)
+    thigh.shift(0, 0, -2.5)
     kit.mirror_x(thigh, body)
 
     # the tail: seven segments, drooping then lifting, the crest running on to a spade at the end
-    parent, z, y = body, 17.5, 22.5
-    for i, (angle, r) in enumerate(zip((-18, -8, -2, 4, 8, 10, 12), (3.8, 3.3, 2.8, 2.4, 2.0, 1.6, 1.25))):
+    parent, z, y = body, 14.5, 22.5
+    for i, (angle, r) in enumerate(zip((-14, -2, 10, 16, 20), (3.6, 3.0, 2.4, 1.8, 1.3))):
         seg = parent.bone(f"tail_{i + 1}", (0, y, z), (angle, 0, 0))
         seg.rounded(f"tail_{i + 1}", (-r, y - r, z - 0.6), (r, y + r, z + 5.6), "scale", min(0.7, r * 0.3),
                     {"down": "belly", "up": "plates"})
-        spine(seg, z, z + 5.0, y + r - 0.2, max(1.2, 2.8 - i * 0.25), step=2.8)
+        spine(seg, z, z + 5.0, y + r - 0.4, 1.3, step=3.0)
         parent, z = seg, z + 5.2
     spade = parent.bone("tail_spade", (0, y, z))
     spade.cube("spade", (-2.2, y - 0.3, z + 0.6), (2.2, y + 0.3, z + 5.0), "plates", rot=("y", 45), origin=(0, y, z + 2.8))
@@ -429,8 +445,10 @@ def build_rig():
     build_wing(body)
     build_folded_wing(body)
     build_armour(body, chest, head)
-    head.scale(1.3)   # a fantasy head: big enough to read from far off, with horns to match
-    root.bone("p_rider", (0, 29, 4))
+    head.scale(HEAD)
+    # the short legs no longer reach the ground: everything comes down to them
+    root.shift(0, -20.0 * (1 - LEGS), 0)
+    root.bone("p_rider", (0, 29 - 20.0 * (1 - LEGS), 4))
     return root
 
 
@@ -443,10 +461,10 @@ def build_armour(body, chest, head):
     armour_plate(helm, "helm_snout", (-2.4, y + 1.6, hz - 12.4), (2.4, y + 2.0, hz - 7.0), "up", mirror=False)
     armour_plate(helm, "helm_cheek", (3.9, y - 1.8, hz - 3.6), (4.3, y + 1.0, hz + 0.4), "east", scallop=True)
     peytral = chest.bone("armor_chest", chest.pivot)
-    armour_plate(peytral, "breastplate", (-4.6, 13.0, -19.2), (4.6, 27.0, -18.7), "north", mirror=False, scallop=True,
+    armour_plate(peytral, "breastplate", (-4.4, 13.4, -15.5), (4.4, 25.6, -15.0), "north", mirror=False, scallop=True,
                  lames=3)
-    armour_plate(peytral, "breast_wing", (4.5, 13.0, -19.2), (9.0, 27.0, -18.7), "north", rot=("y", -45),
-                 origin=(4.5, 20.0, -18.95), scallop=True, lames=3)
+    armour_plate(peytral, "breast_wing", (4.3, 13.4, -15.5), (8.6, 25.6, -15.0), "north", rot=("y", -45),
+                 origin=(4.3, 20.0, -15.25), scallop=True, lames=3)
     saddle = body.bone("armor_saddle", body.pivot)
     saddle.cube("saddle", (-5.6, 26.8, -1.0), (5.6, 28.0, 9.0), "leather")
     saddle.cube("saddle_cantle", (-3.6, 27.8, 7.4), (3.6, 29.6, 9.0), "leather")
@@ -461,12 +479,12 @@ FOLDED = {"wing_root_r": {"scale": keys((0, (0, 0, 0)))}, "wing_root_l": {"scale
           "wingfold_r": {"scale": keys((0, (1, 1, 1)))}, "wingfold_l": {"scale": keys((0, (1, 1, 1)))}}
 SPREAD = {"wing_root_r": {"scale": keys((0, (1, 1, 1)))}, "wing_root_l": {"scale": keys((0, (1, 1, 1)))},
           "wingfold_r": {"scale": keys((0, (0, 0, 0)))}, "wingfold_l": {"scale": keys((0, (0, 0, 0)))}}
-NECK = ("neck_1", "neck_2", "neck_3", "hi_neck_4", "neck_5")
+NECK = ("neck_1", "hi_neck_2", "neck_3")
 
 
 def tail(length, amp, freq=1):
     out = {f"tail_{i + 1}": {"rotation": wave(length, amp * (0.5 + 0.18 * i), -0.1 * i, axis=1, freq=freq)}
-           for i in range(7)}
+           for i in range(5)}
     out["tail_spade"] = {"rotation": wave(length, amp * 1.6, -0.75, axis=1, freq=freq)}
     return out
 
@@ -495,7 +513,7 @@ TUCKED = {"arm_r": {"rotation": keys((0, (50, 0, 0)))}, "foreshin_r": {"rotation
           "forepaw_r": {"rotation": keys((0, (30, 0, 0)))},
           "thigh_r": {"rotation": keys((0, (55, 0, 0)))}, "hindshin_r": {"rotation": keys((0, (-20, 0, 0)))},
           "hindhock_r": {"rotation": keys((0, (30, 0, 0)))}, "hindpaw_r": {"rotation": keys((0, (35, 0, 0)))}}
-STRAIGHT_TAIL = {f"tail_{i + 1}": {"rotation": keys((0, ((18, 8, 2, -4, -8, -10, -12)[i], 0, 0)))} for i in range(7)}
+STRAIGHT_TAIL = {f"tail_{i + 1}": {"rotation": keys((0, ((14, 2, -10, -16, -20)[i], 0, 0)))} for i in range(5)}
 
 
 def dragon_animations():
@@ -535,14 +553,14 @@ def dragon_animations():
             {"body_main": {"position": keys((0, (0, 2.5, 0)), (0.55, (0, -1.8, 0)), (1.0, (0, 0, 0)))}})),
         ("attack", 0.8, False, with_(FOLDED, {
             "neck_1": {"rotation": keys((0, (0, 0, 0)), (0.25, (14, 0, 0)), (0.4, (-22, 0, 0)), (0.8, (0, 0, 0)))},
-            "hi_neck_4": {"rotation": keys((0, (0, 0, 0)), (0.25, (12, 0, 0)), (0.4, (-12, 0, 0)), (0.8, (0, 0, 0)))},
+            "hi_neck_2": {"rotation": keys((0, (0, 0, 0)), (0.25, (12, 0, 0)), (0.4, (-12, 0, 0)), (0.8, (0, 0, 0)))},
             "head": {"rotation": keys((0, (0, 0, 0)), (0.25, (8, 0, 0)), (0.4, (-10, 0, 0)), (0.8, (0, 0, 0)))},
             "jaw": {"rotation": keys((0, (0, 0, 0)), (0.25, (35, 0, 0)), (0.4, (0, 0, 0)), (0.8, (0, 0, 0)))},
             "arm_r": {"rotation": keys((0, (0, 0, 0)), (0.3, (-45, 0, 0)), (0.45, (25, 0, 0)), (0.8, (0, 0, 0)))}})),
         ("breath", 2.0, False, with_(FOLDED, {
             "neck_1": {"rotation": keys((0, (0, 0, 0)), (0.5, (18, 0, 0)), (0.8, (-14, 0, 0)), (1.7, (-14, 0, 0)),
                                         (2.0, (0, 0, 0)))},
-            "neck_2": {"rotation": keys((0, (0, 0, 0)), (0.5, (10, 0, 0)), (0.8, (-6, 0, 0)), (2.0, (0, 0, 0)))},
+            "hi_neck_2": {"rotation": keys((0, (0, 0, 0)), (0.5, (10, 0, 0)), (0.8, (-6, 0, 0)), (2.0, (0, 0, 0)))},
             "head": {"rotation": keys((0, (0, 0, 0)), (0.5, (12, 0, 0)), (0.8, (-4, 0, 0)), (1.7, (-4, 0, 0)),
                                       (2.0, (0, 0, 0)))},
             "jaw": {"rotation": keys((0, (0, 0, 0)), (0.5, (6, 0, 0)), (0.8, (40, 0, 0)), (1.7, (40, 0, 0)),
