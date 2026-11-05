@@ -1,0 +1,46 @@
+# The Excavation skill's tree, read by Core's SkillTree (see SkillDef). Dirt, sand, gravel and clay — and what lies in them.
+# Three branches stacked on the canvas, three rows each; each has a choice, a capstone and ends in its
+# free mastery badge. Node ids are unique across every skill's tree: a hero's ranks are kept as
+# <skill>:<node>.
+branches:
+  digger:
+    title: Digger
+    icon: iron_shovel
+    blurb: "A faster shovel that lasts, and flint from the gravel."
+  treasure_hunter:
+    title: Treasure Hunter
+    icon: chest
+    blurb: "Nuggets, bones and better in the dirt; more clay."
+  archaeologist:
+    title: Archaeologist
+    icon: brush
+    blurb: "Patient hands: finds twice over, brushes that last."
+
+nodes:
+  digger: {branch: digger, at: [0, 1], title: Digger, icon: wooden_shovel, ranks: 3, level: 1, level-step: 2, effects: {dig_speed: 5}}
+  sturdy_handle: {branch: digger, at: [1, 0], title: Sturdy Handle, icon: stick, ranks: 2, level: 3, level-step: 2, requires: [digger], effects: {dig_wear: 10}}
+  gravel_sifter: {branch: digger, at: [1, 2], title: Gravel Sifter, icon: flint, ranks: 2, level: 3, level-step: 2, requires: [digger], effects: {dig_flint: 10}}
+  earthworker: {branch: digger, at: [2, 1], title: Earthworker, icon: iron_shovel, ranks: 3, level: 6, level-step: 2, requires: [sturdy_handle, gravel_sifter], effects: {dig_speed: 5}}
+  fast_spade: {branch: digger, at: [3, 0], title: Fast Spade, icon: golden_shovel, choice: true, cost: 2, level: 12, requires: [earthworker], excludes: [flint_knapper], effects: {dig_speed: 15}}
+  flint_knapper: {branch: digger, at: [3, 2], title: Flint Knapper, icon: flint_and_steel, choice: true, cost: 2, level: 12, requires: [earthworker], excludes: [fast_spade], effects: {dig_flint: 30}}
+  hardened_spade: {branch: digger, at: [4, 1], title: Hardened Spade, icon: diamond_shovel, ranks: 2, level: 16, level-step: 4, requires: [fast_spade, flint_knapper], effects: {dig_speed: 5, dig_wear: 10}}
+  earthshaker: {branch: digger, at: [5, 1], title: Earthshaker, icon: netherite_shovel, capstone: true, cost: 3, level: 28, requires: [hardened_spade], effects: {dig_speed: 20, dig_wear: 15}}
+  digger_mastery: {branch: digger, at: [6, 1], title: "Digger's Mastery", icon: piston, mastery: true, cost: 0, requires: [earthshaker], effects: {dig_earthmover: 1}}
+  dirt_digger: {branch: treasure_hunter, at: [0, 4], title: Dirt Digger, icon: gold_nugget, ranks: 3, level: 1, level-step: 2, effects: {dig_treasure: 0.5}}
+  clay_shaper: {branch: treasure_hunter, at: [1, 3], title: Clay Shaper, icon: clay_ball, ranks: 2, level: 3, level-step: 2, requires: [dirt_digger], effects: {dig_clay: 10}}
+  bone_finder: {branch: treasure_hunter, at: [1, 5], title: Bone Finder, icon: bone, ranks: 2, level: 3, level-step: 2, requires: [dirt_digger], effects: {dig_treasure: 0.25}}
+  lucky_find: {branch: treasure_hunter, at: [2, 4], title: Lucky Find, icon: gold_ingot, ranks: 3, level: 6, level-step: 2, requires: [clay_shaper, bone_finder], effects: {dig_treasure: 0.5}}
+  potter: {branch: treasure_hunter, at: [3, 3], title: Potter, icon: brick, choice: true, cost: 2, level: 12, requires: [lucky_find], excludes: [fortune_seeker], effects: {dig_clay: 30}}
+  fortune_seeker: {branch: treasure_hunter, at: [3, 5], title: Fortune Seeker, icon: emerald, choice: true, cost: 2, level: 12, requires: [lucky_find], excludes: [potter], effects: {dig_treasure: 1}}
+  sharp_eyes: {branch: treasure_hunter, at: [4, 4], title: Sharp Eyes, icon: spyglass, ranks: 2, level: 16, level-step: 4, requires: [potter, fortune_seeker], effects: {dig_treasure: 0.25, dig_clay: 5}}
+  buried_riches: {branch: treasure_hunter, at: [5, 4], title: Buried Riches, icon: chest, capstone: true, cost: 3, level: 28, requires: [sharp_eyes], effects: {dig_treasure: 1, dig_clay: 10}}
+  treasure_hunter_mastery: {branch: treasure_hunter, at: [6, 4], title: "Treasure Hunter's Mastery", icon: diamond, mastery: true, cost: 0, requires: [buried_riches], effects: {dig_rare_treasure: 1}}
+  archaeologist: {branch: archaeologist, at: [0, 7], title: Archaeologist, icon: brush, ranks: 3, level: 1, level-step: 2, effects: {dig_brush: 5}}
+  light_touch: {branch: archaeologist, at: [1, 6], title: Light Touch, icon: feather, ranks: 2, level: 3, level-step: 2, requires: [archaeologist], effects: {dig_brush_wear: 15}}
+  sand_sifter: {branch: archaeologist, at: [1, 8], title: Sand Sifter, icon: sand, ranks: 2, level: 3, level-step: 2, requires: [archaeologist], effects: {dig_flint: 5}}
+  dust_reader: {branch: archaeologist, at: [2, 7], title: Dust Reader, icon: suspicious_sand, ranks: 3, level: 6, level-step: 2, requires: [light_touch, sand_sifter], effects: {dig_brush: 5}}
+  twice_lucky: {branch: archaeologist, at: [3, 6], title: Twice Lucky, icon: decorated_pot, choice: true, cost: 2, level: 12, requires: [dust_reader], excludes: [gentle_brush], effects: {dig_brush: 15}}
+  gentle_brush: {branch: archaeologist, at: [3, 8], title: Gentle Brush, icon: white_wool, choice: true, cost: 2, level: 12, requires: [dust_reader], excludes: [twice_lucky], effects: {dig_brush_wear: 30}}
+  field_notes: {branch: archaeologist, at: [4, 7], title: Field Notes, icon: writable_book, ranks: 2, level: 16, level-step: 4, requires: [twice_lucky, gentle_brush], effects: {dig_brush: 3, dig_brush_wear: 10}}
+  grand_excavation: {branch: archaeologist, at: [5, 7], title: Grand Excavation, icon: suspicious_gravel, capstone: true, cost: 3, level: 28, requires: [field_notes], effects: {dig_brush: 5, dig_treasure: 0.5}}
+  archaeologist_mastery: {branch: archaeologist, at: [6, 7], title: "Archaeologist's Mastery", icon: spyglass, mastery: true, cost: 0, requires: [grand_excavation], effects: {dig_keen_eye: 1}}

@@ -1,0 +1,46 @@
+# The Smithing skill's tree, read by Core's SkillTree (see SkillDef). Anvils, salvage and the forge.
+# Three branches stacked on the canvas, three rows each; each has a choice, a capstone and ends in its
+# free mastery badge. Node ids are unique across every skill's tree: a hero's ranks are kept as
+# <skill>:<node>.
+branches:
+  anvil_work:
+    title: Anvil Work
+    icon: anvil
+    blurb: "Fewer levels, less prior work, repairs that mend more."
+  salvager:
+    title: Salvager
+    icon: grindstone
+    blurb: "Old gear back into ingots and gems."
+  forgemaster:
+    title: Forgemaster
+    icon: netherite_ingot
+    blurb: "Sturdier armour and weapons, templates kept, netherite."
+
+nodes:
+  smith: {branch: anvil_work, at: [0, 1], title: Smith, icon: anvil, ranks: 3, level: 1, level-step: 2, effects: {smith_discount: 4}}
+  careful_work: {branch: anvil_work, at: [1, 0], title: Careful Work, icon: iron_ingot, ranks: 2, level: 3, level-step: 2, requires: [smith], effects: {smith_rework: 15}}
+  mender: {branch: anvil_work, at: [1, 2], title: Mender, icon: iron_nugget, ranks: 2, level: 3, level-step: 2, requires: [smith], effects: {smith_mend: 15}}
+  journeyman: {branch: anvil_work, at: [2, 1], title: Journeyman, icon: chipped_anvil, ranks: 3, level: 6, level-step: 2, requires: [careful_work, mender], effects: {smith_discount: 4}}
+  thrifty: {branch: anvil_work, at: [3, 0], title: Thrifty, icon: emerald, choice: true, cost: 2, level: 12, requires: [journeyman], excludes: [restorer], effects: {smith_discount: 16}}
+  restorer: {branch: anvil_work, at: [3, 2], title: Restorer, icon: experience_bottle, choice: true, cost: 2, level: 12, requires: [journeyman], excludes: [thrifty], effects: {smith_mend: 50, smith_rework: 20}}
+  masters_eye: {branch: anvil_work, at: [4, 1], title: "Master's Eye", icon: name_tag, ranks: 2, level: 16, level-step: 4, requires: [thrifty, restorer], effects: {smith_rework: 15, smith_discount: 5}}
+  master_smith: {branch: anvil_work, at: [5, 1], title: Master Smith, icon: damaged_anvil, capstone: true, cost: 3, level: 28, requires: [masters_eye], effects: {smith_no_limit: 1, smith_discount: 10}}
+  anvil_work_mastery: {branch: anvil_work, at: [6, 1], title: "Smith's Mastery", icon: smithing_table, mastery: true, cost: 0, requires: [master_smith], effects: {smith_anvil_save: 1}}
+  salvager: {branch: salvager, at: [0, 4], title: Salvager, icon: grindstone, ranks: 3, level: 1, level-step: 2, effects: {smith_salvage: 10}}
+  scrap_sorter: {branch: salvager, at: [1, 3], title: Scrap Sorter, icon: iron_nugget, ranks: 2, level: 3, level-step: 2, requires: [salvager], effects: {smith_salvage: 5}}
+  patchwork: {branch: salvager, at: [1, 5], title: Patchwork, icon: leather, ranks: 2, level: 3, level-step: 2, requires: [salvager], effects: {smith_gear_wear: 5}}
+  recycler: {branch: salvager, at: [2, 4], title: Recycler, icon: hopper, ranks: 3, level: 6, level-step: 2, requires: [scrap_sorter, patchwork], effects: {smith_salvage: 5}}
+  thorough: {branch: salvager, at: [3, 3], title: Thorough, icon: iron_block, choice: true, cost: 2, level: 12, requires: [recycler], excludes: [field_repairs], effects: {smith_salvage: 15}}
+  field_repairs: {branch: salvager, at: [3, 5], title: Field Repairs, icon: leather_chestplate, choice: true, cost: 2, level: 12, requires: [recycler], excludes: [thorough], effects: {smith_gear_wear: 15, smith_mend: 10}}
+  reclaimer: {branch: salvager, at: [4, 4], title: Reclaimer, icon: chest_minecart, ranks: 2, level: 16, level-step: 4, requires: [thorough, field_repairs], effects: {smith_salvage: 3, smith_gear_wear: 5}}
+  breaker_of_arms: {branch: salvager, at: [5, 4], title: Breaker of Arms, icon: iron_sword, capstone: true, cost: 3, level: 28, requires: [reclaimer], effects: {smith_salvage: 4, smith_gear_wear: 5}}
+  salvager_mastery: {branch: salvager, at: [6, 4], title: "Salvager's Mastery", icon: enchanted_book, mastery: true, cost: 0, requires: [breaker_of_arms], effects: {smith_salvage_book: 1}}
+  forgemaster: {branch: forgemaster, at: [0, 7], title: Forgemaster, icon: blast_furnace, ranks: 3, level: 1, level-step: 2, effects: {smith_gear_wear: 3}}
+  template_keeper: {branch: forgemaster, at: [1, 6], title: Template Keeper, icon: paper, ranks: 2, level: 3, level-step: 2, requires: [forgemaster], effects: {smith_template: 5}}
+  quench: {branch: forgemaster, at: [1, 8], title: Quench, icon: water_bucket, ranks: 2, level: 3, level-step: 2, requires: [forgemaster], effects: {smith_gear_wear: 3}}
+  armourer: {branch: forgemaster, at: [2, 7], title: Armourer, icon: iron_chestplate, ranks: 3, level: 6, level-step: 2, requires: [template_keeper, quench], effects: {smith_gear_wear: 3}}
+  copyist: {branch: forgemaster, at: [3, 6], title: Copyist, icon: netherite_upgrade_smithing_template, choice: true, cost: 2, level: 12, requires: [armourer], excludes: [hardened_plate], effects: {smith_template: 25}}
+  hardened_plate: {branch: forgemaster, at: [3, 8], title: Hardened Plate, icon: diamond_chestplate, choice: true, cost: 2, level: 12, requires: [armourer], excludes: [copyist], effects: {smith_gear_wear: 12}}
+  ancient_craft: {branch: forgemaster, at: [4, 7], title: Ancient Craft, icon: ancient_debris, ranks: 2, level: 16, level-step: 4, requires: [copyist, hardened_plate], effects: {smith_template: 5, smith_gear_wear: 2}}
+  netherwright: {branch: forgemaster, at: [5, 7], title: Netherwright, icon: netherite_ingot, capstone: true, cost: 3, level: 28, requires: [ancient_craft], effects: {smith_template: 5, smith_gear_wear: 10}}
+  forgemaster_mastery: {branch: forgemaster, at: [6, 7], title: "Forgemaster's Mastery", icon: netherite_scrap, mastery: true, cost: 0, requires: [netherwright], effects: {smith_netherite_scrap: 1}}

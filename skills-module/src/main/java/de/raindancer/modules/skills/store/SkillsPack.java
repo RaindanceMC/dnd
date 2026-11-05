@@ -71,7 +71,9 @@ public final class SkillsPack {
     /** The branches' paintings, in this order from U+E000 in the font rainsadventurers:tree_scene. */
     static final List<String> SCENES = List.of("vitality", "might", "marksman", "shadow", "arcana",
             "guardian", "warden", "arms", "fury", "trickshot", "ranger", "acrobatics", "rogue", "mysticism",
-            "battlemage");
+            "battlemage",
+            "prospector", "delver", "veinbreaker", "digger", "treasure_hunter", "archaeologist",
+            "lumberjack", "forester", "feller", "anvil_work", "salvager", "forgemaster");
     private static final net.kyori.adventure.text.format.TextColor TREE_INK =
             net.kyori.adventure.text.format.TextColor.color(0xF1E4C6);
 

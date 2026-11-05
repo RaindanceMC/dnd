@@ -136,6 +136,114 @@
    ]
   },
   {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/prospector.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue00f"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/delver.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue010"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/veinbreaker.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue011"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/digger.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue012"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/treasure_hunter.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue013"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/archaeologist.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue014"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/lumberjack.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue015"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/forester.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue016"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/feller.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue017"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/anvil_work.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue018"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/salvager.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue019"
+   ]
+  },
+  {
+   "type": "bitmap",
+   "file": "rainsadventurers:font/tree_scene/forgemaster.png",
+   "ascent": 13,
+   "height": 222,
+   "chars": [
+    "\ue01a"
+   ]
+  },
+  {
    "type": "space",
    "advances": {
     "\uf808": -8,

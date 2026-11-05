@@ -1,0 +1,46 @@
+# The Mining skill's tree, read by Core's SkillTree (see SkillDef). Ores, depth and veins.
+# Three branches stacked on the canvas, three rows each; each has a choice, a capstone and ends in its
+# free mastery badge. Node ids are unique across every skill's tree: a hero's ranks are kept as
+# <skill>:<node>.
+branches:
+  prospector:
+    title: Prospector
+    icon: diamond_ore
+    blurb: "Ores twice over and more experience from them."
+  delver:
+    title: Delver
+    icon: iron_pickaxe
+    blurb: "A faster pickaxe that lasts, haste after ore, eyes for the dark."
+  veinbreaker:
+    title: Veinbreaker
+    icon: redstone_ore
+    blurb: "Crouch, and the whole vein comes with the first ore."
+
+nodes:
+  ore_finder: {branch: prospector, at: [0, 1], title: Ore Finder, icon: iron_ore, ranks: 3, level: 1, level-step: 2, effects: {mine_ore_double: 4}}
+  assayer: {branch: prospector, at: [1, 0], title: Assayer, icon: gold_nugget, ranks: 2, level: 3, level-step: 2, requires: [ore_finder], effects: {mine_ore_xp: 15}}
+  keen_assayer: {branch: prospector, at: [1, 2], title: Keen Assayer, icon: compass, ranks: 2, level: 3, level-step: 2, requires: [ore_finder], effects: {mine_ore_xp: 10}}
+  rich_seams: {branch: prospector, at: [2, 1], title: Rich Seams, icon: raw_iron, ranks: 3, level: 6, level-step: 2, requires: [assayer, keen_assayer], effects: {mine_ore_double: 4}}
+  lucky_strike: {branch: prospector, at: [3, 0], title: Lucky Strike, icon: emerald, choice: true, cost: 2, level: 12, requires: [rich_seams], excludes: [deep_reader], effects: {mine_ore_double: 12}}
+  deep_reader: {branch: prospector, at: [3, 2], title: Deep Reader, icon: recovery_compass, choice: true, cost: 2, level: 12, requires: [rich_seams], excludes: [lucky_strike], effects: {mine_ore_xp: 50}}
+  gem_eye: {branch: prospector, at: [4, 1], title: Gem Eye, icon: diamond, ranks: 2, level: 16, level-step: 4, requires: [lucky_strike, deep_reader], effects: {mine_ore_double: 3, mine_ore_xp: 10}}
+  gem_cutter: {branch: prospector, at: [5, 1], title: Gem Cutter, icon: amethyst_shard, capstone: true, cost: 3, level: 28, requires: [gem_eye], effects: {mine_ore_double: 8, mine_ore_xp: 30}}
+  prospector_mastery: {branch: prospector, at: [6, 1], title: "Prospector's Mastery", icon: diamond_ore, mastery: true, cost: 0, requires: [gem_cutter], effects: {mine_motherlode: 3}}
+  tunneler: {branch: delver, at: [0, 4], title: Tunneler, icon: stone_pickaxe, ranks: 3, level: 1, level-step: 2, effects: {mine_speed: 5}}
+  nimble_pick: {branch: delver, at: [1, 3], title: Nimble Pick, icon: sugar, ranks: 2, level: 3, level-step: 2, requires: [tunneler], effects: {mine_haste: 2}}
+  tempered_pick: {branch: delver, at: [1, 5], title: Tempered Pick, icon: iron_ingot, ranks: 2, level: 3, level-step: 2, requires: [tunneler], effects: {mine_wear: 10}}
+  stonebreaker: {branch: delver, at: [2, 4], title: Stonebreaker, icon: iron_pickaxe, ranks: 3, level: 6, level-step: 2, requires: [nimble_pick, tempered_pick], effects: {mine_speed: 5}}
+  ore_rush: {branch: delver, at: [3, 3], title: Ore Rush, icon: golden_pickaxe, choice: true, cost: 2, level: 12, requires: [stonebreaker], excludes: [deep_sight], effects: {mine_haste: 6}}
+  deep_sight: {branch: delver, at: [3, 5], title: Deep Sight, icon: ender_eye, choice: true, cost: 2, level: 12, requires: [stonebreaker], excludes: [ore_rush], effects: {mine_deep_sight: 1}}
+  hardened_pick: {branch: delver, at: [4, 4], title: Hardened Pick, icon: diamond_pickaxe, ranks: 2, level: 16, level-step: 4, requires: [ore_rush, deep_sight], effects: {mine_wear: 10, mine_speed: 5}}
+  deep_delver: {branch: delver, at: [5, 4], title: Deep Delver, icon: netherite_pickaxe, capstone: true, cost: 3, level: 28, requires: [hardened_pick], effects: {mine_speed: 20, mine_wear: 15}}
+  delver_mastery: {branch: delver, at: [6, 4], title: "Delver's Mastery", icon: beacon, mastery: true, cost: 0, requires: [deep_delver], effects: {mine_haste_two: 1, mine_haste: 2}}
+  vein_miner: {branch: veinbreaker, at: [0, 7], title: Vein Miner, icon: raw_copper, ranks: 3, level: 1, level-step: 2, effects: {mine_vein: 2}}
+  steady_hand: {branch: veinbreaker, at: [1, 6], title: Steady Hand, icon: iron_nugget, ranks: 2, level: 3, level-step: 2, requires: [vein_miner], effects: {mine_vein_wear: 10}}
+  long_vein: {branch: veinbreaker, at: [1, 8], title: Long Vein, icon: copper_ore, ranks: 2, level: 3, level-step: 2, requires: [vein_miner], effects: {mine_vein: 2}}
+  vein_breaker: {branch: veinbreaker, at: [2, 7], title: Vein Breaker, icon: redstone_ore, ranks: 3, level: 6, level-step: 2, requires: [steady_hand, long_vein], effects: {mine_vein: 2}}
+  wide_vein: {branch: veinbreaker, at: [3, 6], title: Wide Vein, icon: lapis_ore, choice: true, cost: 2, level: 12, requires: [vein_breaker], excludes: [careful_vein], effects: {mine_vein: 8}}
+  careful_vein: {branch: veinbreaker, at: [3, 8], title: Careful Vein, icon: brush, choice: true, cost: 2, level: 12, requires: [vein_breaker], excludes: [wide_vein], effects: {mine_vein_wear: 35}}
+  seam_splitter: {branch: veinbreaker, at: [4, 7], title: Seam Splitter, icon: deepslate_iron_ore, ranks: 2, level: 16, level-step: 4, requires: [wide_vein, careful_vein], effects: {mine_vein: 2, mine_vein_wear: 5}}
+  heart_of_the_mountain: {branch: veinbreaker, at: [5, 7], title: Heart of the Mountain, icon: deepslate_diamond_ore, capstone: true, cost: 3, level: 28, requires: [seam_splitter], effects: {mine_vein: 4, mine_vein_wear: 15}}
+  veinbreaker_mastery: {branch: veinbreaker, at: [6, 7], title: "Veinbreaker's Mastery", icon: lodestone, mastery: true, cost: 0, requires: [heart_of_the_mountain], effects: {mine_vein_magnet: 1}}

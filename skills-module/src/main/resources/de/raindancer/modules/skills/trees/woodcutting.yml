@@ -1,0 +1,46 @@
+# The Woodcutting skill's tree, read by Core's SkillTree (see SkillDef). Logs, leaves and whole trees.
+# Three branches stacked on the canvas, three rows each; each has a choice, a capstone and ends in its
+# free mastery badge. Node ids are unique across every skill's tree: a hero's ranks are kept as
+# <skill>:<node>.
+branches:
+  lumberjack:
+    title: Lumberjack
+    icon: iron_axe
+    blurb: "A faster axe that lasts, and logs twice over."
+  forester:
+    title: Forester
+    icon: oak_sapling
+    blurb: "Saplings, apples and sticks from the leaves — and new trees."
+  feller:
+    title: Feller
+    icon: spruce_log
+    blurb: "Crouch, and the whole tree comes down."
+
+nodes:
+  lumberjack: {branch: lumberjack, at: [0, 1], title: Lumberjack, icon: wooden_axe, ranks: 3, level: 1, level-step: 2, effects: {chop_speed: 5}}
+  oiled_handle: {branch: lumberjack, at: [1, 0], title: Oiled Handle, icon: honeycomb, ranks: 2, level: 3, level-step: 2, requires: [lumberjack], effects: {chop_wear: 10}}
+  clean_cut: {branch: lumberjack, at: [1, 2], title: Clean Cut, icon: oak_log, ranks: 2, level: 3, level-step: 2, requires: [lumberjack], effects: {chop_log_double: 2}}
+  woodsman: {branch: lumberjack, at: [2, 1], title: Woodsman, icon: iron_axe, ranks: 3, level: 6, level-step: 2, requires: [oiled_handle, clean_cut], effects: {chop_speed: 5}}
+  heavy_swing: {branch: lumberjack, at: [3, 0], title: Heavy Swing, icon: golden_axe, choice: true, cost: 2, level: 12, requires: [woodsman], excludes: [splitter], effects: {chop_speed: 20}}
+  splitter: {branch: lumberjack, at: [3, 2], title: Splitter, icon: oak_planks, choice: true, cost: 2, level: 12, requires: [woodsman], excludes: [heavy_swing], effects: {chop_log_double: 8}}
+  seasoned: {branch: lumberjack, at: [4, 1], title: Seasoned, icon: diamond_axe, ranks: 2, level: 16, level-step: 4, requires: [heavy_swing, splitter], effects: {chop_log_double: 2, chop_wear: 10}}
+  old_growth: {branch: lumberjack, at: [5, 1], title: Old Growth, icon: netherite_axe, capstone: true, cost: 3, level: 28, requires: [seasoned], effects: {chop_speed: 20, chop_log_double: 4, chop_wear: 15}}
+  lumberjack_mastery: {branch: lumberjack, at: [6, 1], title: "Lumberjack's Mastery", icon: dark_oak_log, mastery: true, cost: 0, requires: [old_growth], effects: {chop_log_triple: 3}}
+  forester: {branch: forester, at: [0, 4], title: Forester, icon: oak_sapling, ranks: 3, level: 1, level-step: 2, effects: {chop_sapling: 5}}
+  orchard: {branch: forester, at: [1, 3], title: Orchard, icon: apple, ranks: 2, level: 3, level-step: 2, requires: [forester], effects: {chop_apple: 3}}
+  twig_gatherer: {branch: forester, at: [1, 5], title: Twig Gatherer, icon: stick, ranks: 2, level: 3, level-step: 2, requires: [forester], effects: {chop_sticks: 10}}
+  green_thumb: {branch: forester, at: [2, 4], title: Green Thumb, icon: birch_sapling, ranks: 3, level: 6, level-step: 2, requires: [orchard, twig_gatherer], effects: {chop_sapling: 5}}
+  orchard_keeper: {branch: forester, at: [3, 3], title: Orchard Keeper, icon: golden_apple, choice: true, cost: 2, level: 12, requires: [green_thumb], excludes: [seed_saver], effects: {chop_apple: 10}}
+  seed_saver: {branch: forester, at: [3, 5], title: Seed Saver, icon: jungle_sapling, choice: true, cost: 2, level: 12, requires: [green_thumb], excludes: [orchard_keeper], effects: {chop_sapling: 15}}
+  canopy_walker: {branch: forester, at: [4, 4], title: Canopy Walker, icon: oak_leaves, ranks: 2, level: 16, level-step: 4, requires: [orchard_keeper, seed_saver], effects: {chop_apple: 2, chop_sticks: 10}}
+  ancient_grove: {branch: forester, at: [5, 4], title: Ancient Grove, icon: cherry_sapling, capstone: true, cost: 3, level: 28, requires: [canopy_walker], effects: {chop_sapling: 5, chop_apple: 5, chop_sticks: 10}}
+  forester_mastery: {branch: forester, at: [6, 4], title: "Forester's Mastery", icon: bone_meal, mastery: true, cost: 0, requires: [ancient_grove], effects: {chop_replant: 1}}
+  feller: {branch: feller, at: [0, 7], title: Feller, icon: stone_axe, ranks: 3, level: 1, level-step: 2, effects: {chop_timber: 4}}
+  steady_swing: {branch: feller, at: [1, 6], title: Steady Swing, icon: iron_nugget, ranks: 2, level: 3, level-step: 2, requires: [feller], effects: {chop_timber_wear: 10}}
+  tall_timber: {branch: feller, at: [1, 8], title: Tall Timber, icon: spruce_log, ranks: 2, level: 3, level-step: 2, requires: [feller], effects: {chop_timber: 6}}
+  treefeller: {branch: feller, at: [2, 7], title: Treefeller, icon: jungle_log, ranks: 3, level: 6, level-step: 2, requires: [steady_swing, tall_timber], effects: {chop_timber: 8}}
+  big_timber: {branch: feller, at: [3, 6], title: Big Timber, icon: dark_oak_log, choice: true, cost: 2, level: 12, requires: [treefeller], excludes: [gentle_fall], effects: {chop_timber: 24}}
+  gentle_fall: {branch: feller, at: [3, 8], title: Gentle Fall, icon: feather, choice: true, cost: 2, level: 12, requires: [treefeller], excludes: [big_timber], effects: {chop_timber_wear: 35}}
+  ringbark: {branch: feller, at: [4, 7], title: Ringbark, icon: stripped_oak_log, ranks: 2, level: 16, level-step: 4, requires: [big_timber, gentle_fall], effects: {chop_timber: 4, chop_timber_wear: 5}}
+  forest_giant: {branch: feller, at: [5, 7], title: Forest Giant, icon: mangrove_log, capstone: true, cost: 3, level: 28, requires: [ringbark], effects: {chop_timber: 16, chop_timber_wear: 15}}
+  feller_mastery: {branch: feller, at: [6, 7], title: "Feller's Mastery", icon: shears, mastery: true, cost: 0, requires: [forest_giant], effects: {chop_clear_canopy: 1}}
