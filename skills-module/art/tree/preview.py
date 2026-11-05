@@ -70,7 +70,7 @@ def page(branch, tree, ranks, left=0):
         if img:
             window.alpha_composite(img, (8 + 36 * (node["at"][0] - left), 18 + 36 * node["at"][1]))
     for col, name in ((0, "arrow"), (2, "spectral_arrow"), (3, "arrow"), (4, tree["branches"][branch]["icon"]),
-                      (5, "arrow"), (7, "spectral_arrow"), (8, "barrier")):
+                      (5, "arrow"), (6, "spectral_arrow"), (7, "writable_book"), (8, "barrier")):
         img = icon(name)
         if img:
             window.alpha_composite(img, (8 + 18 * col, 18 + 18 * 5))
