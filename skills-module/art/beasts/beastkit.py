@@ -12,6 +12,7 @@ import math
 import os
 import random
 import re
+import zlib
 import sys
 
 from PIL import Image, ImageDraw
@@ -337,3 +338,208 @@ def frame(name, time):
     """Shows animation name at time in the viewport (for shots)."""
     return eval_js("""(() => { const a = Animation.all.find(x => x.name === %s); a.select();
       Timeline.setTime(%s); Animator.preview(); return a.name; })()""" % (json.dumps(name), json.dumps(time)))
+
+
+# ------------------------------------------------------------------------------------------------ shared painters
+# Used by every beast: material painters for Atlas.tile, face painters for Atlas.paint, armour plates, animation keys.
+
+def ramp_at(ramp, k):
+    k = max(0.0, min(0.999, k))
+    i = k * (len(ramp) - 1)
+    return mix(ramp[int(i)], ramp[min(len(ramp) - 1, int(i) + 1)], i - int(i))
+
+
+def feathers(tile, rng, ramp, w=10, h=8, rim=None):
+    """Contour feathers as a scale pattern: each feather a rounded tip pointing down with a dark outline, a lit
+    upper part and a faint shaft; rows overlap so the row below shows under each tip. Big enough that a single cube
+    face shows whole feathers."""
+    px = tile.load()
+    size = tile.size[0]
+    for y in range(size):
+        for x in range(size):
+            px[x, y] = ramp[0] + (255,)
+    for row in range(-2, size // h + 2):
+        top = row * h
+        shift = (w // 2) if row % 2 else 0
+        for col in range(-1, size // w + 2):
+            left = col * w + shift
+            tone = rng.uniform(0.38, 0.62)
+            cx = left + (w - 1) / 2
+            for yy in range(h + 4):
+                for xx in range(w):
+                    x, y = left + xx, top + yy
+                    if not (0 <= x < size and 0 <= y < size):
+                        continue
+                    dx = (xx - (w - 1) / 2) / (w / 2)
+                    curve = 1 - dx * dx
+                    bottom = h + 3 * curve
+                    if yy > bottom:
+                        continue
+                    if yy > bottom - 1 or abs(dx) > 0.92:
+                        c = rim if (rim and yy > bottom - 1) else ramp[0]
+                    else:
+                        k = tone + 0.35 * (1 - yy / (h + 3)) - 0.15 * max(0.0, dx)
+                        c = ramp_at(ramp, k)
+                        if abs(x - cx) < 0.6 and yy < h - 1:
+                            c = mix(c, ramp[-1], 0.3)
+                    px[x, y] = c + (255,)
+
+
+def fur(tile, rng, ramp, base=0.5, span=0.3):
+    """Short soft fur: smooth tone, lighter on top, fine 1-px strands in clumps — no specks."""
+    px = tile.load()
+    size = tile.size[0]
+    clumps = [[rng.uniform(-0.05, 0.05) for _ in range(size // 4 + 1)] for _ in range(size // 6 + 1)]
+    for y in range(size):
+        for x in range(size):
+            k = base + span * (1 - y / size) + clumps[y // 6][x // 4]
+            if (x + (y // 6)) % 4 == 0:
+                k -= 0.06
+            px[x, y] = ramp_at(ramp, k) + (255,)
+
+
+def smooth(tile, rng, ramp, top=0.85, bottom=0.25):
+    px = tile.load()
+    size = tile.size[0]
+    for y in range(size):
+        for x in range(size):
+            px[x, y] = ramp_at(ramp, top + (bottom - top) * y / size) + (255,)
+
+
+def scales(tile, rng, ramp):
+    px = tile.load()
+    size = tile.size[0]
+    for y in range(size):
+        for x in range(size):
+            row = y // 2
+            ox = (x + (1 if row % 2 else 0)) % 3
+            k = 0.7 if ox == 1 else 0.45
+            if y % 2 == 1 and ox == 0:
+                k = 0.15
+            px[x, y] = ramp_at(ramp, k) + (255,)
+
+
+def plate_edge(tile, rng):
+    """The thin sides of a plate: dark steel."""
+    px = tile.load()
+    for y in range(tile.size[0]):
+        for x in range(tile.size[0]):
+            px[x, y] = mix(hexrgb("#5d646c"), hexrgb("#8e969f"), (x * 7 + y * 3) % 5 / 8) + (255,)
+
+
+def metal(scallop=False, lames=0, rivets=True):
+    """A plate's outer face, painted whole: light steel (a tint makes it iron, gold, diamond, netherite), lit from the
+    top with a soft sheen across, an engraved line just inside the rim, rivets in the upper corners, engraved lines
+    where lames overlap and, if asked, a scalloped lower edge."""
+    def paint(image):
+        w, h = image.size
+        px = image.load()
+
+        def bottom(x):
+            if not scallop:
+                return h
+            k = (x % 6) - 2.5
+            return h - 2.2 * (k * k) / 6.25
+        for y in range(h):
+            for x in range(w):
+                edge = bottom(x)
+                if y >= edge:
+                    continue
+                lit = 1 - y / max(1, h)
+                sheen = max(0.0, 1 - abs((x + y) % max(8, w) - max(8, w) * 0.35) / 3)
+                c = mix(hexrgb("#7f8891"), hexrgb("#e6eaee"), 0.35 + 0.45 * lit + 0.2 * sheen)
+                inset = min(x, w - 1 - x, y, edge - 1 - y)
+                if inset < 1:
+                    c = hexrgb("#4e555c")
+                elif inset < 2:
+                    c = hexrgb("#f2f4f6")
+                elif lames and h > 6 and y % max(3, h // lames) == 0:
+                    c = hexrgb("#5d646c")
+                if rivets and y == 2 and x in (2, w - 3) and w > 6:
+                    c = hexrgb("#3f454b")
+                px[x, y] = c + (255,)
+    return paint
+
+
+def noise(*key):
+    return (zlib.crc32(repr(key).encode()) & 0xFFFF) / 0xFFFF
+
+
+def scale_rows(x, z, za, rows, fw, rh, tip):
+    """Which feather of a shingled block covers (x, z): rows of fw-wide feathers starting at za, each rh deep plus a
+    rounded tip lying over the row behind. The front row lies on top. @return (row, col, u, distance to the tip,
+    depth) or None; u runs -1..1 across the feather."""
+    r = math.floor((z - za) / rh)
+    for rr in (r - 1, r):
+        if not 0 <= rr < rows:
+            continue
+        shift = fw / 2 if rr % 2 else 0
+        col = math.floor((x - shift) / fw)
+        u = ((x - shift) - (col + 0.5) * fw) / (fw / 2)
+        top = za + rr * rh
+        bottom = top + rh + tip * (1 - u * u)
+        if top <= z <= bottom:
+            return rr, col, u, bottom - z, bottom - top
+    return None
+
+
+def lanes(x, x0, width):
+    lane = math.floor((x - x0) / width)
+    return lane, ((x - x0) - (lane + 0.5) * width) / (width / 2)
+
+
+def armour_plate(bone, name, frm, to, face, rot=None, origin=None, mirror=True, **look):
+    """A thin plate painted on its outer face, dark steel on its sides; with its twin on the other side unless the
+    plate sits on the middle."""
+    paint = {face: (name, metal(**look))}
+    bone.cube(name + ("_r" if mirror else ""), frm, to, "plate_edge", rot=rot, origin=origin, paint=paint)
+    if mirror:
+        swap = {"east": "west", "west": "east"}
+        mrot = (rot[0], -rot[1]) if rot and rot[0] in ("y", "z") else rot
+        morigin = (-origin[0], origin[1], origin[2]) if origin else None
+        bone.cube(name + "_l", (-to[0], frm[1], frm[2]), (-frm[0], to[1], to[2]), "plate_edge", rot=mrot,
+                  origin=morigin, mirror_uv=True, paint={swap.get(face, face): (name, metal(**look))})
+
+
+def wave(length, amp, phase=0.0, axis=0, base=(0.0, 0.0, 0.0), steps=8, freq=1):
+    """A sine over one loop on one axis, as keys: amp * sin(2 pi (freq * t / length + phase))."""
+    keys = []
+    for i in range(steps + 1):
+        t = length * i / steps
+        v = list(base)
+        v[axis] += round(amp * math.sin(2 * math.pi * (freq * i / steps + phase)), 2)
+        keys.append((t, v))
+    return keys
+
+
+def keys(*pairs):
+    return [(t, list(v)) for t, v in pairs]
+
+
+def with_(*parts):
+    out = {}
+    for part in parts:
+        for bone, chans in part.items():
+            out.setdefault(bone, {}).update(chans)
+    return out
+
+
+def mirror(tracks):
+    return mirrored(tracks)
+
+
+def gait(length, amp, limbs):
+    """Legs walking: limbs = (upper bone, lower bone, phase, bend). Each upper bone swings; its lower joint bends
+    by bend x the swing while the leg comes forward (a quarter cycle on) and stays straight under load."""
+    out = {}
+    for upper, lower, phase, bend in limbs:
+        out[upper] = {"rotation": wave(length, amp, phase)}
+        out[lower] = {"rotation": [(t, [max(0.0, v[0]) * bend, 0, 0]) for t, v in wave(length, amp * 1.1, phase - 0.25)]}
+    return out
+
+
+def show(prefix, visible):
+    """Shows or hides every bone whose name starts with prefix (armour, a wing set) for pictures."""
+    return eval_js("""(() => { let n = 0; for (const g of Group.all) if (g.name.startsWith(%s)) { n++;
+      g.visibility = %s; g.forEachChild(c => { c.visibility = %s; }, Cube); }
+      Canvas.updateVisibility(); return n; })()""" % (json.dumps(prefix), json.dumps(visible), json.dumps(visible)))
