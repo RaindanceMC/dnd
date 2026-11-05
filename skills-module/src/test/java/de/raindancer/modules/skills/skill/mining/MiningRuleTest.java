@@ -1,6 +1,7 @@
 package de.raindancer.modules.skills.skill.mining;
 
 import org.bukkit.Material;
+import org.bukkit.potion.PotionEffect;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -54,6 +55,8 @@ class MiningRuleTest {
         assertThat(rule.deep(-30, false)).as("the nether has no deep").isFalse();
         assertThat(rule.ours(true, false, MiningRule.NIGHT_VISION_TICKS)).isTrue();
         assertThat(rule.ours(false, true, 3_600)).as("a potion's").isFalse();
+        assertThat(rule.ours(true, false, PotionEffect.INFINITE_DURATION))
+                .as("the Night Vision enchantment's endless one").isFalse();
         assertThat(rule.needsNightVision(MiningRule.NIGHT_VISION_TICKS - 100)).isFalse();
         assertThat(rule.needsNightVision(200)).as("before it starts to flicker").isTrue();
     }

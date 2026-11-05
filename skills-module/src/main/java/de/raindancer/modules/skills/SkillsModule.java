@@ -56,7 +56,7 @@ import java.util.random.RandomGenerator;
  */
 public final class SkillsModule implements FlexModule {
 
-    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Skills", "0.14.3")
+    private static final ModuleInfo INFO = ModuleInfo.of("dnd", "Skills", "0.14.4")
             .describedAs("Skills with trees of their own, levelled by playing, with mastery badges — and magic items.")
             .by("Raindancer118");
 

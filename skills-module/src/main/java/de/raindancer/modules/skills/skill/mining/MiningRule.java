@@ -56,9 +56,12 @@ public final class MiningRule implements ISkillsRule {
         return overworld && y < 0;
     }
 
-    /** Night vision a player has is ours — ambient, without particles, no longer than we lend it. */
+    /**
+     * Night vision a player has is ours — ambient, without particles, no longer than we lend it. An endless one
+     * (the Night Vision enchantment's) counts its ticks as -1 and is never ours.
+     */
     public boolean ours(boolean ambient, boolean particles, int ticks) {
-        return ambient && !particles && ticks <= NIGHT_VISION_TICKS;
+        return ambient && !particles && ticks > 0 && ticks <= NIGHT_VISION_TICKS;
     }
 
     public boolean needsNightVision(int ticksLeft) {
