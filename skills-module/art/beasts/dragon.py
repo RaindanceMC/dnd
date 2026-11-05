@@ -94,6 +94,7 @@ ARM = (("wing_humerus", SHOULDER, 18.0, -25.0), ("wing_forearm", (18.0, -7.0), 3
 FINGERS = ((0.0, 30.0), (-22.5, 28.0), (-45.0, 24.0))   # cube rotation in the hand, length
 FLANK = (6.5, 15.0)   # where the membrane meets the body
 W_PX = 4               # pixels per unit of the painted membrane
+WING_SCALE = 1.6
 
 
 def turn(p, pivot, degrees):
@@ -248,6 +249,7 @@ def build_wing(body):
         hand.cube(f"finger_{n}_end_r", (34.0 + length * 0.55, 26.6, -7.4), (34.0 + length, 27.4, -6.6), "plates",
                   rot=r, origin=o_)
     panel(hand, "wing_hand", 3, (32.0, 66.0, -12.0, 26.0), 27.0)
+    hum.scale(WING_SCALE)   # painted and placed at life size, then grown to a fantasy span
     kit.mirror_x(root, body)
 
 
@@ -304,6 +306,7 @@ def build_folded_wing(body):
     fold.cube("fold_thumb_r", (5.6, 30.2, -13.4), (6.8, 31.2, -11.2), "skin")
     fold.cube("fold_claw_r", (5.8, 29.6, -14.4), (6.6, 31.0, -13.2), "claw")
     fold.rounded("fold_forearm_r", (5.2, 28.8, -9.0), (7.4, 30.8, 6.0), "scale", 0.5)
+    fold.scale(1.15)
     kit.mirror_x(fold, body)
 
 
@@ -332,22 +335,22 @@ def build_rig():
     root = Bone("root", (0, 0, 0))
     body = root.bone("body_main", (0, 20, 4))
     body.rounded("waist", (-6.8, 13.4, -4.0), (6.8, 26.0, 10.0), "scale", 1.6, {"down": "belly", "up": "plates"})
-    body.rounded("hips", (-7.2, 14.0, 8.5), (7.2, 26.6, 18.5), "scale", 1.6, {"down": "belly", "up": "plates"})
-    spine(body, -3.0, 18.0, 25.6, 2.6)
+    body.rounded("hips", (-6.6, 14.4, 8.5), (6.6, 26.2, 18.5), "scale", 1.6, {"down": "belly", "up": "plates"})
+    spine(body, -3.0, 18.0, 25.8, 3.8)
 
     chest = body.bone("chest", (0, 20, -8))
-    chest.rounded("chest", (-7.8, 12.6, -16.8), (7.8, 27.8, -3.0), "scale", 1.8,
+    chest.rounded("chest", (-9.0, 11.6, -18.2), (9.0, 29.0, -2.6), "scale", 2.2,
                   {"north": "belly", "down": "belly", "up": "plates"})
-    spine(chest, -15.0, -3.0, 27.0, 3.0)
+    spine(chest, -16.0, -3.0, 28.6, 4.4)
 
     # the S-neck: five segments rising steeply out of the chest, then bending forward to carry the head level
     parent, z, y = chest, -15.0, 24.0
-    for i, (angle, r) in enumerate(zip((30, 12, 4, -14, -20), (4.3, 3.9, 3.5, 3.2, 3.0))):
+    for i, (angle, r) in enumerate(zip((30, 12, 4, -14, -20), (4.9, 4.3, 3.8, 3.4, 3.1))):
         name = "hi_neck_4" if i == 3 else f"neck_{i + 1}"
         seg = parent.bone(name, (0, y, z), (angle, 0, 0))
         seg.rounded(f"neck_{i + 1}", (-r, y - r, z - 5.0), (r, y + r, z + 0.6), "scale", 0.8,
                     {"down": "belly", "up": "plates"})
-        spine(seg, z - 4.5, z, y + r - 0.2, 2.0 - i * 0.2, step=2.4)
+        spine(seg, z - 4.5, z, y + r - 0.2, 3.0 - i * 0.25, step=2.4)
         parent, z = seg, z - 4.6
     head = parent.bone("head", (0, y, z), (-12, 0, 0))
     hz = z
@@ -417,7 +420,7 @@ def build_rig():
         seg = parent.bone(f"tail_{i + 1}", (0, y, z), (angle, 0, 0))
         seg.rounded(f"tail_{i + 1}", (-r, y - r, z - 0.6), (r, y + r, z + 5.6), "scale", min(0.7, r * 0.3),
                     {"down": "belly", "up": "plates"})
-        spine(seg, z, z + 5.0, y + r - 0.2, max(0.9, 2.0 - i * 0.18), step=2.8)
+        spine(seg, z, z + 5.0, y + r - 0.2, max(1.2, 2.8 - i * 0.25), step=2.8)
         parent, z = seg, z + 5.2
     spade = parent.bone("tail_spade", (0, y, z))
     spade.cube("spade", (-2.2, y - 0.3, z + 0.6), (2.2, y + 0.3, z + 5.0), "plates", rot=("y", 45), origin=(0, y, z + 2.8))
@@ -426,6 +429,7 @@ def build_rig():
     build_wing(body)
     build_folded_wing(body)
     build_armour(body, chest, head)
+    head.scale(1.3)   # a fantasy head: big enough to read from far off, with horns to match
     root.bone("p_rider", (0, 29, 4))
     return root
 
@@ -439,10 +443,10 @@ def build_armour(body, chest, head):
     armour_plate(helm, "helm_snout", (-2.4, y + 1.6, hz - 12.4), (2.4, y + 2.0, hz - 7.0), "up", mirror=False)
     armour_plate(helm, "helm_cheek", (3.9, y - 1.8, hz - 3.6), (4.3, y + 1.0, hz + 0.4), "east", scallop=True)
     peytral = chest.bone("armor_chest", chest.pivot)
-    armour_plate(peytral, "breastplate", (-4.2, 14.0, -17.8), (4.2, 26.0, -17.3), "north", mirror=False, scallop=True,
+    armour_plate(peytral, "breastplate", (-4.6, 13.0, -19.2), (4.6, 27.0, -18.7), "north", mirror=False, scallop=True,
                  lames=3)
-    armour_plate(peytral, "breast_wing", (4.1, 14.0, -17.8), (8.0, 26.0, -17.3), "north", rot=("y", -45),
-                 origin=(4.1, 20.0, -17.55), scallop=True, lames=3)
+    armour_plate(peytral, "breast_wing", (4.5, 13.0, -19.2), (9.0, 27.0, -18.7), "north", rot=("y", -45),
+                 origin=(4.5, 20.0, -18.95), scallop=True, lames=3)
     saddle = body.bone("armor_saddle", body.pivot)
     saddle.cube("saddle", (-5.6, 26.8, -1.0), (5.6, 28.0, 9.0), "leather")
     saddle.cube("saddle_cantle", (-3.6, 27.8, 7.4), (3.6, 29.6, 9.0), "leather")

@@ -56,6 +56,20 @@ class Bone:
         self.cube(name + "_v", (x1 + r, y1, z1 + r), (x2 - r, y2, z2 - r), material, faces=faces)
         self.cube(name + "_d", (x1 + r, y1 + r, z1), (x2 - r, y2 - r, z2), material, faces=faces)
 
+    def scale(self, factor, center=None):
+        """Grows this bone and everything under it by factor about center (default its pivot): pivots, cubes and
+        rotation origins move, rotations stay. Faces painted per pixel keep their painting, just on more pixels."""
+        c = center or list(self.pivot)
+
+        def at(p):
+            return [c[i] + (p[i] - c[i]) * factor for i in range(3)]
+        for b in self.walk():
+            b.pivot = at(b.pivot)
+            for cube in b.cubes:
+                cube["from"], cube["to"], cube["origin"] = at(cube["from"]), at(cube["to"]), at(cube["origin"])
+                cube["inflate"] *= factor
+        return self
+
     def walk(self):
         yield self
         for child in self.children:
@@ -108,7 +122,7 @@ class Atlas:
         self.free = [(x, y) for y in range(0, 256, TILE) for x in range(0, 256, TILE)]
         # painted faces go on shelves: right of the tiles first, then below them
         self.shelves = [[256, 0, SIZE, 256], [0, 256, SIZE, SIZE]]
-        self.cursor = None
+        self.shelf, self.cursor = 0, None
         self.painted = {}
 
     def tile(self, name, painter, seed=1, fixed=False, align=1):
@@ -128,20 +142,21 @@ class Atlas:
         mirrored wing) shares one painting."""
         if key in self.painted:
             return self.painted[key]
-        for shelf in self.shelves:
-            x0, y0, x1, y1 = shelf
-            if self.cursor is None or self.cursor[0] is not shelf:
-                self.cursor = [shelf, x0, y0, 0]
-            _, cx, cy, row = self.cursor
+        while self.shelf < len(self.shelves):
+            x0, y0, x1, y1 = self.shelves[self.shelf]
+            if self.cursor is None:
+                self.cursor = [x0, y0, 0]
+            cx, cy, row = self.cursor
             if cx + w > x1:
                 cx, cy, row = x0, cy + row + 1, 0
             if cy + h > y1:
-                self.cursor = None
+                # this shelf is full: go on with the next one, never back over what is painted
+                self.shelf, self.cursor = self.shelf + 1, None
                 continue
             image = Image.new("RGBA", (w, h), (0, 0, 0, 0))
             painter(image)
             self.image.alpha_composite(image, (cx, cy))
-            self.cursor = [shelf, cx + w + 1, cy, max(row, h)]
+            self.cursor = [cx + w + 1, cy, max(row, h)]
             self.painted[key] = [cx, cy, cx + w, cy + h]
             return self.painted[key]
         raise RuntimeError("the texture is full")
