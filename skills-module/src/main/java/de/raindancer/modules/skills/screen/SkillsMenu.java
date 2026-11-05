@@ -34,12 +34,12 @@ public final class SkillsMenu extends PaginatedMenu<SkillView> implements ISkill
 
     @Override
     protected Component title() {
-        return Component.text("Skills", NamedTextColor.DARK_GRAY);
+        return Component.text("Your skills", NamedTextColor.DARK_GRAY);
     }
 
     @Override
     public String breadcrumb() {
-        return "Skills";
+        return "Your skills";
     }
 
     @Override
