@@ -9,7 +9,8 @@ import java.util.stream.Stream;
 
 /**
  * The plugin was RainsAdventurers until 0.13.0, so a server that updates has its settings in plugins/RainsAdventurers.
- * On the first start as RainsSkills they are copied over; the old folder is left as it is.
+ * On the first start as RainsSkills they are copied over — all but the resource pack it wrote out; the old folder is
+ * left as it is.
  */
 public final class OldFolder {
 
@@ -30,7 +31,10 @@ public final class OldFolder {
             return 0;
         }
         try (Stream<Path> walk = Files.walk(old)) {
-            List<Path> files = walk.filter(Files::isRegularFile).toList();
+            // Not the resource pack it wrote out: the plugin writes its own on every start, and anything stale there
+            // would be sent to every player.
+            List<Path> files = walk.filter(Files::isRegularFile)
+                    .filter(file -> !old.relativize(file).getName(0).toString().equals("pack")).toList();
             int copied = 0;
             for (Path file : files) {
                 Path target = own.resolve(old.relativize(file).toString());

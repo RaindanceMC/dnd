@@ -31,6 +31,19 @@ class OldFolderTest {
     }
 
     @Test
+    @DisplayName("the resource pack the old plugin wrote out is left behind: the new one writes its own on every start")
+    void notThePack() throws IOException {
+        Path old = Files.createDirectories(plugins.resolve("RainsAdventurers"));
+        Files.writeString(old.resolve("config.yml"), "a: 1\n");
+        Files.createDirectories(old.resolve("pack/looks/assets"));
+        Files.writeString(old.resolve("pack/looks/assets/old.png"), "x");
+        Path own = plugins.resolve("RainsSkills");
+
+        assertThat(OldFolder.carryOver(own)).isEqualTo(1);
+        assertThat(own.resolve("pack")).doesNotExist();
+    }
+
+    @Test
     @DisplayName("once RainsSkills has a config of its own, nothing is copied again — not over the owner's changes")
     void onlyOnce() throws IOException {
         Path old = Files.createDirectories(plugins.resolve("RainsAdventurers"));
